@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>چت عشق با وفا</title>
+<style>
+body {
+  margin: 0;
+  font-family: Tahoma, sans-serif;
+  background: #f3f0f7;
+  color: #292333;
+}
+header {
+  background: #713b91;
+  color: white;
+  padding: 22px;
+  text-align: center;
+}
+main {
+  max-width: 600px;
+  margin: 25px auto;
+  padding: 15px;
+}
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 3px 12px #ddd;
+}
+input, button {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 13px;
+  margin-top: 10px;
+  border-radius: 9px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+button {
+  background: #713b91;
+  color: white;
+  border: none;
+}
+#messages {
+  height: 300px;
+  overflow-y: auto;
+  background: #faf8fc;
+  padding: 12px;
+  border-radius: 10px;
+}
+.msg {
+  background: #eadcf3;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+<header>
+  <h2>❤️ چت عشق با وفا ❤️</h2>
+  <p>دوستی، مهربانی و احترام</p>
+</header>
+
+<main>
+  <div class="panel" id="login">
+    <h3>خوش آمدید</h3>
+    <input id="username" placeholder="نام کاربری خود را بنویسید">
+    <button onclick="enterChat()">ورود به چت</button>
+  </div>
+
+  <div class="panel" id="chat" hidden>
+    <h3 id="welcome"></h3>
+    <div id="messages"></div>
+    <input id="message" placeholder="پیام خود را بنویسید">
+    <button onclick="sendMessage()">ارسال پیام ❤️</button>
+  </div>
+</main>
+
+<script>
+let user = "";
+
+function enterChat() {
+  user = document.getElementById("username").value.trim();
+  if (!user) {
+    alert("لطفاً نام کاربری بنویسید");
+    return;
+  }
+  document.getElementById("login").hidden = true;
+  document.getElementById("chat").hidden = false;
+  document.getElementById("welcome").textContent =
+    "سلام " + user + " عزیز ❤️";
+}
+
+function sendMessage() {
+  const input = document.getElementById("message");
+  const value = input.value.trim();
+  if (!value) return;
+
+  const item = document.createElement("div");
+  item.className = "msg";
+  item.textContent = user + ": " + value;
+  document.getElementById("messages").appendChild(item);
+  input.value = "";
+}
+</script>
+</body>
+</html>
