@@ -1,1 +1,0 @@
-# chat-eshgh-ba-vafa-2026
