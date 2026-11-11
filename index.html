@@ -1,109 +1,214 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>چت عشق با وفا</title>
 <style>
-body {
-  margin: 0;
-  font-family: Tahoma, sans-serif;
-  background: #f3f0f7;
-  color: #292333;
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Tahoma,sans-serif;
+ background:#f3f0f7;color:#292333
 }
-header {
-  background: #713b91;
-  color: white;
-  padding: 22px;
-  text-align: center;
+header{
+ background:#713b91;color:white;
+ text-align:center;padding:15px
 }
-main {
-  max-width: 600px;
-  margin: 25px auto;
-  padding: 15px;
+main{max-width:850px;margin:18px auto;padding:10px}
+.panel{
+ background:white;border-radius:15px;
+ padding:15px;box-shadow:0 3px 12px #ddd
 }
-.panel {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 3px 12px #ddd;
+input,button{
+ width:100%;padding:12px;margin-top:10px;
+ border:1px solid #ccc;border-radius:9px;font-size:15px
 }
-input, button {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 13px;
-  margin-top: 10px;
-  border-radius: 9px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+button{background:#713b91;color:white;border:0}
+#layout{display:grid;grid-template-columns:220px 1fr;gap:12px}
+#users{min-height:390px}
+.user{
+ display:flex;align-items:center;gap:9px;
+ padding:9px 3px;border-bottom:1px solid #eee
 }
-button {
-  background: #713b91;
-  color: white;
-  border: none;
+.avatar{
+ width:43px;height:43px;border-radius:50%;
+ object-fit:cover;background:#eadcf3
 }
-#messages {
-  height: 300px;
-  overflow-y: auto;
-  background: #faf8fc;
-  padding: 12px;
-  border-radius: 10px;
+.dot{
+ width:10px;height:10px;border-radius:50%;
+ background:#20bd62;display:inline-block
 }
-.msg {
-  background: #eadcf3;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 10px;
+.status{font-size:11px;color:#16a052}
+#messages{
+ height:310px;overflow-y:auto;
+ background:#faf8fc;padding:10px;border-radius:10px
+}
+.msg{
+ background:#eadcf3;padding:10px;
+ margin:8px 0;border-radius:10px;overflow-wrap:anywhere
+}
+.me{background:#d9f2df}
+#profile{text-align:center;margin-bottom:12px}
+#myPhoto{width:75px;height:75px;border-radius:50%;object-fit:cover}
+#sendArea{display:flex;gap:7px}
+#sendArea input{flex:1;min-width:0}
+#sendArea button{width:90px}
+@media(max-width:550px){
+ #layout{grid-template-columns:1fr}
+ #users{min-height:auto}
+ #userList{display:flex;overflow-x:auto;gap:12px}
+ .user{min-width:105px;flex-direction:column}
+ #messages{height:300px}
 }
 </style>
 </head>
 <body>
 <header>
-  <h2>❤️ چت عشق با وفا ❤️</h2>
-  <p>دوستی، مهربانی و احترام</p>
+ <h2>❤️ چت عشق با وفا ❤️</h2>
+ <p>دوستی، مهربانی و احترام</p>
 </header>
 
 <main>
-  <div class="panel" id="login">
-    <h3>خوش آمدید</h3>
-    <input id="username" placeholder="نام کاربری خود را بنویسید">
-    <button onclick="enterChat()">ورود به چت</button>
+ <div class="panel" id="login">
+  <h3>خوش آمدید ❤️</h3>
+  <input id="username" placeholder="نام کاربری خود را بنویسید">
+  <label>عکس پروفایل خود را انتخاب کنید:</label>
+  <input type="file" id="photo" accept="image/*">
+  <button onclick="enterChat()">ورود به چت</button>
+ </div>
+
+ <div id="chat" hidden>
+  <div class="panel" id="profile">
+   <img id="myPhoto" class="avatar"
+    src="https://placehold.co/100x100?text=User">
+   <h3 id="welcome"></h3>
+   <span class="dot"></span>
+   <span class="status">آنلاین</span>
+   <button onclick="logout()">خروج از چت</button>
   </div>
 
-  <div class="panel" id="chat" hidden>
-    <h3 id="welcome"></h3>
+  <div id="layout">
+   <div class="panel" id="users">
+    <h3>👥 کاربران آنلاین</h3>
+    <div id="userList"></div>
+   </div>
+
+   <div class="panel">
+    <h3>💬 گفت‌وگوی عمومی</h3>
     <div id="messages"></div>
-    <input id="message" placeholder="پیام خود را بنویسید">
-    <button onclick="sendMessage()">ارسال پیام ❤️</button>
+    <div id="sendArea">
+     <input id="message" placeholder="پیام خود را بنویسید">
+     <button onclick="sendMessage()">ارسال ❤️</button>
+    </div>
+   </div>
   </div>
+ </div>
 </main>
 
 <script>
-let user = "";
+let user="";
+let avatar="";
+let heartbeat=null;
 
-function enterChat() {
-  user = document.getElementById("username").value.trim();
-  if (!user) {
-    alert("لطفاً نام کاربری بنویسید");
-    return;
+function enterChat(){
+ user=document.getElementById("username").value.trim();
+ if(!user){alert("نام کاربری را بنویسید");return}
+
+ const file=document.getElementById("photo").files[0];
+ if(file){
+  if(file.size>2*1024*1024){
+   alert("حجم عکس باید کمتر از ۲ مگابایت باشد");
+   return;
   }
-  document.getElementById("login").hidden = true;
-  document.getElementById("chat").hidden = false;
-  document.getElementById("welcome").textContent =
-    "سلام " + user + " عزیز ❤️";
+  const reader=new FileReader();
+  reader.onload=()=>{
+   avatar=reader.result;
+   startChat();
+  };
+  reader.readAsDataURL(file);
+ }else{
+  avatar="https://placehold.co/100x100?text=User";
+  startChat();
+ }
 }
 
-function sendMessage() {
-  const input = document.getElementById("message");
-  const value = input.value.trim();
-  if (!value) return;
-
-  const item = document.createElement("div");
-  item.className = "msg";
-  item.textContent = user + ": " + value;
-  document.getElementById("messages").appendChild(item);
-  input.value = "";
+function startChat(){
+ document.getElementById("login").hidden=true;
+ document.getElementById("chat").hidden=false;
+ document.getElementById("welcome").textContent="سلام "+user+" عزیز ❤️";
+ document.getElementById("myPhoto").src=avatar;
+ updatePresence();
+ heartbeat=setInterval(updatePresence,15000);
+ renderUsers();
 }
+
+function updatePresence(){
+ let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
+ users[user]={name:user,photo:avatar,lastSeen:Date.now()};
+ localStorage.setItem("chatUsers",JSON.stringify(users));
+ renderUsers();
+}
+
+function renderUsers(){
+ let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
+ let now=Date.now();
+ Object.keys(users).forEach(k=>{
+  if(now-users[k].lastSeen>60000)delete users[k];
+ });
+ localStorage.setItem("chatUsers",JSON.stringify(users));
+
+ const list=document.getElementById("userList");
+ list.innerHTML="";
+ Object.values(users).forEach(u=>{
+  const item=document.createElement("div");
+  item.className="user";
+  const img=document.createElement("img");
+  img.className="avatar";
+  img.src=u.photo;
+  const info=document.createElement("div");
+  const name=document.createElement("b");
+  name.textContent=u.name;
+  const status=document.createElement("div");
+  status.innerHTML='<span class="dot"></span> <span class="status">آنلاین</span>';
+  info.append(name,status);
+  item.append(img,info);
+  list.append(item);
+ });
+}
+
+function sendMessage(){
+ const input=document.getElementById("message");
+ const value=input.value.trim();
+ if(!value)return;
+ const item=document.createElement("div");
+ item.className="msg me";
+ item.textContent=user+": "+value;
+ document.getElementById("messages").append(item);
+ input.value="";
+ document.getElementById("messages").scrollTop=
+ document.getElementById("messages").scrollHeight;
+}
+
+function logout(){
+ clearInterval(heartbeat);
+ let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
+ delete users[user];
+ localStorage.setItem("chatUsers",JSON.stringify(users));
+ document.getElementById("chat").hidden=true;
+ document.getElementById("login").hidden=false;
+ document.getElementById("username").value="";
+ user="";
+}
+
+window.addEventListener("beforeunload",()=>{
+ if(user){
+  let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
+  delete users[user];
+  localStorage.setItem("chatUsers",JSON.stringify(users));
+ }
+});
 </script>
 </body>
 </html>
+
