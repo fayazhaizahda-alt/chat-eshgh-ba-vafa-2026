@@ -104,13 +104,13 @@ from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
 import {
  getAuth,createUserWithEmailAndPassword,
- signInWithEmailAndPassword,signOut,deleteUser
+ signInWithEmailAndPassword,signOut
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 
 import {
  getFirestore,collection,doc,setDoc,updateDoc,
  addDoc,query,where,onSnapshot,serverTimestamp,
- runTransaction,getDoc
+ getDoc
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -203,26 +203,11 @@ window.enterChat=async function(){
   const identity=await usernameEmail(name);
 
   if(mode==="register"){
-   const existing=await getDoc(doc(db,"usernameIndex",identity.key));
-   if(existing.exists()){
-    throw new Error("این نام کاربری قبلاً ثبت شده است");
-   }
-
+   // Firebase Authentication keeps the generated username email unique.
+   // This avoids unauthenticated reads/writes to a public username index.
    credential=await createUserWithEmailAndPassword(
     auth,identity.email,password
    );
-
-   try{
-    await runTransaction(db,async tx=>{
-     const ref=doc(db,"usernameIndex",identity.key);
-     const snap=await tx.get(ref);
-     if(snap.exists())throw new Error("این نام کاربری قبلاً ثبت شده است");
-     tx.set(ref,{uid:credential.user.uid});
-    });
-   }catch(e){
-    await deleteUser(credential.user);
-    throw e;
-   }
 
    const file=$("photo").files[0];
    myPhoto=file?await compressPhoto(file):"";
@@ -231,12 +216,6 @@ window.enterChat=async function(){
    credential=await signInWithEmailAndPassword(
     auth,identity.email,password
    );
-
-   const index=await getDoc(doc(db,"usernameIndex",identity.key));
-   if(!index.exists()||index.data().uid!==credential.user.uid){
-    await signOut(auth);
-    throw new Error("نام کاربری یا رمز عبور اشتباه است");
-   }
 
    const oldProfile=await getDoc(doc(db,"users",credential.user.uid));
    myPhoto=oldProfile.exists()?oldProfile.data().photo||"":"";
