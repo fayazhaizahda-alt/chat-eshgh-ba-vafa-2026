@@ -108,6 +108,7 @@ button:disabled{opacity:.5}
 <img id="profileCardPhoto" alt="عکس پروفایل" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff">
 <h3 id="profileCardName"></h3>
 <p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
+<p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
 <p id="profileCardStatus" class="small"></p>
 <button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
 <button type="button" onclick="closeProfile()">بستن</button>
@@ -398,6 +399,7 @@ window.showProfile=function(u){
  $("profileCardPhoto").src=u.photo||"";
  $("profileCardName").textContent=u.name||"کاربر";
  $("profileCardUsername").textContent="@"+(u.name||"user");
+ $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.role||"user");
  const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
  $("profileCardStatus").textContent=online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین";
  $("profileCard").style.display="block";
@@ -512,7 +514,7 @@ window.sendMessage=async function(){
 };
 
 function canManageUsers(){return ["owner","admin"].includes(myRole);}
-function roleLabel(role){const labels={owner:"مالک اصلی",admin:"ادمین",manager:"مدیر ناظر",moderator:"ناظم",user:"کاربر"};return labels[role]||"کاربر";}
+function roleLabel(role){const labels={owner:"مالک اصلی",admin:"ادمین",manager:"مدیر ناظر",moderator:"ناظم",user:"مهمان"};return labels[role]||"مهمان";}
 function allowedRoles(){
  if(myRole==="owner")return ["user","moderator","manager","admin"];
  if(myRole==="admin")return ["user","moderator","manager"];
