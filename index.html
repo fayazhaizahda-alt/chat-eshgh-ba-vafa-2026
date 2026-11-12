@@ -16,6 +16,11 @@ input{width:100%;margin:7px 0}
 button{background:#1769c2;color:white;border:0;cursor:pointer}
 button:disabled{opacity:.5}
 #layout{display:grid;grid-template-columns:155px minmax(0,1fr);gap:8px}
+#adminPanel{max-height:150px;overflow-y:auto;padding:7px;margin-bottom:7px}
+#adminPanel h3{font-size:15px;margin:2px 0 5px}
+#adminPanel .small{margin:3px 0;font-size:11px}
+#adminUsers>div{padding:5px!important;gap:4px!important}
+#adminUsers button,#adminUsers select{padding:6px 8px;font-size:12px;border-radius:7px}
 #messages{height:520px;overflow-y:auto;background-color:#fff8fc;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2790%27 height=%2778%27 viewBox=%270 0 90 78%27%3E%3Cpath d=%27M22 16 C22 9 32 7 36 15 C40 7 50 9 50 16 C50 24 36 32 36 32 C36 32 22 24 22 16Z%27 fill=%27%23f5a8c5%27 fill-opacity=%270.30%27/%3E%3Cpath d=%27M62 48 C62 42 70 40 74 47 C78 40 86 42 86 48 C86 55 74 62 74 62 C74 62 62 55 62 48Z%27 fill=%27%238bbcf0%27 fill-opacity=%270.25%27/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.94));background-size:90px 78px,auto;padding:10px;border-radius:10px;border:1px solid #f2cddd}
 .msg{background:#e4efff;padding:10px;margin:8px 0;border-radius:10px;overflow-wrap:anywhere}
 .mine{background:#d9f2df}
@@ -75,7 +80,13 @@ button:disabled{opacity:.5}
 <button onclick="exitChat()">خروج از چت</button>
 </div>
 
-<div class="panel" id="adminPanel" style="display:none">\n<h3>🛡️ پنل مدیریت</h3>\n<p class="small">مدیریت رتبه‌ها، مسدودسازی کاربران و حذف پیام‌های نامناسب</p>\n<div id="adminUsers"></div>\n</div>\n\n<div id="layout">
+<div class="panel" id="adminPanel" style="display:none">
+<h3>🛡️ پنل مدیریت</h3>
+<p class="small">مدیریت رتبه‌ها، مسدودسازی کاربران و حذف پیام‌های نامناسب</p>
+<div id="adminUsers"></div>
+</div>
+
+<div id="layout">
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
 <div id="userList"></div>
