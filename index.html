@@ -214,6 +214,59 @@ button{cursor:pointer}
  .botTag{font-size:7px;padding:3px}
 }
 
+
+/* اصلاح نهایی: پروفایل مالک، ربات و کاربران در ستون کنار پنجره چت */
+#layout{display:grid!important;grid-template-columns:minmax(0,1fr) 270px!important;gap:12px!important;align-items:start!important}
+#chatPanel{grid-column:1!important;grid-row:1!important;min-width:0!important}
+#profileSidebar{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;gap:10px!important;min-width:0!important}
+#profileSidebar>.panel{width:100%;min-width:0;margin:0!important}
+#myProfilePanel{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:14px!important}
+#myPhoto{width:76px;height:76px;margin:0 auto;border-radius:50%;object-fit:cover}
+#myProfilePanel h3{font-size:16px;margin:2px 0;overflow-wrap:anywhere}
+#myProfilePanel button{width:100%;margin:2px 0}
+#botProfile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:14px!important}
+#botAvatar{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:38px;background:linear-gradient(145deg,#8b5aa6,#43346f);border:2px solid #d9a9ed}
+#botProfile h3{margin:2px 0;color:#f4c8f0}
+#users{display:block!important;position:static!important;grid-column:auto!important;grid-row:auto!important;min-height:0!important;max-height:360px!important;overflow:auto!important;padding:10px!important}
+#users h3{font-size:14px!important;margin:2px 0 9px!important}
+#userList{display:flex;flex-direction:column;gap:5px}
+#users .user{width:100%;min-width:0;min-height:48px;padding:6px!important;font-size:11px!important;gap:6px!important}
+#users .avatar{width:36px;height:36px;flex:0 0 36px}
+#profileCard{width:100%;padding:12px!important}
+@media(max-width:760px){
+ #layout{grid-template-columns:minmax(0,1fr) 112px!important;gap:7px!important}
+ #profileSidebar{gap:6px!important}
+ #profileSidebar>.panel{padding:7px!important}
+ #myPhoto{width:46px;height:46px}
+ #myProfilePanel h3,#botProfile h3{font-size:10px;line-height:1.5}
+ #myProfilePanel p,#botProfile p,#botProfile .botTag{font-size:8px;line-height:1.5}
+ #myProfilePanel button{font-size:8px;padding:5px 2px}
+ #botAvatar{width:42px;height:42px;font-size:25px}
+ #users{max-height:240px!important}
+ #users h3{font-size:9px!important}
+ #users .user{font-size:8px!important;min-height:35px;padding:3px!important;gap:3px!important;overflow-wrap:anywhere}
+ #users .avatar{width:25px;height:25px;flex-basis:25px}
+ #profileCardPhoto{width:42px!important;height:42px!important}
+ #profileCard h3,#profileCard p{font-size:8px!important;overflow-wrap:anywhere}
+ #profileCard button{font-size:7px;padding:4px 2px}
+ #myUid,#photoStatus{display:none}
+ #logoutBtn{max-width:100%!important;width:100%!important;height:auto!important;min-height:20px!important;font-size:8px!important;padding:3px!important}
+}
+@media(max-width:430px){
+ #layout{grid-template-columns:minmax(0,1fr) 88px!important;gap:5px!important}
+ #chatPanel{padding:5px!important}
+ #profileSidebar>.panel{padding:5px!important}
+ #myPhoto{width:38px;height:38px}
+ #botAvatar{width:36px;height:36px;font-size:21px}
+ #users .user{flex-direction:column;justify-content:center;text-align:center}
+ #users .avatar{width:25px;height:25px;flex-basis:25px}
+ #roomTitle{font-size:10px;line-height:1.5}
+ #messages{height:52vh;min-height:250px;max-height:460px;padding:5px}
+ #sendArea{gap:3px}
+ #sendArea input{font-size:9px;padding:5px}
+ #sendArea button{font-size:8px;min-width:0;padding:5px}
+ #emoji button{font-size:9px;padding:3px;margin:1px}
+}
 </style>
 </head>
 <body>
@@ -244,11 +297,6 @@ button{cursor:pointer}
 
 <div id="chat">
 <div id="layout">
-<div class="panel" id="users">
-<h3>👥 کاربران آنلاین</h3>
-<div id="userList"></div>
-</div>
-
 <div class="panel" id="chatPanel">
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
 <button id="returnPublicBtn" onclick="openPublic()">بازگشت به گفت‌وگوی عمومی</button>
@@ -275,17 +323,20 @@ button{cursor:pointer}
 <button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
 <input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
 <p id="photoStatus" class="small"></p>
-<p class="small">شناسه کاربری: <span id="myUid"></span></p>
+<p class="small" id="myUid">شناسه کاربری</p>
 <button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
 </div>
 
-</div>
-
 <div class="panel" id="botProfile">
- <div id="botAvatar">🤖</div>
+ <div id="botAvatar">👩🏻‍🦰</div>
  <h3>هیله</h3>
  <p class="small"><span class="dot"></span> ربات آنلاین</p>
  <span class="botTag">پاسخ‌گوی چت عشق با وفا</span>
+</div>
+
+<div class="panel" id="users">
+<h3>👥 کاربران آنلاین</h3>
+<div id="userList"></div>
 </div>
 
 <div class="panel" id="profileCard" style="display:none;text-align:center">
@@ -298,7 +349,6 @@ button{cursor:pointer}
 <button type="button" onclick="closeProfile()">بستن</button>
 </div>
 </aside>
-
 </div>
 </main>
 
@@ -348,13 +398,6 @@ let moderationUnsub=null;
 const botProcessed=new Set();
 
 const $=id=>document.getElementById(id);
-/* Place the signed-in profile above the conversation, as in the reference design. */
-const profilePanel=$("myProfilePanel");
-if(profilePanel) $("chatPanel").prepend(profilePanel);
-const botPanel=$("botProfile");
-if(botPanel) $("chatPanel").append(botPanel);
-
-
 window.setMode=function(value){
  mode=value;
  $("loginMode").classList.toggle("active",mode==="login");
