@@ -44,6 +44,7 @@ button:disabled{opacity:.5}
 .msg{padding:6px;margin:5px 0;font-size:12px}
 #logoutBtn{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;width:fit-content!important;max-width:76px!important;min-width:0!important;height:10px!important;min-height:10px!important;padding:0 3px!important;margin:0!important;font-size:7px!important;line-height:9px!important;border-radius:3px!important;white-space:nowrap!important}
 .dot{display:inline-block;width:9px;height:9px;background:#20bd62;border-radius:50%}
+#profileCard{padding:18px;margin:10px 0;text-align:center}#profileCard button{margin:5px;padding:8px 12px;font-size:12px}#profileCardPhoto{display:block;margin:0 auto 8px}
 #sendArea{display:flex;gap:7px}
 #sendArea input{flex:1;min-width:0}
 #sendArea button{min-width:75px}
@@ -101,6 +102,15 @@ button:disabled{opacity:.5}
 <h3>🛡️ پنل مدیریت</h3>
 <p class="small">مدیریت رتبه‌ها، مسدودسازی کاربران و حذف پیام‌های نامناسب</p>
 <div id="adminUsers"></div>
+</div>
+
+<div class="panel" id="profileCard" style="display:none;text-align:center">
+<img id="profileCardPhoto" alt="عکس پروفایل" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff">
+<h3 id="profileCardName"></h3>
+<p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
+<p id="profileCardStatus" class="small"></p>
+<button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
+<button type="button" onclick="closeProfile()">بستن</button>
 </div>
 
 <div id="layout">
@@ -373,7 +383,7 @@ function renderUsers(){
   info.textContent=countryFlag(u.countryCode||"")+" "+u.name+" 🟢 آنلاین";
 
   btn.append(img,info);
-  btn.onclick=()=>openPrivate(u);
+  btn.onclick=()=>showProfile(u);
   list.append(btn);
  });
 
@@ -382,6 +392,27 @@ function renderUsers(){
  }
 }
 
+let selectedProfile=null;
+window.showProfile=function(u){
+ selectedProfile=u;
+ $("profileCardPhoto").src=u.photo||"";
+ $("profileCardName").textContent=u.name||"کاربر";
+ $("profileCardUsername").textContent="@"+(u.name||"user");
+ const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
+ $("profileCardStatus").textContent=online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین";
+ $("profileCard").style.display="block";
+ $("profileCard").scrollIntoView({behavior:"smooth",block:"center"});
+};
+window.closeProfile=function(){
+ $("profileCard").style.display="none";
+ selectedProfile=null;
+};
+window.chatWithProfile=function(){
+ if(!selectedProfile)return;
+ const u=selectedProfile;
+ closeProfile();
+ openPrivate(u);
+};
 function stopMessages(){
  if(messagesUnsub){
   messagesUnsub();
