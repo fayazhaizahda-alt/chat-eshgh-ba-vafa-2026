@@ -417,6 +417,18 @@ button{cursor:pointer}
 <p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
 <p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
 <p id="profileCardStatus" class="small"></p>
+<div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:10px;border:1px solid #8053a2;border-radius:12px;background:#211b32">
+ <p style="margin:3px 0 8px;font-weight:bold;color:#f1d7ff">🛡️ مدیریت کاربر (فقط مالک)</p>
+ <label for="ownerRoleSelect" style="display:block;font-size:12px;margin:5px">تعیین رتبه کاربر</label>
+ <select id="ownerRoleSelect" style="width:100%;padding:9px;border-radius:8px">
+  <option value="user">مهمان</option>
+  <option value="moderator">ناظم</option>
+  <option value="manager">مدیر ناظر</option>
+  <option value="admin">ادمین</option>
+ </select>
+ <button type="button" onclick="saveUserRole()" style="width:100%;margin-top:7px">ثبت رتبه</button>
+ <button type="button" id="ownerBanButton" onclick="toggleUserBan()" style="width:100%;margin-top:7px;background:#a83252">مسدود کردن حساب</button>
+</div>
 <button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
 <button type="button" onclick="closeProfile()">بستن</button>
 </div>
@@ -735,9 +747,45 @@ window.showProfile=function(u){
  $("profileCardUsername").textContent="@"+(u.name||"user");
  $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
  const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
- $("profileCardStatus").textContent=online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین";
+ $("profileCardStatus").textContent=(online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین")+(u.banned?" · 🚫 مسدود":"");
+ const ownerControls=$("ownerUserControls");
+ const isOwner=me?.uid===OWNER_UID && u.uid!==OWNER_UID;
+ ownerControls.style.display=isOwner?"block":"none";
+ if(isOwner){
+  $("ownerRoleSelect").value=["user","moderator","manager","admin"].includes(u.role||"user")?(u.role||"user"):"user";
+  $("ownerBanButton").textContent=u.banned?"🔓 آزاد کردن حساب":"🚫 مسدود کردن حساب";
+  $("ownerBanButton").style.background=u.banned?"#247a54":"#a83252";
+ }
  $("profileCard").style.display="block";
  $("profileCard").scrollIntoView({behavior:"smooth",block:"center"});
+};
+window.saveUserRole=async function(){
+ if(!me||me.uid!==OWNER_UID||!selectedProfile||selectedProfile.uid===OWNER_UID)return alert("فقط مالک اصلی می‌تواند رتبه کاربران را تغییر دهد.");
+ const role=$("ownerRoleSelect").value;
+ if(!["user","moderator","manager","admin"].includes(role))return alert("رتبه انتخاب‌شده معتبر نیست.");
+ try{
+  await updateDoc(doc(db,"users",selectedProfile.uid),{role});
+  selectedProfile.role=role;
+  $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(role);
+  alert("رتبه کاربر با موفقیت تغییر کرد.");
+ }catch(e){alert("تغییر رتبه انجام نشد: "+e.message);}
+};
+window.toggleUserBan=async function(){
+ if(!me||me.uid!==OWNER_UID||!selectedProfile||selectedProfile.uid===OWNER_UID)return alert("فقط مالک اصلی می‌تواند کاربران را مسدود یا آزاد کند.");
+ const banning=!selectedProfile.banned;
+ const question=banning?"این حساب مسدود شود؟ کاربر از چت خارج می‌شود و دیگر نمی‌تواند وارد شود.":"این حساب از مسدودی آزاد شود؟";
+ if(!confirm(question))return;
+ try{
+  const changes=banning
+   ?{banned:true,bannedBy:me.uid,bannedAt:Date.now(),banReason:"مسدودسازی توسط مالک"}
+   :{banned:false,bannedBy:null,bannedAt:null,banReason:null};
+  await updateDoc(doc(db,"users",selectedProfile.uid),changes);
+  selectedProfile.banned=banning;
+  $("profileCardStatus").textContent=banning?"🚫 این حساب مسدود شده است.":"⚪ حساب از مسدودی آزاد شد.";
+  $("ownerBanButton").textContent=banning?"🔓 آزاد کردن حساب":"🚫 مسدود کردن حساب";
+  $("ownerBanButton").style.background=banning?"#247a54":"#a83252";
+  alert(banning?"حساب کاربر مسدود شد.":"حساب کاربر آزاد شد.");
+ }catch(e){alert("عملیات انجام نشد: "+e.message);}
 };
 window.closeProfile=function(){
  $("profileCard").style.display="none";
