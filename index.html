@@ -538,13 +538,14 @@ function startBotModeration(){
  moderationUnsub=onSnapshot(publicQuery,snapshot=>{
   snapshot.docChanges().forEach(async change=>{
    if(change.type!=="added")return;
-   const message={id:change.doc.id,...change.doc.data()};
+   const message={id:change.doc.id,...change.doc.data({serverTimestamps:"estimate"})};
    if(!message.senderUid || message.senderUid==="CHAT_BOT" ||
       message.senderUid===OWNER_UID || message.bot ||
       botProcessed.has(message.id))return;
-   botProcessed.add(message.id);
-   const created=message.createdAt?.toMillis?.()||message.createdAt||0;
+   const created=message.createdAt?.toMillis?.()||
+    (typeof message.createdAt==="number"?message.createdAt:0);
    if(!created || Date.now()-created>45000)return;
+   botProcessed.add(message.id);
 
    if(isOffensiveMessage(message.text)){
     try{
