@@ -679,14 +679,14 @@ function startBotModeration(){
    if(change.type!=="added")return;
    const message={id:change.doc.id,...change.doc.data({serverTimestamps:"estimate"})};
    if(!message.senderUid || message.senderUid==="CHAT_BOT" ||
-      message.senderUid===OWNER_UID || message.bot ||
-      botProcessed.has(message.id))return;
+      message.bot || botProcessed.has(message.id))return;
    const created=message.createdAt?.toMillis?.()||
     (typeof message.createdAt==="number"?message.createdAt:0);
    if(!created || Date.now()-created>45000)return;
    botProcessed.add(message.id);
 
-   if(isOffensiveMessage(message.text)){
+   // کاربران عادی برای توهین مسدود می‌شوند؛ مالک مستثنا است.
+   if(message.senderUid!==OWNER_UID && isOffensiveMessage(message.text)){
     try{
      await deleteDoc(doc(db,"messages",message.id));
      await updateDoc(doc(db,"users",message.senderUid),{
@@ -698,6 +698,7 @@ function startBotModeration(){
     return;
    }
 
+   // هیله به سلام همه کاربران، حتی مالک، پاسخ می‌دهد.
    if(/سلام|درود|السلام علیکم|السلام‌علیکم/u.test(normalizeBotText(message.text))){
     await sendBotMessage("وعلیکم‌السلام! خوش آمدی ❤️");
    }
