@@ -659,15 +659,18 @@ function isOffensiveMessage(value){
 
 async function sendBotMessage(message){
  try{
+  if(!me)throw new Error("کاربر هنوز وارد حساب نشده است");
+  // برای سازگاری با قوانین Firestore، پیام ربات با حساب واردشده ثبت می‌شود
+  // اما فیلد bot باعث می‌شود در صفحه با نام و ظاهر هیله نمایش داده شود.
   await addDoc(collection(db,"messages"),{
-   senderUid:"CHAT_BOT",
+   senderUid:me.uid,
    senderName:"هیله",
    text:message,
    type:"public",
    bot:true,
    createdAt:serverTimestamp()
   });
- }catch(e){console.error("Bot message failed:",e);}
+ }catch(e){console.error("Bot message failed:",e);$("roomTitle").textContent="خطای ارسال پیام هیله: "+(e.message||e);}
 }
 
 function startBotModeration(){
@@ -759,7 +762,7 @@ function renderMessages(arr){
  box.innerHTML="";
  arr.forEach(m=>{
   const div=document.createElement("div");
-  div.className="msg"+(m.senderUid===me.uid?" mine":"");
+  div.className="msg"+(m.senderUid===me.uid&&!m.bot?" mine":"");
 
   const name=document.createElement("b");
   name.textContent=m.bot?"🌸 هیله: ":(m.senderName+": ");
