@@ -81,6 +81,39 @@ input,select{background:#111720;color:#edf1f7;border:1px solid #3a4656}
 .small{color:#aab4c2}
 @media(max-width:650px){#layout{grid-template-columns:1fr;gap:9px}#users{position:static;max-height:155px}#userList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}#messages{height:55vh;min-height:280px;max-height:470px}}
 
+
+/* Profile is displayed in a dedicated column beside the chat */
+#layout{display:grid;grid-template-columns:190px minmax(0,1fr) 215px;gap:12px;align-items:start}
+#layout>.panel{padding:13px;margin:0;min-width:0}
+#profileSidebar{min-width:0;display:flex;flex-direction:column;gap:12px}
+#profileSidebar .panel{margin:0;padding:14px}
+#myProfilePanel{text-align:center}
+#myPhoto{display:block;width:76px;height:76px;margin:0 auto 10px;border-radius:50%;object-fit:cover;border:2px solid #bd5b9b;background:#30394a}
+#myProfilePanel h3{font-size:15px;overflow-wrap:anywhere}
+#myProfilePanel button{font-size:11px;padding:8px 10px;margin:4px}
+#myUid{overflow-wrap:anywhere;font-size:10px}
+#profileCard{width:100%}
+#chatPanel{min-width:0}
+@media(max-width:760px){
+ #layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px}
+ #chatPanel{grid-column:1/-1;grid-row:1}
+ #profileSidebar{grid-column:2;grid-row:2}
+ #users{grid-column:1;grid-row:2;position:static;max-height:280px;overflow-y:auto}
+ #userList{display:block}
+ #messages{height:52vh;min-height:280px;max-height:460px}
+}
+@media(max-width:430px){
+ #layout{grid-template-columns:1fr}
+ #chatPanel{grid-column:1;grid-row:1}
+ #users{grid-column:1;grid-row:2;max-height:150px}
+ #profileSidebar{grid-column:1;grid-row:3}
+ #userList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+ #myProfilePanel{display:grid;grid-template-columns:65px 1fr;align-items:center;text-align:right;gap:4px 10px}
+ #myPhoto{grid-row:1/5;width:58px;height:58px;margin:auto}
+ #myProfilePanel h3,#myProfilePanel p,#myProfilePanel button{margin:2px 0}
+ #profileCardPhoto{width:82px!important;height:82px!important}
+}
+
 </style>
 </head>
 <body>
@@ -110,34 +143,13 @@ input,select{background:#111720;color:#edf1f7;border:1px solid #3a4656}
 </div>
 
 <div id="chat">
-<div class="panel">
-<img id="myPhoto" class="avatar" alt="عکس پروفایل">
-<button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس پروفایل</button>
-<input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
-<p id="photoStatus" class="small"></p>
-<h3 id="welcome"></h3>
-<span class="dot"></span> آنلاین
-<p class="small">شناسه کاربری: <span id="myUid"></span></p>
-<button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
-</div>
-
-<div class="panel" id="profileCard" style="display:none;text-align:center">
-<img id="profileCardPhoto" alt="عکس پروفایل" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff">
-<h3 id="profileCardName"></h3>
-<p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
-<p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
-<p id="profileCardStatus" class="small"></p>
-<button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
-<button type="button" onclick="closeProfile()">بستن</button>
-</div>
-
 <div id="layout">
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
 <div id="userList"></div>
 </div>
 
-<div class="panel">
+<div class="panel" id="chatPanel">
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
 <button id="returnPublicBtn" onclick="openPublic()">بازگشت به گفت‌وگوی عمومی</button>
 <div id="messages"></div>
@@ -154,7 +166,30 @@ input,select{background:#111720;color:#edf1f7;border:1px solid #3a4656}
 <button onclick="sendMessage()">ارسال</button>
 </div>
 </div>
+
+<aside id="profileSidebar">
+<div class="panel" id="myProfilePanel">
+<img id="myPhoto" class="avatar" alt="عکس پروفایل">
+<h3 id="welcome"></h3>
+<p class="small"><span class="dot"></span> آنلاین</p>
+<button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
+<input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
+<p id="photoStatus" class="small"></p>
+<p class="small">شناسه کاربری: <span id="myUid"></span></p>
+<button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
 </div>
+
+<div class="panel" id="profileCard" style="display:none;text-align:center">
+<img id="profileCardPhoto" alt="عکس پروفایل" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff">
+<h3 id="profileCardName"></h3>
+<p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
+<p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
+<p id="profileCardStatus" class="small"></p>
+<button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
+<button type="button" onclick="closeProfile()">بستن</button>
+</div>
+</aside>
+
 </div>
 </main>
 
