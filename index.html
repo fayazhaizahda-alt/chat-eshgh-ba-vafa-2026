@@ -287,6 +287,29 @@ button{cursor:pointer}
  }
  #sendArea{margin-top:auto}
 }
+
+/* افزایش محسوس ارتفاع پنجره پیام‌ها در موبایل */
+@media(max-width:700px){
+ #chatPanel{
+  height:auto!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+ }
+ #messages{
+  flex:0 0 auto!important;
+  height:70dvh!important;
+  min-height:420px!important;
+  max-height:none!important;
+ }
+}
+@media(max-width:430px){
+ #messages{
+  height:70dvh!important;
+  min-height:420px!important;
+  max-height:none!important;
+ }
+}
 </style>
 </head>
 <body>
