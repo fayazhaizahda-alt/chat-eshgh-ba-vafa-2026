@@ -267,6 +267,26 @@ button{cursor:pointer}
  #sendArea button{font-size:8px;min-width:0;padding:5px}
  #emoji button{font-size:9px;padding:3px;margin:1px}
 }
+
+/* پنجره چت در موبایل تا پایین صفحه امتداد داشته باشد */
+@media(max-width:700px){
+ main{margin:0 auto;padding:3px}
+ #chat{min-height:calc(100dvh - 82px)}
+ #layout{min-height:calc(100dvh - 88px);align-items:stretch!important}
+ #chatPanel{
+  height:calc(100dvh - 88px);
+  min-height:calc(100dvh - 88px);
+  display:flex!important;
+  flex-direction:column!important;
+ }
+ #messages{
+  flex:1 1 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+ }
+ #sendArea{margin-top:auto}
+}
 </style>
 </head>
 <body>
