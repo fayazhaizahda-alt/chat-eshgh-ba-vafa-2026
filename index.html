@@ -351,6 +351,8 @@ const $=id=>document.getElementById(id);
 /* Place the signed-in profile above the conversation, as in the reference design. */
 const profilePanel=$("myProfilePanel");
 if(profilePanel) $("chatPanel").prepend(profilePanel);
+const botPanel=$("botProfile");
+if(botPanel) $("chatPanel").append(botPanel);
 
 
 window.setMode=function(value){
