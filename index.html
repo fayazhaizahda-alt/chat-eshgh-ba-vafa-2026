@@ -71,7 +71,7 @@ button:disabled{opacity:.5}
 <button onclick="exitChat()">خروج از چت</button>
 </div>
 
-<div id="layout">
+<div class="panel" id="adminPanel" style="display:none">\n<h3>🛡️ پنل مدیریت</h3>\n<p class="small">مدیریت رتبه‌ها، مسدودسازی کاربران و حذف پیام‌های نامناسب</p>\n<div id="adminUsers"></div>\n</div>\n\n<div id="layout">
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
 <div id="userList"></div>
@@ -110,7 +110,7 @@ import {
 import {
  getFirestore,collection,doc,setDoc,updateDoc,
  addDoc,query,where,onSnapshot,serverTimestamp,
- getDoc
+ getDoc,deleteDoc
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -127,7 +127,11 @@ const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
 
+// حساب مالک اصلی برنامه
+const OWNER_UID="eaZWtnAluVMZ1bjDMrKcu8hye6t1";
+
 let me=null;
+let myRole="user";
 let myName="";
 let myPhoto="";
 let activePeer=null;
@@ -223,6 +227,13 @@ window.enterChat=async function(){
 
   me=credential.user;
   myName=name;
+  const profileSnap=await getDoc(doc(db,"users",me.uid));
+  const profileData=profileSnap.exists()?profileSnap.data():{};
+  if(profileData.banned===true){
+   await signOut(auth); me=null;
+   throw new Error("این حساب به دلیل تخلف مسدود شده است. برای پیگیری با مالک برنامه تماس بگیرید.");
+  }
+  myRole=me.uid===OWNER_UID?"owner":(profileData.role||"user");
 
   await setDoc(doc(db,"users",me.uid),{
    name:myName,
@@ -238,6 +249,7 @@ window.enterChat=async function(){
   $("myUid").textContent=me.uid;
 
   startUsers();
+  renderAdminPanel();
   openPublic();
 
   if(heartbeat)clearInterval(heartbeat);
@@ -255,6 +267,7 @@ window.enterChat=async function(){
   if(e.code==="auth/invalid-credential")message="نام کاربری یا رمز عبور اشتباه است";
   if(e.code==="auth/weak-password")message="رمز عبور باید حداقل ۶ حرف باشد";
   if(e.code==="auth/network-request-failed")message="اتصال اینترنت را بررسی کنید";
+  if(e.message&&e.message.includes("مسدود شده"))message=e.message;
   $("error").textContent=message;
  }
 
@@ -266,6 +279,7 @@ function startUsers(){
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
   allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
   renderUsers();
+  renderAdminPanel();
  },e=>console.error(e));
 }
 
@@ -361,6 +375,11 @@ function renderMessages(arr){
   body.textContent=m.text;
 
   div.append(name,body);
+  if(myRole!=="user"){
+   const del=document.createElement("button");
+   del.textContent="حذف پیام"; del.style.marginTop="6px";
+   del.onclick=()=>removeMessage(m.id); div.append(del);
+  }
   box.append(div);
  });
  box.scrollTop=box.scrollHeight;
@@ -392,6 +411,50 @@ window.sendMessage=async function(){
  }
 };
 
+function canManageUsers(){return ["owner","admin","manager"].includes(myRole);}
+function roleLabel(role){const labels={owner:"مالک اصلی",admin:"ادمین",manager:"مدیر ناظر",moderator:"ناظم",user:"کاربر"};return labels[role]||"کاربر";}
+function allowedRoles(){
+ if(myRole==="owner")return ["user","moderator","manager","admin"];
+ if(myRole==="admin")return ["user","moderator","manager"];
+ if(myRole==="manager")return ["user","moderator"];
+ return [];
+}
+function renderAdminPanel(){
+ const panel=$("adminPanel"),list=$("adminUsers"); if(!panel||!list)return;
+ panel.style.display=canManageUsers()?"block":"none"; if(!canManageUsers())return;
+ list.innerHTML="";
+ allUsers.filter(u=>u.uid!==me?.uid).forEach(u=>{
+  const row=document.createElement("div");
+  row.style.cssText="padding:10px;border-top:1px solid #eee;display:flex;gap:7px;align-items:center;flex-wrap:wrap";
+  const label=document.createElement("span");
+  label.textContent=(u.name||"بدون نام")+" — "+roleLabel(u.role||"user")+(u.banned?" — مسدود":""); row.append(label);
+  const roles=allowedRoles();
+  if(roles.length&&u.role!=="owner"){
+   const select=document.createElement("select");
+   roles.forEach(role=>{const o=document.createElement("option");o.value=role;o.textContent=roleLabel(role);if((u.role||"user")===role)o.selected=true;select.append(o);});
+   const save=document.createElement("button");save.textContent="ثبت رتبه";
+   save.onclick=async()=>{
+    if(myRole!=="owner"&&u.role==="admin")return alert("فقط مالک اصلی می‌تواند رتبه ادمین را تغییر دهد.");
+    if(select.value==="admin"&&myRole!=="owner")return alert("فقط مالک اصلی می‌تواند ادمین تعیین کند.");
+    try{await updateDoc(doc(db,"users",u.uid),{role:select.value});alert("رتبه تغییر کرد.");}
+    catch(e){alert("تغییر رتبه انجام نشد: "+e.message);}
+   };row.append(select,save);
+  }
+  if(myRole!=="moderator"&&!u.banned){
+   const ban=document.createElement("button");ban.textContent="اخراج و مسدودسازی";
+   ban.onclick=async()=>{if(!confirm("این حساب مسدود شود؟ کاربر دیگر نمی‌تواند وارد چت شود."))return;
+    try{await updateDoc(doc(db,"users",u.uid),{banned:true,bannedBy:me.uid,bannedAt:Date.now()});alert("حساب مسدود شد.");}
+    catch(e){alert("مسدودسازی انجام نشد: "+e.message);}
+   };row.append(ban);
+  }
+  list.append(row);
+ });
+}
+async function removeMessage(messageId){
+ if(myRole==="user")return;if(!confirm("این پیام حذف شود؟"))return;
+ try{await deleteDoc(doc(db,"messages",messageId));}
+ catch(e){alert("حذف پیام انجام نشد: "+e.message);}
+}
 window.addEmoji=function(emoji){
  $("message").value+=emoji;
  $("message").focus();
