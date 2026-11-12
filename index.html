@@ -4,211 +4,332 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>چت عشق با وفا</title>
+<title>چت عشق با وفا ۲۰۲۶</title>
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;font-family:Tahoma,sans-serif;
- background:#f3f0f7;color:#292333
-}
-header{
- background:#713b91;color:white;
- text-align:center;padding:15px
-}
-main{max-width:850px;margin:18px auto;padding:10px}
-.panel{
- background:white;border-radius:15px;
- padding:15px;box-shadow:0 3px 12px #ddd
-}
-input,button{
- width:100%;padding:12px;margin-top:10px;
- border:1px solid #ccc;border-radius:9px;font-size:15px
-}
-button{background:#713b91;color:white;border:0}
-#layout{display:grid;grid-template-columns:220px 1fr;gap:12px}
-#users{min-height:390px}
-.user{
- display:flex;align-items:center;gap:9px;
- padding:9px 3px;border-bottom:1px solid #eee
-}
-.avatar{
- width:43px;height:43px;border-radius:50%;
- object-fit:cover;background:#eadcf3
-}
-.dot{
- width:10px;height:10px;border-radius:50%;
- background:#20bd62;display:inline-block
-}
-.status{font-size:11px;color:#16a052}
-#messages{
- height:310px;overflow-y:auto;
- background:#faf8fc;padding:10px;border-radius:10px
-}
-.msg{
- background:#eadcf3;padding:10px;
- margin:8px 0;border-radius:10px;overflow-wrap:anywhere
-}
-.me{background:#d9f2df}
-#profile{text-align:center;margin-bottom:12px}
-#myPhoto{width:75px;height:75px;border-radius:50%;object-fit:cover}
+body{margin:0;font-family:Tahoma;background:#f3eff7;color:#292333}
+header{background:#713b91;color:white;text-align:center;padding:15px}
+main{max-width:950px;margin:15px auto;padding:10px}
+.panel{background:white;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px #ddd}
+input,button{font-family:Tahoma;padding:12px;border-radius:9px;border:1px solid #ccc;font-size:14px}
+input{width:100%;margin:7px 0}
+button{background:#713b91;color:white;border:0;cursor:pointer}
+button:disabled{opacity:.5}
+#layout{display:grid;grid-template-columns:230px 1fr;gap:12px}
+#messages{height:350px;overflow-y:auto;background:#faf8fc;padding:10px;border-radius:10px}
+.msg{background:#eadcf3;padding:10px;margin:8px 0;border-radius:10px;overflow-wrap:anywhere}
+.mine{background:#d9f2df}
+.user{display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #eee;width:100%;text-align:right}
+.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eadcf3}
+.dot{display:inline-block;width:9px;height:9px;background:#20bd62;border-radius:50%}
 #sendArea{display:flex;gap:7px}
 #sendArea input{flex:1;min-width:0}
-#sendArea button{width:90px}
-@media(max-width:550px){
+#sendArea button{min-width:75px}
+#emoji button{width:auto;padding:6px;margin:3px;background:#eee;color:#333}
+.small{font-size:12px;color:#777}
+#chat{display:none}
+@media(max-width:600px){
  #layout{grid-template-columns:1fr}
- #users{min-height:auto}
- #userList{display:flex;overflow-x:auto;gap:12px}
- .user{min-width:105px;flex-direction:column}
  #messages{height:300px}
+ #users{max-height:180px;overflow:auto}
 }
 </style>
 </head>
 <body>
 <header>
- <h2>❤️ چت عشق با وفا ❤️</h2>
- <p>دوستی، مهربانی و احترام</p>
+<h2>❤️ چت عشق با وفا ❤️</h2>
+<p>دوستی، مهربانی و احترام</p>
 </header>
 
 <main>
- <div class="panel" id="login">
-  <h3>خوش آمدید ❤️</h3>
-  <input id="username" placeholder="نام کاربری خود را بنویسید">
-  <label>عکس پروفایل خود را انتخاب کنید:</label>
-  <input type="file" id="photo" accept="image/*">
-  <button onclick="enterChat()">ورود به چت</button>
- </div>
+<div class="panel" id="login">
+<h3>خوش آمدید ❤️</h3>
+<input id="username" placeholder="نام کاربری خود را بنویسید">
+<label>عکس پروفایل (اختیاری):</label>
+<input type="file" id="photo" accept="image/*">
+<button id="enterBtn" onclick="enterChat()">ورود به چت</button>
+<p id="error" class="small"></p>
+</div>
 
- <div id="chat" hidden>
-  <div class="panel" id="profile">
-   <img id="myPhoto" class="avatar"
-    src="https://placehold.co/100x100?text=User">
-   <h3 id="welcome"></h3>
-   <span class="dot"></span>
-   <span class="status">آنلاین</span>
-   <button onclick="logout()">خروج از چت</button>
-  </div>
+<div id="chat">
+<div class="panel">
+<img id="myPhoto" class="avatar">
+<h3 id="welcome"></h3>
+<span class="dot"></span> آنلاین
+<p class="small">شناسه کاربری: <span id="myUid"></span></p>
+<button onclick="exitChat()">خروج از چت</button>
+</div>
 
-  <div id="layout">
-   <div class="panel" id="users">
-    <h3>👥 کاربران آنلاین</h3>
-    <div id="userList"></div>
-   </div>
+<div id="layout">
+<div class="panel" id="users">
+<h3>👥 کاربران آنلاین</h3>
+<div id="userList"></div>
+</div>
 
-   <div class="panel">
-    <h3>💬 گفت‌وگوی عمومی</h3>
-    <div id="messages"></div>
-    <div id="sendArea">
-     <input id="message" placeholder="پیام خود را بنویسید">
-     <button onclick="sendMessage()">ارسال ❤️</button>
-    </div>
-   </div>
-  </div>
- </div>
+<div class="panel">
+<h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
+<button onclick="openPublic()">بازگشت به گفت‌وگوی عمومی</button>
+<div id="messages"></div>
+<div id="emoji">
+<button onclick="addEmoji('❤️')">❤️</button>
+<button onclick="addEmoji('😍')">😍</button>
+<button onclick="addEmoji('😂')">😂</button>
+<button onclick="addEmoji('😘')">😘</button>
+<button onclick="addEmoji('🌹')">🌹</button>
+<button onclick="addEmoji('👍')">👍</button>
+</div>
+<div id="sendArea">
+<input id="message" placeholder="پیام خود را بنویسید">
+<button onclick="sendMessage()">ارسال</button>
+</div>
+</div>
+</div>
+</div>
 </main>
 
-<script>
-let user="";
-let avatar="";
+<script type="module">
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+
+import {getAuth,signInAnonymously}
+from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+import {
+ getFirestore,collection,doc,setDoc,updateDoc,
+ addDoc,query,where,onSnapshot,serverTimestamp,limit
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyBuj3nb-ACIwFVkCnuzRqFRwCRz323nQ9I",
+ authDomain:"chat-eshgh-ba-vafa.firebaseapp.com",
+ projectId:"chat-eshgh-ba-vafa",
+ storageBucket:"chat-eshgh-ba-vafa.firebasestorage.app",
+ messagingSenderId:"235744727404",
+ appId:"1:235744727404:web:8f02d62853698462cba349",
+ measurementId:"G-NR1076K019"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let me=null;
+let myName="";
+let myPhoto="";
+let activePeer=null;
+let usersUnsub=null;
+let messagesUnsub=null;
 let heartbeat=null;
+let allUsers=[];
 
-function enterChat(){
- user=document.getElementById("username").value.trim();
- if(!user){alert("نام کاربری را بنویسید");return}
+const $=id=>document.getElementById(id);
 
- const file=document.getElementById("photo").files[0];
- if(file){
-  if(file.size>2*1024*1024){
-   alert("حجم عکس باید کمتر از ۲ مگابایت باشد");
-   return;
-  }
+async function getUser(){
+ if(!auth.currentUser) await signInAnonymously(auth);
+ return auth.currentUser;
+}
+
+async function compressPhoto(file){
+ return new Promise((resolve,reject)=>{
   const reader=new FileReader();
   reader.onload=()=>{
-   avatar=reader.result;
-   startChat();
+   const img=new Image();
+   img.onload=()=>{
+    const canvas=document.createElement("canvas");
+    const scale=Math.min(1,180/img.width,180/img.height);
+    canvas.width=img.width*scale;
+    canvas.height=img.height*scale;
+    canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+    resolve(canvas.toDataURL("image/jpeg",.65));
+   };
+   img.onerror=reject;
+   img.src=reader.result;
   };
+  reader.onerror=reject;
   reader.readAsDataURL(file);
- }else{
-  avatar="https://placehold.co/100x100?text=User";
-  startChat();
+ });
+}
+
+window.enterChat=async function(){
+ const name=$("username").value.trim();
+ if(!name){$("error").textContent="نام کاربری را وارد کنید";return}
+ if(name.length>25){$("error").textContent="نام باید کمتر از ۲۵ حرف باشد";return}
+
+ $("enterBtn").disabled=true;
+ $("error").textContent="لطفاً صبر کنید...";
+
+ try{
+  me=await getUser();
+  myName=name;
+  const file=$("photo").files[0];
+  myPhoto=file?await compressPhoto(file):"";
+
+  await setDoc(doc(db,"users",me.uid),{
+   name:myName,
+   photo:myPhoto,
+   lastSeen:Date.now()
+  },{merge:true});
+
+  $("login").style.display="none";
+  $("chat").style.display="block";
+  $("welcome").textContent="سلام "+myName+" عزیز ❤️";
+  $("myPhoto").src=myPhoto||"";
+  $("myUid").textContent=me.uid;
+
+  startUsers();
+  openPublic();
+
+  heartbeat=setInterval(async()=>{
+   if(me){
+    try{
+     await updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()});
+    }catch(e){}
+   }
+  },20000);
+
+ }catch(e){
+  $("error").textContent="خطا در اتصال: "+e.message;
  }
-}
+ $("enterBtn").disabled=false;
+};
 
-function startChat(){
- document.getElementById("login").hidden=true;
- document.getElementById("chat").hidden=false;
- document.getElementById("welcome").textContent="سلام "+user+" عزیز ❤️";
- document.getElementById("myPhoto").src=avatar;
- updatePresence();
- heartbeat=setInterval(updatePresence,15000);
- renderUsers();
-}
-
-function updatePresence(){
- let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
- users[user]={name:user,photo:avatar,lastSeen:Date.now()};
- localStorage.setItem("chatUsers",JSON.stringify(users));
- renderUsers();
+function startUsers(){
+ if(usersUnsub)usersUnsub();
+ usersUnsub=onSnapshot(collection(db,"users"),snap=>{
+  allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
+  renderUsers();
+ },e=>console.error(e));
 }
 
 function renderUsers(){
- let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
- let now=Date.now();
- Object.keys(users).forEach(k=>{
-  if(now-users[k].lastSeen>60000)delete users[k];
- });
- localStorage.setItem("chatUsers",JSON.stringify(users));
-
- const list=document.getElementById("userList");
+ const list=$("userList");
  list.innerHTML="";
- Object.values(users).forEach(u=>{
-  const item=document.createElement("div");
-  item.className="user";
+ const now=Date.now();
+
+ allUsers.forEach(u=>{
+  if(u.uid===me.uid)return;
+  const online=u.lastSeen && now-u.lastSeen<75000;
+  if(!online)return;
+
+  const btn=document.createElement("button");
+  btn.className="user";
+
   const img=document.createElement("img");
   img.className="avatar";
-  img.src=u.photo;
-  const info=document.createElement("div");
-  const name=document.createElement("b");
-  name.textContent=u.name;
-  const status=document.createElement("div");
-  status.innerHTML='<span class="dot"></span> <span class="status">آنلاین</span>';
-  info.append(name,status);
-  item.append(img,info);
-  list.append(item);
+  img.src=u.photo||"";
+  const info=document.createElement("span");
+  info.textContent=u.name+"  🟢 آنلاین";
+
+  btn.append(img,info);
+  btn.onclick=()=>openPrivate(u);
+  list.append(btn);
+ });
+ if(!list.children.length)list.textContent="فعلاً کاربر آنلاین دیگری نیست";
+}
+
+function stopMessages(){
+ if(messagesUnsub){messagesUnsub();messagesUnsub=null}
+}
+
+window.openPublic=function(){
+ activePeer=null;
+ $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
+ listenMessages("public");
+};
+
+window.openPrivate=function(u){
+ activePeer=u;
+ $("roomTitle").textContent="گفت‌وگوی خصوصی با "+u.name;
+ listenMessages("private");
+};
+
+function listenMessages(type){
+ stopMessages();
+ $("messages").innerHTML="در حال دریافت پیام‌ها...";
+ let q;
+
+ if(type==="public"){
+  q=query(collection(db,"messages"),where("type","==","public"));
+ }else{
+  q=query(collection(db,"messages"),
+    where("members","array-contains",me.uid));
+ }
+
+ messagesUnsub=onSnapshot(q,snap=>{
+  let arr=snap.docs.map(d=>({id:d.id,...d.data()}));
+
+  if(type==="private"){
+   arr=arr.filter(m=>m.members?.includes(activePeer.uid));
+  }
+
+  arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+  arr=arr.slice(-100);
+  renderMessages(arr);
+ },e=>{
+  $("messages").textContent="خطا در دریافت پیام‌ها: "+e.message;
  });
 }
 
-function sendMessage(){
- const input=document.getElementById("message");
- const value=input.value.trim();
- if(!value)return;
- const item=document.createElement("div");
- item.className="msg me";
- item.textContent=user+": "+value;
- document.getElementById("messages").append(item);
- input.value="";
- document.getElementById("messages").scrollTop=
- document.getElementById("messages").scrollHeight;
+function renderMessages(arr){
+ const box=$("messages");
+ box.innerHTML="";
+ arr.forEach(m=>{
+  const div=document.createElement("div");
+  div.className="msg"+(m.senderUid===me.uid?" mine":"");
+  const name=document.createElement("b");
+  name.textContent=m.senderName+": ";
+  const body=document.createElement("span");
+  body.textContent=m.text;
+  div.append(name,body);
+  box.append(div);
+ });
+ box.scrollTop=box.scrollHeight;
 }
 
-function logout(){
- clearInterval(heartbeat);
- let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
- delete users[user];
- localStorage.setItem("chatUsers",JSON.stringify(users));
- document.getElementById("chat").hidden=true;
- document.getElementById("login").hidden=false;
- document.getElementById("username").value="";
- user="";
-}
+window.sendMessage=async function(){
+ const text=$("message").value.trim();
+ if(!text||!me)return;
 
-window.addEventListener("beforeunload",()=>{
- if(user){
-  let users=JSON.parse(localStorage.getItem("chatUsers")||"{}");
-  delete users[user];
-  localStorage.setItem("chatUsers",JSON.stringify(users));
+ try{
+  const data={
+   senderUid:me.uid,
+   senderName:myName,
+   text:text,
+   createdAt:serverTimestamp()
+  };
+
+  if(activePeer){
+   data.type="private";
+   data.members=[me.uid,activePeer.uid];
+  }else{
+   data.type="public";
+  }
+
+  await addDoc(collection(db,"messages"),data);
+  $("message").value="";
+ }catch(e){
+  alert("پیام ارسال نشد: "+e.message);
  }
-});
+};
+
+window.addEmoji=function(emoji){
+ $("message").value+=emoji;
+ $("message").focus();
+};
+
+window.exitChat=async function(){
+ if(heartbeat)clearInterval(heartbeat);
+ stopMessages();
+ if(usersUnsub){usersUnsub();usersUnsub=null}
+ if(me){
+  try{await updateDoc(doc(db,"users",me.uid),{lastSeen:0})}catch(e){}
+ }
+ $("chat").style.display="none";
+ $("login").style.display="block";
+ $("message").value="";
+};
 </script>
 </body>
 </html>
+
 
