@@ -21,7 +21,14 @@ button:disabled{opacity:.5}
 #adminPanel .small{margin:3px 0;font-size:11px}
 #adminUsers>div{padding:5px!important;gap:4px!important}
 #adminUsers button,#adminUsers select{padding:6px 8px;font-size:12px;border-radius:7px}
-#messages{height:320px;overflow-y:auto;background-color:#fff8fc;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2790%27 height=%2778%27 viewBox=%270 0 90 78%27%3E%3Cpath d=%27M22 16 C22 9 32 7 36 15 C40 7 50 9 50 16 C50 24 36 32 36 32 C36 32 22 24 22 16Z%27 fill=%27%23f5a8c5%27 fill-opacity=%270.30%27/%3E%3Cpath d=%27M62 48 C62 42 70 40 74 47 C78 40 86 42 86 48 C86 55 74 62 74 62 C74 62 62 55 62 48Z%27 fill=%27%238bbcf0%27 fill-opacity=%270.25%27/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.94));background-size:90px 78px,auto;padding:10px;border-radius:10px;border:1px solid #f2cddd}
+
+#roomTitle{font-size:13px;margin:2px 0 5px}
+#layout>.panel{padding:6px;margin-bottom:6px}
+#layout>.panel>button{padding:5px 7px;font-size:10px;border-radius:6px}
+#sendArea input{padding:6px;font-size:11px;margin:3px 0}
+#sendArea button{padding:6px 8px;font-size:10px;min-width:48px}
+#emoji button{padding:3px;margin:1px;font-size:11px}
+#messages{height:180px;overflow-y:auto;background-color:#fff8fc;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2790%27 height=%2778%27 viewBox=%270 0 90 78%27%3E%3Cpath d=%27M22 16 C22 9 32 7 36 15 C40 7 50 9 50 16 C50 24 36 32 36 32 C36 32 22 24 22 16Z%27 fill=%27%23f5a8c5%27 fill-opacity=%270.30%27/%3E%3Cpath d=%27M62 48 C62 42 70 40 74 47 C78 40 86 42 86 48 C86 55 74 62 74 62 C74 62 62 55 62 48Z%27 fill=%27%238bbcf0%27 fill-opacity=%270.25%27/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.94));background-size:90px 78px,auto;padding:10px;border-radius:10px;border:1px solid #f2cddd}
 .msg{background:#e4efff;padding:10px;margin:8px 0;border-radius:10px;overflow-wrap:anywhere}
 .mine{background:#d9f2df}
 .user{display:flex;align-items:center;gap:3px;padding:3px;border-bottom:1px solid #eee;width:100%;text-align:right;font-size:10px}
@@ -46,7 +53,7 @@ button:disabled{opacity:.5}
 .mode.active{background:#1769c2;color:white}
 @media(max-width:600px){
  #layout{grid-template-columns:1fr}
- #messages{height:260px}
+ #messages{height:150px}
  #users{max-height:90px;overflow:auto;padding:5px}
 }
 </style>
