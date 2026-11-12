@@ -28,6 +28,8 @@ button:disabled{opacity:.5}
 #emoji button{width:auto;padding:6px;margin:3px;background:#eee;color:#333}
 .small{font-size:12px;color:#777}
 #chat{display:none}
+.mode{background:#eee;color:#713b91;margin:3px}
+.mode.active{background:#713b91;color:white}
 @media(max-width:600px){
  #layout{grid-template-columns:1fr}
  #messages{height:300px}
@@ -44,9 +46,18 @@ button:disabled{opacity:.5}
 <main>
 <div class="panel" id="login">
 <h3>خوش آمدید ❤️</h3>
-<input id="username" placeholder="نام کاربری خود را بنویسید">
+
+<button class="mode active" id="loginMode" onclick="setMode('login')">ورود</button>
+<button class="mode" id="registerMode" onclick="setMode('register')">ثبت‌نام</button>
+
+<input id="username" placeholder="نام کاربری">
+<input id="password" type="password" placeholder="رمز عبور">
+
+<div id="photoArea" style="display:none">
 <label>عکس پروفایل (اختیاری):</label>
 <input type="file" id="photo" accept="image/*">
+</div>
+
 <button id="enterBtn" onclick="enterChat()">ورود به چت</button>
 <p id="error" class="small"></p>
 </div>
@@ -91,12 +102,15 @@ button:disabled{opacity:.5}
 import {initializeApp}
 from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
-import {getAuth,signInAnonymously}
-from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {
+ getAuth,createUserWithEmailAndPassword,
+ signInWithEmailAndPassword,signOut,deleteUser
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 
 import {
  getFirestore,collection,doc,setDoc,updateDoc,
- addDoc,query,where,onSnapshot,serverTimestamp,limit
+ addDoc,query,where,onSnapshot,serverTimestamp,
+ runTransaction,getDoc
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -121,12 +135,29 @@ let usersUnsub=null;
 let messagesUnsub=null;
 let heartbeat=null;
 let allUsers=[];
+let mode="login";
 
 const $=id=>document.getElementById(id);
 
-async function getUser(){
- if(!auth.currentUser) await signInAnonymously(auth);
- return auth.currentUser;
+window.setMode=function(value){
+ mode=value;
+ $("loginMode").classList.toggle("active",mode==="login");
+ $("registerMode").classList.toggle("active",mode==="register");
+ $("photoArea").style.display=mode==="register"?"block":"none";
+ $("enterBtn").textContent=mode==="register"?"ثبت‌نام و ورود":"ورود به چت";
+ $("error").textContent="";
+};
+
+async function usernameEmail(name){
+ const normalized=name.trim().toLowerCase();
+ const bytes=new TextEncoder().encode(normalized);
+ const hash=await crypto.subtle.digest("SHA-256",bytes);
+ const hex=Array.from(new Uint8Array(hash))
+  .map(b=>b.toString(16).padStart(2,"0")).join("");
+ return {
+  key:hex,
+  email:"u-"+hex+"@login.chat-eshgh-ba-vafa.com"
+ };
 }
 
 async function compressPhoto(file){
@@ -152,20 +183,71 @@ async function compressPhoto(file){
 
 window.enterChat=async function(){
  const name=$("username").value.trim();
- if(!name){$("error").textContent="نام کاربری را وارد کنید";return}
- if(name.length>25){$("error").textContent="نام باید کمتر از ۲۵ حرف باشد";return}
+ const password=$("password").value;
+
+ if(name.length<2||name.length>25){
+  $("error").textContent="نام کاربری باید بین ۲ تا ۲۵ حرف باشد";
+  return;
+ }
+ if(password.length<6){
+  $("error").textContent="رمز عبور باید حداقل ۶ حرف یا عدد باشد";
+  return;
+ }
 
  $("enterBtn").disabled=true;
  $("error").textContent="لطفاً صبر کنید...";
 
+ let credential=null;
+
  try{
-  me=await getUser();
+  const identity=await usernameEmail(name);
+
+  if(mode==="register"){
+   const existing=await getDoc(doc(db,"usernameIndex",identity.key));
+   if(existing.exists()){
+    throw new Error("این نام کاربری قبلاً ثبت شده است");
+   }
+
+   credential=await createUserWithEmailAndPassword(
+    auth,identity.email,password
+   );
+
+   try{
+    await runTransaction(db,async tx=>{
+     const ref=doc(db,"usernameIndex",identity.key);
+     const snap=await tx.get(ref);
+     if(snap.exists())throw new Error("این نام کاربری قبلاً ثبت شده است");
+     tx.set(ref,{uid:credential.user.uid});
+    });
+   }catch(e){
+    await deleteUser(credential.user);
+    throw e;
+   }
+
+   const file=$("photo").files[0];
+   myPhoto=file?await compressPhoto(file):"";
+
+  }else{
+   credential=await signInWithEmailAndPassword(
+    auth,identity.email,password
+   );
+
+   const index=await getDoc(doc(db,"usernameIndex",identity.key));
+   if(!index.exists()||index.data().uid!==credential.user.uid){
+    await signOut(auth);
+    throw new Error("نام کاربری یا رمز عبور اشتباه است");
+   }
+
+   const oldProfile=await getDoc(doc(db,"users",credential.user.uid));
+   myPhoto=oldProfile.exists()?oldProfile.data().photo||"":"";
+  }
+
+  me=credential.user;
   myName=name;
-  const file=$("photo").files[0];
-  myPhoto=file?await compressPhoto(file):"";
 
   await setDoc(doc(db,"users",me.uid),{
    name:myName,
+   usernameKey:identity.key,
    photo:myPhoto,
    lastSeen:Date.now()
   },{merge:true});
@@ -179,6 +261,7 @@ window.enterChat=async function(){
   startUsers();
   openPublic();
 
+  if(heartbeat)clearInterval(heartbeat);
   heartbeat=setInterval(async()=>{
    if(me){
     try{
@@ -188,8 +271,14 @@ window.enterChat=async function(){
   },20000);
 
  }catch(e){
-  $("error").textContent="خطا در اتصال: "+e.message;
+  let message=e.message||"خطای نامشخص";
+  if(e.code==="auth/email-already-in-use")message="این نام کاربری قبلاً ثبت شده است";
+  if(e.code==="auth/invalid-credential")message="نام کاربری یا رمز عبور اشتباه است";
+  if(e.code==="auth/weak-password")message="رمز عبور باید حداقل ۶ حرف باشد";
+  if(e.code==="auth/network-request-failed")message="اتصال اینترنت را بررسی کنید";
+  $("error").textContent=message;
  }
+
  $("enterBtn").disabled=false;
 };
 
@@ -207,8 +296,8 @@ function renderUsers(){
  const now=Date.now();
 
  allUsers.forEach(u=>{
-  if(u.uid===me.uid)return;
-  const online=u.lastSeen && now-u.lastSeen<75000;
+  if(!me||u.uid===me.uid)return;
+  const online=u.lastSeen&&now-u.lastSeen<65000;
   if(!online)return;
 
   const btn=document.createElement("button");
@@ -217,18 +306,25 @@ function renderUsers(){
   const img=document.createElement("img");
   img.className="avatar";
   img.src=u.photo||"";
+
   const info=document.createElement("span");
-  info.textContent=u.name+"  🟢 آنلاین";
+  info.textContent=u.name+" 🟢 آنلاین";
 
   btn.append(img,info);
   btn.onclick=()=>openPrivate(u);
   list.append(btn);
  });
- if(!list.children.length)list.textContent="فعلاً کاربر آنلاین دیگری نیست";
+
+ if(!list.children.length){
+  list.textContent="فعلاً کاربر آنلاین دیگری نیست";
+ }
 }
 
 function stopMessages(){
- if(messagesUnsub){messagesUnsub();messagesUnsub=null}
+ if(messagesUnsub){
+  messagesUnsub();
+  messagesUnsub=null;
+ }
 }
 
 window.openPublic=function(){
@@ -252,7 +348,7 @@ function listenMessages(type){
   q=query(collection(db,"messages"),where("type","==","public"));
  }else{
   q=query(collection(db,"messages"),
-    where("members","array-contains",me.uid));
+   where("members","array-contains",me.uid));
  }
 
  messagesUnsub=onSnapshot(q,snap=>{
@@ -262,7 +358,9 @@ function listenMessages(type){
    arr=arr.filter(m=>m.members?.includes(activePeer.uid));
   }
 
-  arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+  arr.sort((a,b)=>
+   (a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0)
+  );
   arr=arr.slice(-100);
   renderMessages(arr);
  },e=>{
@@ -276,10 +374,13 @@ function renderMessages(arr){
  arr.forEach(m=>{
   const div=document.createElement("div");
   div.className="msg"+(m.senderUid===me.uid?" mine":"");
+
   const name=document.createElement("b");
   name.textContent=m.senderName+": ";
+
   const body=document.createElement("span");
   body.textContent=m.text;
+
   div.append(name,body);
   box.append(div);
  });
@@ -319,17 +420,32 @@ window.addEmoji=function(emoji){
 
 window.exitChat=async function(){
  if(heartbeat)clearInterval(heartbeat);
+ heartbeat=null;
  stopMessages();
- if(usersUnsub){usersUnsub();usersUnsub=null}
- if(me){
-  try{await updateDoc(doc(db,"users",me.uid),{lastSeen:0})}catch(e){}
+
+ if(usersUnsub){
+  usersUnsub();
+  usersUnsub=null;
  }
+
+ if(me){
+  try{
+   await updateDoc(doc(db,"users",me.uid),{lastSeen:0});
+  }catch(e){}
+ }
+
+ await signOut(auth);
+ me=null;
+ activePeer=null;
+
  $("chat").style.display="none";
  $("login").style.display="block";
  $("message").value="";
+ $("password").value="";
 };
 </script>
 </body>
 </html>
+
 
 
