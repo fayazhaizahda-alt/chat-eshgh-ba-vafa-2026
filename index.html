@@ -358,7 +358,8 @@ from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
 import {
  getAuth,createUserWithEmailAndPassword,
- signInWithEmailAndPassword,signOut
+ signInWithEmailAndPassword,signOut,onAuthStateChanged,
+ setPersistence,browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 
 import {
@@ -396,6 +397,45 @@ let allUsers=[];
 let mode="login";
 let moderationUnsub=null;
 const botProcessed=new Set();
+let loginInProgress=false;
+
+// با باز شدن دوباره صفحه، حساب کاربر از حافظه محلی Firebase بازیابی می‌شود.
+async function restoreSavedSession(user){
+ try{
+  const snap=await getDoc(doc(db,"users",user.uid));
+  if(!snap.exists())return;
+  const profile=snap.data();
+  if(profile.banned===true){
+   await signOut(auth);
+   $("error").textContent="این حساب مسدود شده است.";
+   return;
+  }
+  me=user;
+  myName=profile.name||"کاربر";
+  myPhoto=profile.photo||"";
+  myRole=user.uid===OWNER_UID?"owner":(profile.role||"user");
+  $("login").style.display="none";
+  $("chat").style.display="block";
+  $("welcome").textContent="خوش آمدی دوباره "+myName+" عزیز ❤️ "+countryFlag(profile.countryCode||"");
+  $("myPhoto").src=myPhoto;
+  $("myUid").textContent=me.uid;
+  startUsers();
+  renderAdminPanel();
+  openPublic();
+  startBotModeration();
+  if(heartbeat)clearInterval(heartbeat);
+  heartbeat=setInterval(async()=>{
+   if(me){
+    try{await updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()});}catch(e){}
+   }
+  },20000);
+ }catch(e){
+  console.error("Session restore failed:",e);
+ }
+}
+onAuthStateChanged(auth,user=>{
+ if(user&&!loginInProgress&&!me)restoreSavedSession(user);
+});
 
 const $=id=>document.getElementById(id);
 window.setMode=function(value){
@@ -489,10 +529,12 @@ window.enterChat=async function(){
 
  $("enterBtn").disabled=true;
  $("error").textContent="لطفاً صبر کنید...";
+ loginInProgress=true;
 
  let credential=null;
 
  try{
+  await setPersistence(auth,browserLocalPersistence);
   const identity=await usernameEmail(name);
 
   if(mode==="register"){
@@ -565,6 +607,7 @@ window.enterChat=async function(){
   $("error").textContent=message;
  }
 
+ loginInProgress=false;
  $("enterBtn").disabled=false;
 };
 
