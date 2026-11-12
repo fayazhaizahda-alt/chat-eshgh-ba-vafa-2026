@@ -58,6 +58,29 @@ button:disabled{opacity:.5}
  #messages{height:320px}
  #users{max-height:90px;overflow:auto;padding:5px}
 }
+
+:root{color-scheme:dark;--bg:#101318;--panel:#1b2029;--line:#303947;--text:#edf1f7;--muted:#aab4c2}
+body{background:radial-gradient(ellipse at top right,#282038,transparent 42%),#101318;color:#edf1f7}
+header{background:linear-gradient(110deg,#34203c,#222b3c 55%,#3a2037);border-bottom:1px solid #50344f}
+.panel{background:linear-gradient(145deg,#1f2530,#181d26);border:1px solid #303947;box-shadow:0 8px 24px #0004}
+input,select{background:#111720;color:#edf1f7;border:1px solid #3a4656}
+#layout{grid-template-columns:240px minmax(0,1fr);gap:12px;align-items:start}
+#layout>.panel{padding:14px;margin:0}
+#users{position:sticky;top:10px;max-height:540px;overflow-y:auto}
+#users h3{font-size:15px;margin:2px 0 12px}
+.user{gap:9px;padding:8px 7px;margin:4px 0;background:#242c39;border:1px solid #333e4e;border-radius:10px;color:#edf1f7;font-size:12px}
+#roomTitle{font-size:17px;margin:2px 0 10px}
+#messages{height:440px;background:radial-gradient(circle at 1px 1px,#394352 1px,transparent 1.5px),#141a23;background-size:22px 22px;border:1px solid #354050}
+.msg{background:#293342;border:1px solid #3b485a;color:#f1f3f8;font-size:13px;line-height:1.8}
+.msg b{color:#f0a5ce}.msg.mine{background:#263c39;border-color:#37665a}.msg.mine b{color:#8fe0bb}
+#emoji button{background:#30394a;color:#fff;border:1px solid #455267}
+#returnPublicBtn{background:#354052;border:1px solid #46536a}
+#profileCard{background:linear-gradient(145deg,#242b39,#1b202b)}
+#profileCardRole{display:inline-block;padding:7px 12px;border:1px solid #8053a2;border-radius:20px;background:#382847;color:#e6c8ff!important}
+#myPhoto{border:2px solid #b95b9b}
+.small{color:#aab4c2}
+@media(max-width:650px){#layout{grid-template-columns:1fr;gap:9px}#users{position:static;max-height:155px}#userList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}#messages{height:55vh;min-height:280px;max-height:470px}}
+
 </style>
 </head>
 <body>
@@ -375,7 +398,7 @@ function renderUsers(){
   img.src=u.photo||"";
 
   const info=document.createElement("span");
-  info.textContent=countryFlag(u.countryCode||"")+" "+u.name+" 🟢 آنلاین";
+  info.textContent=countryFlag(u.countryCode||"")+" "+u.name+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
 
   btn.append(img,info);
   btn.onclick=()=>showProfile(u);
@@ -393,7 +416,7 @@ window.showProfile=function(u){
  $("profileCardPhoto").src=u.photo||"";
  $("profileCardName").textContent=u.name||"کاربر";
  $("profileCardUsername").textContent="@"+(u.name||"user");
- $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.role||"user");
+ $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
  const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
  $("profileCardStatus").textContent=online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین";
  $("profileCard").style.display="block";
