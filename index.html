@@ -254,6 +254,8 @@ let messagesUnsub=null;
 let heartbeat=null;
 let allUsers=[];
 let mode="login";
+let moderationUnsub=null;
+const botProcessed=new Set();
 
 const $=id=>document.getElementById(id);
 
@@ -402,6 +404,8 @@ window.enterChat=async function(){
   startUsers();
   renderAdminPanel();
   openPublic();
+  startBotModeration();
+  await sendBotMessage("🤖 سلام "+myName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
 
   if(heartbeat)clearInterval(heartbeat);
   heartbeat=setInterval(async()=>{
@@ -429,6 +433,11 @@ function startUsers(){
  if(usersUnsub)usersUnsub();
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
   allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
+  if(me && allUsers.some(u=>u.uid===me.uid && u.banned===true)){
+   alert("🤖 حساب شما به دلیل تخلف مسدود شده است.");
+   exitChat();
+   return;
+  }
   renderUsers();
   renderAdminPanel();
  },e=>console.error(e));
@@ -486,6 +495,76 @@ window.chatWithProfile=function(){
  closeProfile();
  openPrivate(u);
 };
+function normalizeBotText(value){
+ return String(value||"").toLowerCase()
+  .replace(/[يى]/g,"ی").replace(/ك/g,"ک")
+  .replace(/[\u200c\u200f]/g," ")
+  .replace(/[ًٌٍَُِّْـ]/g," ")
+  .replace(/\s+/g," ").trim();
+}
+
+function isOffensiveMessage(value){
+ const normalized=normalizeBotText(value);
+ const words=normalized.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+ const blockedWords=[
+  "احمق","بی‌شعور","بی شعور","حرامزاده","حرامی","کثافت",
+  "فاحشه","جنده","مادرجنده","پدرسوخته","بی‌ناموس","بی ناموس",
+  "ولدزنا","کسکش","کونی","گوه","گوهی","سگ پدر",
+  "fuck","fucking","bitch","shit","asshole"
+ ];
+ return blockedWords.some(term=>{
+  const t=normalizeBotText(term);
+  return t.includes(" ") ? normalized.includes(t) : words.includes(t);
+ });
+}
+
+async function sendBotMessage(message){
+ try{
+  await addDoc(collection(db,"messages"),{
+   senderUid:"CHAT_BOT",
+   senderName:"🤖 ربات",
+   text:message,
+   type:"public",
+   bot:true,
+   createdAt:serverTimestamp()
+  });
+ }catch(e){console.error("Bot message failed:",e);}
+}
+
+function startBotModeration(){
+ if(me?.uid!==OWNER_UID)return;
+ if(moderationUnsub)moderationUnsub();
+ const publicQuery=query(collection(db,"messages"),where("type","==","public"));
+ moderationUnsub=onSnapshot(publicQuery,snapshot=>{
+  snapshot.docChanges().forEach(async change=>{
+   if(change.type!=="added")return;
+   const message={id:change.doc.id,...change.doc.data()};
+   if(!message.senderUid || message.senderUid==="CHAT_BOT" ||
+      message.senderUid===OWNER_UID || message.bot ||
+      botProcessed.has(message.id))return;
+   botProcessed.add(message.id);
+   const created=message.createdAt?.toMillis?.()||message.createdAt||0;
+   if(!created || Date.now()-created>45000)return;
+
+   if(isOffensiveMessage(message.text)){
+    try{
+     await deleteDoc(doc(db,"messages",message.id));
+     await updateDoc(doc(db,"users",message.senderUid),{
+      banned:true,bannedBy:"CHAT_BOT",bannedAt:Date.now(),
+      banReason:"توهین و استفاده از الفاظ نامناسب"
+     });
+     await sendBotMessage("🛡️ ربات: پیام توهین‌آمیز حذف شد و حساب فرستنده مسدود گردید.");
+    }catch(e){console.error("Bot moderation failed:",e);}
+    return;
+   }
+
+   if(/سلام|درود|السلام علیکم|السلام‌علیکم/u.test(normalizeBotText(message.text))){
+    await sendBotMessage("🤖 وعلیکم‌السلام! خوش آمدی ❤️");
+   }
+  });
+ },error=>console.error("Bot moderation listener failed:",error));
+}
+
 function stopMessages(){
  if(messagesUnsub){
   messagesUnsub();
@@ -641,6 +720,10 @@ window.exitChat=async function(){
  if(usersUnsub){
   usersUnsub();
   usersUnsub=null;
+ }
+ if(moderationUnsub){
+  moderationUnsub();
+  moderationUnsub=null;
  }
 
  if(me){
