@@ -15,18 +15,22 @@ input,button{font-family:Tahoma;padding:12px;border-radius:9px;border:1px solid 
 input{width:100%;margin:7px 0}
 button{background:#1769c2;color:white;border:0;cursor:pointer}
 button:disabled{opacity:.5}
-#layout{display:grid;grid-template-columns:155px minmax(0,1fr);gap:8px}
+#layout{display:grid;grid-template-columns:105px minmax(0,1fr);gap:6px}
 #adminPanel{max-height:150px;overflow-y:auto;padding:7px;margin-bottom:7px}
 #adminPanel h3{font-size:15px;margin:2px 0 5px}
 #adminPanel .small{margin:3px 0;font-size:11px}
 #adminUsers>div{padding:5px!important;gap:4px!important}
 #adminUsers button,#adminUsers select{padding:6px 8px;font-size:12px;border-radius:7px}
-#messages{height:520px;overflow-y:auto;background-color:#fff8fc;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2790%27 height=%2778%27 viewBox=%270 0 90 78%27%3E%3Cpath d=%27M22 16 C22 9 32 7 36 15 C40 7 50 9 50 16 C50 24 36 32 36 32 C36 32 22 24 22 16Z%27 fill=%27%23f5a8c5%27 fill-opacity=%270.30%27/%3E%3Cpath d=%27M62 48 C62 42 70 40 74 47 C78 40 86 42 86 48 C86 55 74 62 74 62 C74 62 62 55 62 48Z%27 fill=%27%238bbcf0%27 fill-opacity=%270.25%27/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.94));background-size:90px 78px,auto;padding:10px;border-radius:10px;border:1px solid #f2cddd}
+#messages{height:320px;overflow-y:auto;background-color:#fff8fc;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2790%27 height=%2778%27 viewBox=%270 0 90 78%27%3E%3Cpath d=%27M22 16 C22 9 32 7 36 15 C40 7 50 9 50 16 C50 24 36 32 36 32 C36 32 22 24 22 16Z%27 fill=%27%23f5a8c5%27 fill-opacity=%270.30%27/%3E%3Cpath d=%27M62 48 C62 42 70 40 74 47 C78 40 86 42 86 48 C86 55 74 62 74 62 C74 62 62 55 62 48Z%27 fill=%27%238bbcf0%27 fill-opacity=%270.25%27/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,239,247,.94));background-size:90px 78px,auto;padding:10px;border-radius:10px;border:1px solid #f2cddd}
 .msg{background:#e4efff;padding:10px;margin:8px 0;border-radius:10px;overflow-wrap:anywhere}
 .mine{background:#d9f2df}
-.user{display:flex;align-items:center;gap:6px;padding:6px;border-bottom:1px solid #eee;width:100%;text-align:right}
-.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#dceaff;border:2px solid #b7d5ff}
+.user{display:flex;align-items:center;gap:3px;padding:3px;border-bottom:1px solid #eee;width:100%;text-align:right;font-size:10px}
+.avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#dceaff;border:1px solid #b7d5ff}
 #myPhoto{width:96px;height:96px;display:block;margin:4px 0 10px}
+#users{padding:6px}
+#users h3{font-size:12px;margin:3px 0 6px}
+#userList{font-size:10px}
+.msg{padding:6px;margin:5px 0;font-size:12px}
 #logoutBtn{display:inline-block!important;width:auto!important;min-width:0!important;height:28px!important;padding:3px 9px!important;margin:0!important;font-size:11px!important;line-height:18px!important;border-radius:6px!important;vertical-align:middle}
 .dot{display:inline-block;width:9px;height:9px;background:#20bd62;border-radius:50%}
 #sendArea{display:flex;gap:7px}
@@ -39,8 +43,8 @@ button:disabled{opacity:.5}
 .mode.active{background:#1769c2;color:white}
 @media(max-width:600px){
  #layout{grid-template-columns:1fr}
- #messages{height:420px}
- #users{max-height:125px;overflow:auto;padding:8px}
+ #messages{height:260px}
+ #users{max-height:90px;overflow:auto;padding:5px}
 }
 </style>
 </head>
