@@ -77,6 +77,7 @@ input,select{background:#111720;color:#edf1f7;border:1px solid #3a4656}
 #returnPublicBtn{background:#354052;border:1px solid #46536a}
 #profileCard{background:linear-gradient(145deg,#242b39,#1b202b)}
 #profileCardRole{display:inline-block;padding:7px 12px;border:1px solid #8053a2;border-radius:20px;background:#382847;color:#e6c8ff!important}
+.role-badge{display:inline-block;margin:3px auto;padding:6px 10px;border:1px solid #bd78a5;border-radius:18px;background:linear-gradient(120deg,#512b4c,#342447);color:#ffe0f1;font-size:12px;font-weight:700}
 #myPhoto{border:2px solid #b95b9b}
 .small{color:#aab4c2}
 @media(max-width:650px){#layout{grid-template-columns:1fr;gap:9px}#users{position:static;max-height:155px}#userList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}#messages{height:55vh;min-height:280px;max-height:470px}}
@@ -481,6 +482,7 @@ header{
 <div class="panel" id="myProfilePanel">
 <img id="myPhoto" class="avatar" alt="عکس پروفایل">
 <h3 id="welcome"></h3>
+<p id="myRoleBadge" class="role-badge">رتبه: در حال بررسی...</p>
 <p class="small"><span class="dot"></span> آنلاین</p>
 <button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
 <input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
@@ -591,6 +593,7 @@ async function restoreSavedSession(user){
   $("login").style.display="none";
   $("chat").style.display="block";
   $("welcome").textContent="خوش آمدی دوباره "+myName+" عزیز ❤️ "+countryFlag(profile.countryCode||"");
+   $("myRoleBadge").textContent="رتبه حساب: "+roleLabel(myRole);
   $("myPhoto").src=myPhoto;
   $("myUid").textContent=me.uid;
   startUsers();
