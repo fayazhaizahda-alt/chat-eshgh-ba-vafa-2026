@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "شعر",
+  "short_name": "شعر",
+  "description": "خواندن شعر و ورود به اتاق چت عشق با وفا",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbe8ef",
+  "theme_color": "#8b315c",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
