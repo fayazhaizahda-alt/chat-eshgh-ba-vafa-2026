@@ -859,6 +859,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
 <p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
 <p id="profileCardStatus" class="small"></p>
+<button type="button" id="profilePrivateBtn" onclick="chatWithProfile()" style="width:100%;margin:12px 0;padding:13px;border-radius:12px;background:linear-gradient(90deg,#a83c91,#70418c);color:white;font-size:18px;font-weight:bold">💌 شخصی</button>
 <div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:12px;border:1px solid #8053a2;border-radius:14px;background:#211b32">
  <p style="margin:3px 0 12px;font-weight:bold;color:#f1d7ff">🛡️ تعیین رتبه کاربر</p>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;text-align:right">
@@ -870,7 +871,6 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
  <button type="button" onclick="saveUserRole()" style="width:100%;margin-top:12px">ثبت رتبه انتخاب‌شده</button>
  <button type="button" id="ownerBanButton" onclick="toggleUserBan()" style="width:100%;margin-top:7px;background:#a83252">مسدود کردن حساب</button>
 </div>
-<button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
 <button type="button" onclick="closeProfile()">بستن</button>
 </div>
 </aside>
@@ -1295,6 +1295,7 @@ window.showProfile=function(u){
  $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
  const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
  $("profileCardStatus").textContent=(online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین")+(u.banned?" · 🚫 مسدود":"");
+ $("profilePrivateBtn").style.display=u.uid===me?.uid?"none":"block";
  const ownerControls=$("ownerUserControls");
  const isOwner=me?.uid===OWNER_UID && u.uid!==OWNER_UID;
  ownerControls.style.display=isOwner?"block":"none";
