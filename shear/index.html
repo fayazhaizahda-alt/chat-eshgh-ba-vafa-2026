@@ -23,7 +23,7 @@ main{max-width:560px;margin:0 auto;padding:12px 18px 38px}
 .arrow{margin-right:auto;color:#a45c7d;font-size:23px}
 .panel{display:none;margin-top:22px;padding:20px;background:#fffafc;border:1px solid #f0d5e1;border-radius:22px;box-shadow:0 8px 24px #7c345010}
 .panel.show{display:block}.panel h2{margin:0 0 10px;font-size:20px}
-.poem{background:#fff;border:1px solid #f1dce6;border-radius:17px;padding:17px;margin:13px 0;box-shadow:0 5px 16px #7c34500b}.poem h3{font-size:16px;margin:0 0 12px;color:#8b315c}.poem p{white-space:pre-line;line-height:2.15;font-size:15px;margin:0 0 13px}.like{border:1px solid #efcbdc;border-radius:999px;background:#fff6fa;color:#963e69;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.like.liked{background:#a83d70;color:white;border-color:#a83d70}.note{font-size:11px;color:#947d89;text-align:center;line-height:1.8;margin-top:14px}
+.category-tabs{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 14px;margin:4px 0 10px;scrollbar-width:thin}.category{flex:0 0 auto;border:1px solid #efcbdc;border-radius:999px;background:#fff;color:#80506a;padding:9px 13px;font:inherit;font-size:12px;cursor:pointer}.category.active{background:#a83d70;color:#fff;border-color:#a83d70}.poem{background:#fff;border:1px solid #f1dce6;border-radius:17px;padding:17px;margin:13px 0;box-shadow:0 5px 16px #7c34500b}.poem h3{font-size:16px;margin:0 0 12px;color:#8b315c}.poem p{white-space:pre-line;line-height:2.15;font-size:15px;margin:0 0 13px}.like{border:1px solid #efcbdc;border-radius:999px;background:#fff6fa;color:#963e69;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.like.liked{background:#a83d70;color:white;border-color:#a83d70}.note{font-size:11px;color:#947d89;text-align:center;line-height:1.8;margin-top:14px}
 footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
 </style>
 </head>
@@ -46,6 +46,14 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
   </button>
   <section class="panel" id="poetryPanel">
     <h2>🌷 گنجینه شعر</h2>
+    <div class="category-tabs" id="categoryTabs" aria-label="دسته‌بندی شعرها">
+      <button type="button" class="category active" data-category="all">همه شعرها</button>
+      <button type="button" class="category" data-category="romantic">❤️ عاشقانه</button>
+      <button type="button" class="category" data-category="longing">🥀 دلتنگی</button>
+      <button type="button" class="category" data-category="loyalty">🤍 وفاداری</button>
+      <button type="button" class="category" data-category="betrayal">💔 بی‌وفایی</button>
+      <button type="button" class="category" data-category="hope">🌱 امید</button>
+    </div>
     <div id="poemList"></div><p class="note">شعرها بدون نام نویسنده نمایش داده می‌شوند. پسندها فعلاً فقط روی همین دستگاه ذخیره می‌شوند.</p>
   </section>
 </main>
@@ -54,35 +62,44 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
 const button=document.getElementById('poetryButton');
 const panel=document.getElementById('poetryPanel');
 const poems=[
-{id:'p1',title:'به یاد تو',body:'شب از خیال چشم تو روشن شده هنوز\nاین قلب خسته با غم تو خو گرفته است\nهر جا که می‌روم، دل من سمت تو رود\nانگار راه خانهٔ من رو به تو گرفته است'},
-{id:'p2',title:'وفا',body:'وفا چراغ خانهٔ دل‌های روشن است\nدر روزگار سرد، پناهی برای ماست\nآن‌کس که با محبت خود عهد می‌کند\nدر قلب دوستان، همیشه عزیز و آشناست'},
-{id:'p3',title:'آرامش دل',body:'گاهی سکوت، حرف دل آدمی شود\nگاهی نگاه، قصهٔ ناگفته می‌شود\nیک قلب پاک اگرچه تنها بماند باز\nبا مهر، روشنایی این جاده می‌شود'},
-{id:'p4',title:'چراغ امید',body:'اگرچه راه زندگی پر ز پیچ و خم شود\nچراغ آرزو درون سینه روشن است\nبه هر کجا که باد غم وزید و خسته‌ام نمود\nامید، دست مهربان و تکیه‌گاه من است'},
-{id:'p5',title:'دل مهربان',body:'دلی که مهر می‌ورزد، بهار جاودان دارد\nمیان لحظه‌های سخت، لبخند و امان دارد\nنه با زر و نه با نام، کسی عزیز دل گردد\nکسی که رسم وفا داند، همیشه جایگاه دارد'}
+{id:'p1',title:'به یاد تو',body:'شب از خیال چشم تو روشن شده هنوز\nاین قلب خسته با غم تو خو گرفته است\nهر جا که می‌روم، دل من سمت تو رود\nانگار راه خانهٔ من رو به تو گرفته است',category:'longing'},
+{id:'p2',title:'وفا',body:'وفا چراغ خانهٔ دل‌های روشن است\nدر روزگار سرد، پناهی برای ماست\nآن‌کس که با محبت خود عهد می‌کند\nدر قلب دوستان، همیشه عزیز و آشناست',category:'loyalty'},
+{id:'p3',title:'آرامش دل',body:'گاهی سکوت، حرف دل آدمی شود\nگاهی نگاه، قصهٔ ناگفته می‌شود\nیک قلب پاک اگرچه تنها بماند باز\nبا مهر، روشنایی این جاده می‌شود',category:'hope'},
+{id:'p4',title:'چراغ امید',body:'اگرچه راه زندگی پر ز پیچ و خم شود\nچراغ آرزو درون سینه روشن است\nبه هر کجا که باد غم وزید و خسته‌ام نمود\nامید، دست مهربان و تکیه‌گاه من است',category:'hope'},
+{id:'p5',title:'دل مهربان',body:'دلی که مهر می‌ورزد، بهار جاودان دارد\nمیان لحظه‌های سخت، لبخند و امان دارد\nنه با زر و نه با نام، کسی عزیز دل گردد\nکسی که رسم وفا داند، همیشه جایگاه دارد',category:'loyalty'}
  ,
-{id:'p6',title:'عشق باوفا',body:'عشق آن نیست که هر روز به زبان آوریم\nعشق آن است که در سختی کنارت بمانیم ❤️'},
-{id:'p7',title:'دلتنگی',body:'دلم تنگ است برای لحظه‌های دیدنت\nبرای خنده‌های شیرین و صدای شنیدنت 🌹'}
+{id:'p6',title:'عشق باوفا',body:'عشق آن نیست که هر روز به زبان آوریم\nعشق آن است که در سختی کنارت بمانیم ❤️',category:'romantic'},
+{id:'p7',title:'دلتنگی',body:'دلم تنگ است برای لحظه‌های دیدنت\nبرای خنده‌های شیرین و صدای شنیدنت 🌹',category:'longing'}
 ,
-{id:'p8',title:'تو در قلب منی',body:'میان شلوغی دنیا تو آرام جان منی\nچراغ روشن شب‌های بی‌نشان منی\nاگر هزار بهار از کنار من بگذرد\nهمیشه تازه‌ترین گل در آسمان منی ❤️'},
-{id:'p9',title:'قرار عاشقی',body:'دلم به بودن تو خو گرفته است\nبه خنده‌های تو دل سپرده است\nکنار تو غم از دلم سفر کند\nکه عشق تو به قلبم جان داده است 🌹'},
-{id:'p10',title:'آغوش خیال',body:'وقتی که دوری، خاطرت نزدیک من است\nنام قشنگت ورد هر آهنگ من است\nهر شب به یادت چشم‌هایم خیره می‌ماند\nعشق تو زیباترین دلتنگی من است'},
-{id:'p11',title:'تا همیشه',body:'نه وعدهٔ بی‌پایه می‌خواهم، نه حرفی بی‌وفا\nفقط دلی پاک و مهربان، پر از مهر و صفا\nاگر کنارم بمانی در فراز و در نشیب\nبا عشق می‌سازیم فردایی پر از نور و وفا 💕'},
-{id:'p12',title:'لبخند تو',body:'لبخند تو بهار دل خستهٔ من است\nصدای تو ترانهٔ آهستهٔ من است\nهر جا که باشم و هر لحظه در سفر\nیاد تو بهترین هم‌نفس من است 🌷'}
+{id:'p8',title:'تو در قلب منی',body:'میان شلوغی دنیا تو آرام جان منی\nچراغ روشن شب‌های بی‌نشان منی\nاگر هزار بهار از کنار من بگذرد\nهمیشه تازه‌ترین گل در آسمان منی ❤️',category:'romantic'},
+{id:'p9',title:'قرار عاشقی',body:'دلم به بودن تو خو گرفته است\nبه خنده‌های تو دل سپرده است\nکنار تو غم از دلم سفر کند\nکه عشق تو به قلبم جان داده است 🌹',category:'romantic'},
+{id:'p10',title:'آغوش خیال',body:'وقتی که دوری، خاطرت نزدیک من است\nنام قشنگت ورد هر آهنگ من است\nهر شب به یادت چشم‌هایم خیره می‌ماند\nعشق تو زیباترین دلتنگی من است',category:'longing'},
+{id:'p11',title:'تا همیشه',body:'نه وعدهٔ بی‌پایه می‌خواهم، نه حرفی بی‌وفا\nفقط دلی پاک و مهربان، پر از مهر و صفا\nاگر کنارم بمانی در فراز و در نشیب\nبا عشق می‌سازیم فردایی پر از نور و وفا 💕',category:'loyalty'},
+{id:'p12',title:'لبخند تو',body:'لبخند تو بهار دل خستهٔ من است\nصدای تو ترانهٔ آهستهٔ من است\nهر جا که باشم و هر لحظه در سفر\nیاد تو بهترین هم‌نفس من است 🌷',category:'romantic'}
+,
+{id:'p13',title:'اشک‌های بی‌صدا',body:'به پای عهد تو دل را صبور نگه داشتم\nولی تو رفتی و من خاطره‌ها نگه داشتم\nچه سخت می‌شود باور کنی کسی که دوستش داشتی\nتمام عشق تو را ساده پشت سر گذاشت 💔',category:'betrayal'},
+{id:'p14',title:'قول شکسته',body:'گفتی که می‌مانی، اما نماندی\nدر فصل سختی دستم را نخواندی\nمن ماندم و یک قلب پر از سؤال\nتو رفتی و عهد دلت را شکاندی',category:'betrayal'}
 ];
 const storageKey='shear-liked-poems-v1';
 function getLikes(){try{return JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(e){return {}}}
+let activeCategory='all';
 function renderPoems(){
  const likes=getLikes();
- document.getElementById('poemList').innerHTML=poems.map(poem=>{
+ document.querySelectorAll('.category').forEach(btn=>btn.classList.toggle('active',btn.dataset.category===activeCategory));
+ const shown=activeCategory==='all'?poems:poems.filter(poem=>poem.category===activeCategory);
+ document.getElementById('poemList').innerHTML=shown.length?shown.map(poem=>{
   const liked=!!likes[poem.id];
   return '<article class="poem"><h3>🌷 '+poem.title+'</h3><p>'+poem.body+'</p><button class="like '+(liked?'liked':'')+'" type="button" data-id="'+poem.id+'" aria-pressed="'+liked+'">'+(liked?'♥ پسندیده شد':'♡ پسندیدن')+'</button></article>';
- }).join('');
+ }).join(''):'<p class="note">هنوز شعری در این بخش نیست.</p>';
  document.querySelectorAll('.like').forEach(btn=>btn.addEventListener('click',()=>{
   const current=getLikes();const id=btn.dataset.id;
   if(current[id]) delete current[id]; else current[id]=true;
   localStorage.setItem(storageKey,JSON.stringify(current));renderPoems();
  }));
 }
+document.querySelectorAll('.category').forEach(btn=>btn.addEventListener('click',()=>{
+ activeCategory=btn.dataset.category;renderPoems();
+}));
 renderPoems();
 button.addEventListener('click',()=>{
   const opened=panel.classList.toggle('show');
