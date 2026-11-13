@@ -847,7 +847,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
 </div>
 
-<div class="panel" id="botProfile">
+<div class="panel" id="botProfile" role="button" tabindex="0" onclick="showBotProfile()" style="cursor:pointer">
  <div id="botAvatar">👩🏻‍🦰</div>
  <h3>هیله</h3>
  <p class="small"><span class="dot"></span> ربات آنلاین</p>
@@ -1296,21 +1296,24 @@ function renderUsers(){
 }
 
 let selectedProfile=null;
+window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",role:"bot",bot:true,lastSeen:Date.now()});};
 window.showProfile=function(u){
  selectedProfile=u;
- $("profileCardPhoto").src=u.photo||"";
- $("profileCardName").textContent=u.displayName||u.name||"کاربر";
- $("profileCardUsername").textContent="نام ثبت‌نامی: "+(u.name||"user");
- $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
- const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
- $("profileCardStatus").textContent=(online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین")+(u.banned?" · 🚫 مسدود":"");
+ if(u.bot){
+  $("profileCardPhoto").src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100">🌸</text></svg>');
+ }else $("profileCardPhoto").src=u.photo||"";
+ $("profileCardName").textContent=u.bot?"🌸 هیله":(u.displayName||u.name||"کاربر");
+ $("profileCardUsername").textContent=u.bot?"نام کاربری: @HEYLE":"نام ثبت‌نامی: "+(u.name||"user");
+ $("profileCardRole").textContent=u.bot?"رتبه حساب: ربات رسمی":"رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
+ const online=!!u.bot||(u.lastSeen&&Date.now()-u.lastSeen<65000);
+ $("profileCardStatus").textContent=u.bot?"🟢 هیله همیشه آنلاین است":(online?"🟢 این حساب موجود است — آنلاین":"🟠 این حساب موجود است — آفلاین")+(u.banned?" · 🚫 مسدود":"");
  const onlineDot=$("profileOnlineDot");
  onlineDot.style.background=online?"#22c55e":"#f59e0b";
  onlineDot.title=online?"آنلاین":"آفلاین";
  onlineDot.setAttribute("aria-label",online?"آنلاین":"آفلاین");
  $("profilePrivateBtn").style.display=u.uid===me?.uid?"none":"block";
  const ownerControls=$("ownerUserControls");
- const isOwner=me?.uid===OWNER_UID && u.uid!==OWNER_UID;
+ const isOwner=me?.uid===OWNER_UID && u.uid!==OWNER_UID && !u.bot;
  ownerControls.style.display=isOwner?"block":"none";
  if(isOwner){
   const currentRole=["user","moderator","manager","admin"].includes(u.role||"user")?(u.role||"user"):"user";
@@ -1571,6 +1574,17 @@ window.sendMessage=async function(){
 
   await addDoc(collection(db,"messages"),data);
   $("message").value="";
+  if(activePeer?.bot){
+   const lower=text.toLowerCase();
+   let reply="من هیله هستم 🌸 خوش آمدی! هرچه خواستی برایم بنویس.";
+   if(/سلام|hello|hi/.test(lower))reply="سلام عزیزم 🌸 خوش آمدی به گفتگوی خصوصی من!";
+   else if(/خوبی|چطوری|حالت/.test(lower))reply="ممنون از مهربانی‌ات ❤️ من خوبم، تو چطوری؟";
+   else if(/اسم|نامت/.test(lower))reply="اسم من هیله است 🌸 ربات چت عشق با وفا.";
+   await addDoc(collection(db,"messages"),{
+    senderUid:me.uid,senderName:"هیله",text:reply,type:"private",bot:true,
+    members:[me.uid,activePeer.uid],createdAt:serverTimestamp()
+   });
+  }
  }catch(e){
   alert("پیام ارسال نشد: "+e.message);
  }
