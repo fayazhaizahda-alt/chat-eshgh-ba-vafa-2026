@@ -515,6 +515,47 @@ header{
  #sendArea button{min-width:40px!important;padding:6px 5px!important;font-size:8px!important}
 }
 
+
+/* تزئینات عاشقانه پس‌زمینه: قلب‌ها و گل‌ها */
+#messages{
+ position:relative!important;
+ isolation:isolate!important;
+ overflow-y:auto!important;
+ background:
+  radial-gradient(ellipse at 88% 18%,rgba(255,255,255,.62),transparent 28%),
+  radial-gradient(ellipse at 12% 82%,rgba(255,210,235,.65),transparent 35%),
+  linear-gradient(155deg,#e8d7ff 0%,#c9c7fa 48%,#f7d8ed 100%)!important;
+}
+#messages::before{
+ content:"💗";
+ position:absolute;
+ z-index:0;
+ right:5%;
+ top:27%;
+ font-size:clamp(78px,15vw,168px);
+ line-height:1;
+ opacity:.48;
+ filter:drop-shadow(0 8px 12px rgba(190,35,125,.25));
+ transform:rotate(8deg);
+ pointer-events:none;
+}
+#messages::after{
+ content:"🌹  💕  🌷";
+ position:absolute;
+ z-index:0;
+ right:8%;
+ bottom:9%;
+ font-size:clamp(25px,5vw,55px);
+ opacity:.5;
+ filter:drop-shadow(0 4px 8px rgba(140,40,110,.2));
+ pointer-events:none;
+}
+#messages>*{position:relative;z-index:1}
+@media(max-width:760px){
+ #messages::before{font-size:clamp(65px,17vw,105px);right:2%;top:32%;opacity:.42}
+ #messages::after{font-size:clamp(20px,5vw,32px);right:4%;bottom:8%}
+}
+
 </style>
 </head>
 <body>
