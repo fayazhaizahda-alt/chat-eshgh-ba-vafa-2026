@@ -485,6 +485,7 @@ header{
 <p id="myRoleBadge" class="role-badge">رتبه: در حال بررسی...</p>
 <p class="small"><span class="dot"></span> آنلاین</p>
 <button type="button" onclick="changeUsername()">✏️ تغییر نام کاربری</button>
+<button type="button" onclick="changeDisplayName()">🌸 تغییر نام نمایشی</button>
 <button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
 <input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
 <p id="photoStatus" class="small"></p>
@@ -566,6 +567,7 @@ const OWNER_UID="eaZWtnAluVMZ1bjDMrKcu8hye6t1";
 let me=null;
 let myRole="user";
 let myName="";
+let myDisplayName="";
 let myPhoto="";
 let activePeer=null;
 let usersUnsub=null;
@@ -590,11 +592,12 @@ async function restoreSavedSession(user){
   }
   me=user;
   myName=profile.name||"کاربر";
+  myDisplayName=profile.displayName||myName;
   myPhoto=profile.photo||"";
   myRole=user.uid===OWNER_UID?"owner":(profile.role||"user");
   $("login").style.display="none";
   $("chat").style.display="block";
-  $("welcome").textContent="خوش آمدی دوباره "+myName+" عزیز ❤️ "+countryFlag(profile.countryCode||"");
+  $("welcome").textContent="خوش آمدی دوباره "+myDisplayName+" عزیز ❤️ "+countryFlag(profile.countryCode||"");
    $("myRoleBadge").textContent="رتبه حساب: "+roleLabel(myRole);
   $("myPhoto").src=myPhoto;
   $("myUid").textContent=me.uid;
@@ -700,6 +703,21 @@ window.changeUsername=async function(){
  }
 };
 
+window.changeDisplayName=async function(){
+ if(!me){alert("ابتدا وارد چت شوید.");return;}
+ const nextName=(prompt("نام نمایشی دلخواه خود را وارد کنید (۲ تا ۲۵ حرف):")||"").trim();
+ if(!nextName)return;
+ if(nextName.length<2||nextName.length>25){alert("نام نمایشی باید بین ۲ تا ۲۵ حرف باشد.");return;}
+ if(nextName.toLowerCase()===myDisplayName.toLowerCase()){alert("این همان نام نمایشی فعلی شماست.");return;}
+ try{
+  await updateDoc(doc(db,"users",me.uid),{displayName:nextName});
+  myDisplayName=nextName;
+  $("welcome").textContent="خوش آمدی "+myDisplayName+" عزیز ❤️";
+  renderUsers();
+  alert("نام نمایشی با موفقیت ذخیره شد. نام ورود و رمز عبور شما هیچ تغییری نکرد.");
+ }catch(e){alert("تغییر نام نمایشی انجام نشد: "+(e.message||"خطای نامشخص"));}
+};
+
 window.changeProfilePhoto=async function(event){
  const file=event.target.files&&event.target.files[0];
  if(!file)return;
@@ -771,10 +789,12 @@ window.enterChat=async function(){
    throw new Error("این حساب به دلیل تخلف مسدود شده است. برای پیگیری با مالک برنامه تماس بگیرید.");
   }
   myRole=me.uid===OWNER_UID?"owner":(profileData.role||"user");
+  myDisplayName=profileData.displayName||myName;
   const country=await detectCountry();
 
   await setDoc(doc(db,"users",me.uid),{
    name:myName,
+   displayName:myDisplayName,
    usernameKey:identity.key,
    photo:myPhoto,
    countryCode:country.countryCode||profileData.countryCode||"",
@@ -784,7 +804,7 @@ window.enterChat=async function(){
 
   $("login").style.display="none";
   $("chat").style.display="block";
-  $("welcome").textContent="سلام "+myName+" عزیز ❤️ "+countryFlag(country.countryCode||profileData.countryCode||"");
+  $("welcome").textContent="سلام "+myDisplayName+" عزیز ❤️ "+countryFlag(country.countryCode||profileData.countryCode||"");
   $("myPhoto").src=myPhoto||"";
   $("myUid").textContent=me.uid;
 
@@ -792,7 +812,7 @@ window.enterChat=async function(){
   renderAdminPanel();
   openPublic();
   startBotModeration();
-  await sendBotMessage("سلام "+myName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
+  await sendBotMessage("سلام "+myDisplayName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
 
   if(heartbeat)clearInterval(heartbeat);
   heartbeat=setInterval(async()=>{
@@ -863,7 +883,7 @@ function renderUsers(){
    btn.append(img);
   }
   const info=document.createElement("span");
-  info.textContent=u.bot?"🌸 هیله · ربات":countryFlag(u.countryCode||"")+" "+(u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
+  info.textContent=u.bot?"🌸 هیله · ربات":countryFlag(u.countryCode||"")+" "+(u.displayName||u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
   btn.append(info);
   if(!u.bot)btn.onclick=()=>showProfile(u);
   list.append(btn);
@@ -878,8 +898,8 @@ let selectedProfile=null;
 window.showProfile=function(u){
  selectedProfile=u;
  $("profileCardPhoto").src=u.photo||"";
- $("profileCardName").textContent=u.name||"کاربر";
- $("profileCardUsername").textContent="@"+(u.name||"user");
+ $("profileCardName").textContent=u.displayName||u.name||"کاربر";
+ $("profileCardUsername").textContent="نام ثبت‌نامی: "+(u.name||"user");
  $("profileCardRole").textContent="رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
  const online=u.lastSeen&&Date.now()-u.lastSeen<65000;
  $("profileCardStatus").textContent=(online?"🟢 این حساب موجود است — آنلاین":"⚪ این حساب موجود است — آفلاین")+(u.banned?" · 🚫 مسدود":"");
@@ -1022,7 +1042,7 @@ window.openPublic=function(){
 
 window.openPrivate=function(u){
  activePeer=u;
- $("roomTitle").textContent="گفت‌وگوی خصوصی با "+u.name;
+ $("roomTitle").textContent="گفت‌وگوی خصوصی با "+(u.displayName||u.name);
  listenMessages("private");
 };
 
@@ -1090,7 +1110,7 @@ window.sendMessage=async function(){
  try{
   const data={
    senderUid:me.uid,
-   senderName:myName,
+   senderName:myDisplayName||myName,
    text:text,
    createdAt:serverTimestamp()
   };
@@ -1125,7 +1145,7 @@ function renderAdminPanel(){
   const row=document.createElement("div");
   row.style.cssText="padding:10px;border-top:1px solid #eee;display:flex;gap:7px;align-items:center;flex-wrap:wrap";
   const label=document.createElement("span");
-  label.textContent=(u.name||"بدون نام")+" — "+roleLabel(u.role||"user")+(u.banned?" — مسدود":""); row.append(label);
+  label.textContent=(u.displayName||u.name||"بدون نام")+" — "+roleLabel(u.role||"user")+(u.banned?" — مسدود":""); row.append(label);
   const roles=allowedRoles();
   if(roles.length&&u.role!=="owner"){
    const select=document.createElement("select");
