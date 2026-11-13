@@ -372,10 +372,11 @@ body{
 
 /* قلب‌های بزرگ و درخشان؛ فضای عاشقانه */
 body{position:relative;isolation:isolate;overflow-x:hidden}
+header,main{position:relative;z-index:1}
 body::before,body::after{
  content:"♥";
  position:fixed;
- z-index:-1;
+ z-index:0;
  pointer-events:none;
  user-select:none;
  line-height:1;
