@@ -2257,6 +2257,7 @@ window.showPoetry=function(){
  const p=document.getElementById("poetrySection");
  const login=document.getElementById("login");
  const chat=document.getElementById("chat");
+ window._poetryReturnToChat=!!(chat&&chat.style.display!=="none"&&chat.style.display!=="");
  if(p)p.style.display="block";
  if(login)login.style.display="none";
  if(chat)chat.style.display="none";
@@ -2267,7 +2268,7 @@ window.hidePoetry=function(){
  const login=document.getElementById("login");
  const chat=document.getElementById("chat");
  if(p)p.style.display="none";
- if(window.me){if(login)login.style.display="none";if(chat)chat.style.display="block";}
+ if(window._poetryReturnToChat){if(login)login.style.display="none";if(chat)chat.style.display="block";}
  else{if(login)login.style.display="block";if(chat)chat.style.display="none";}
 };
 </script>
