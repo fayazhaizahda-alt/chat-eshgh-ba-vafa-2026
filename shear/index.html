@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8b315c">
+<meta name="description" content="برنامه شعر؛ خواندن شعر و ورود به اتاق چت عشق با وفا">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>شعر</title>
+<style>
+:root{color-scheme:light;--ink:#382536;--pink:#a83d70;--rose:#f7dce8;--cream:#fff9fb}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Tahoma,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 12%,#fff 0 2%,transparent 24%),linear-gradient(145deg,#fbe8ef,#f3eaff 55%,#fff4e9)}
+header{text-align:center;padding:42px 18px 24px}
+.logo{width:76px;height:76px;margin:auto auto 12px;border-radius:25px;background:linear-gradient(145deg,#c65a89,#81315e);display:grid;place-items:center;color:white;font-size:38px;box-shadow:0 12px 28px #8b315c35}
+h1{font-size:32px;margin:8px 0}.sub{color:#805c72;margin:0;font-size:14px}
+main{max-width:560px;margin:0 auto;padding:12px 18px 38px}
+.choice{display:flex;align-items:center;gap:16px;width:100%;border:1px solid #f0d5e1;background:#fffafc;border-radius:22px;padding:19px;margin:13px 0;text-align:right;color:inherit;text-decoration:none;box-shadow:0 8px 24px #7c345010;cursor:pointer;transition:transform .15s}
+.choice:active{transform:scale(.985)}
+.symbol{width:58px;height:58px;flex:0 0 58px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:#f9e1eb}
+.choice h2{font-size:18px;margin:0 0 7px}.choice p{font-size:12px;color:#8b7180;margin:0;line-height:1.8}
+.arrow{margin-right:auto;color:#a45c7d;font-size:23px}
+.panel{display:none;margin-top:22px;padding:20px;background:#fffafc;border:1px solid #f0d5e1;border-radius:22px;box-shadow:0 8px 24px #7c345010}
+.panel.show{display:block}.panel h2{margin:0 0 10px;font-size:20px}
+.empty{text-align:center;padding:25px 8px;color:#876d7c;line-height:2;font-size:14px}
+footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-hidden="true">🌹</div>
+  <h1>شعر</h1>
+  <p class="sub">دنیایی برای شعر و دوستی</p>
+</header>
+<main>
+  <a class="choice" href="../" aria-label="ورود به اتاق چت عشق با وفا">
+    <div class="symbol">💬</div>
+    <div><h2>اتاق چت عشق با وفا</h2><p>برای گفت‌وگو وارد چت شوید</p></div>
+    <span class="arrow">‹</span>
+  </a>
+  <button class="choice" id="poetryButton" type="button" aria-expanded="false" aria-controls="poetryPanel">
+    <div class="symbol">📖</div>
+    <div><h2>بخش شعر</h2><p>خواندن شعرها و پسندیدن شعرهای دلخواه</p></div>
+    <span class="arrow">‹</span>
+  </button>
+  <section class="panel" id="poetryPanel">
+    <h2>🌷 گنجینه شعر</h2>
+    <div class="empty">بخش شعر آماده است.<br>شعرهایی که برای این برنامه انتخاب می‌کنی، اینجا نمایش داده می‌شوند.</div>
+  </section>
+</main>
+<footer>با مهر و عشق 🌹</footer>
+<script>
+const button=document.getElementById('poetryButton');
+const panel=document.getElementById('poetryPanel');
+button.addEventListener('click',()=>{
+  const opened=panel.classList.toggle('show');
+  button.setAttribute('aria-expanded',String(opened));
+  if(opened) panel.scrollIntoView({behavior:'smooth',block:'start'});
+});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
