@@ -867,14 +867,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <button id="returnPublicBtn" onclick="openPublic()">بازگشت به گفت‌وگوی عمومی</button>
 <button id="clearAllChatsBtn" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:8px 12px;font-size:12px;margin:4px 0">🗑️ پاک کردن تمام چت‌ها</button>
 <div id="messages"></div>
-<div id="emoji">
-<button onclick="addEmoji('❤️')">❤️</button>
-<button onclick="addEmoji('😍')">😍</button>
-<button onclick="addEmoji('😂')">😂</button>
-<button onclick="addEmoji('😘')">😘</button>
-<button onclick="addEmoji('🌹')">🌹</button>
-<button onclick="addEmoji('👍')">👍</button>
-</div>
+
 <div id="sendArea">
 <input id="message" placeholder="پیام خود را بنویسید">
 <button onclick="sendMessage()">ارسال</button>
@@ -1815,3 +1808,7 @@ window.exitChat=async function(){
   }
   #sendArea button{min-height:54px!important}
 }
+
+
+/* حذف کامل نوار شکلک‌ها از صفحه چت */
+#emoji{display:none!important;height:0!important;min-height:0!important;padding:0!important;margin:0!important}
