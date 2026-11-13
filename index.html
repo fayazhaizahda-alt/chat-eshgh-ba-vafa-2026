@@ -484,6 +484,7 @@ header{
 <h3 id="welcome"></h3>
 <p id="myRoleBadge" class="role-badge">رتبه: در حال بررسی...</p>
 <p class="small"><span class="dot"></span> آنلاین</p>
+<button type="button" onclick="changeUsername()">✏️ تغییر نام کاربری</button>
 <button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
 <input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
 <p id="photoStatus" class="small"></p>
@@ -535,6 +536,7 @@ from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {
  getAuth,createUserWithEmailAndPassword,
  signInWithEmailAndPassword,signOut,onAuthStateChanged,
+ EmailAuthProvider,reauthenticateWithCredential,updateEmail,
  setPersistence,browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 
@@ -670,6 +672,33 @@ async function compressPhoto(file){
   reader.readAsDataURL(file);
  });
 }
+
+window.changeUsername=async function(){
+ if(!me){alert("ابتدا وارد چت شوید.");return;}
+ const nextName=(prompt("نام کاربری جدید را وارد کنید (۲ تا ۲۵ حرف):")||"").trim();
+ if(!nextName)return;
+ if(nextName.length<2||nextName.length>25){alert("نام کاربری باید بین ۲ تا ۲۵ حرف باشد.");return;}
+ if(nextName.toLowerCase()===myName.toLowerCase()){alert("این همان نام کاربری فعلی شماست.");return;}
+ const password=prompt("برای تأیید هویت، رمز عبور فعلی خود را وارد کنید:");
+ if(password===null||!password)return;
+ try{
+  const identity=await usernameEmail(nextName);
+  const credential=EmailAuthProvider.credential(me.email,password);
+  await reauthenticateWithCredential(me,credential);
+  await updateEmail(me,identity.email);
+  await updateDoc(doc(db,"users",me.uid),{name:nextName,usernameKey:identity.key});
+  myName=nextName;
+  $("welcome").textContent="خوش آمدی "+myName+" عزیز ❤️";
+  renderUsers();
+  alert("نام کاربری با موفقیت تغییر کرد. از این پس با نام جدید وارد شوید.");
+ }catch(e){
+  let message=e.message||"خطای نامشخص";
+  if(e.code==="auth/email-already-in-use")message="این نام کاربری قبلاً توسط شخص دیگری انتخاب شده است.";
+  else if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential")message="رمز عبور فعلی درست نیست.";
+  else if(e.code==="auth/requires-recent-login")message="لطفاً دوباره خارج شوید و وارد شوید، سپس تغییر نام را انجام دهید.";
+  alert("تغییر نام کاربری انجام نشد: "+message);
+ }
+};
 
 window.changeProfilePhoto=async function(event){
  const file=event.target.files&&event.target.files[0];
