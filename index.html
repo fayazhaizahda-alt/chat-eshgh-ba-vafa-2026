@@ -804,6 +804,32 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
   border-color: transparent !important;
 }
 
+
+/* ثابت ماندن جای نوشتن پیام هنگام بالا و پایین رفتن صفحه */
+#chatPanel{display:flex!important;flex-direction:column!important;min-height:0}
+#sendArea{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:100!important;
+  flex:0 0 auto!important;
+  margin-top:auto!important;
+  background:#f7f1ff!important;
+  box-shadow:0 -5px 14px rgba(35,16,58,.16)!important;
+}
+#message{scroll-margin-bottom:16px}
+@media(max-width:700px){
+  #chatPanel{min-height:calc(100dvh - 88px)!important}
+  #messages{
+    min-height:220px!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+  }
+  #sendArea{
+    bottom:0!important;
+    padding-bottom:max(5px,env(safe-area-inset-bottom))!important;
+  }
+}
+
 </style>
 </head>
 <body>
