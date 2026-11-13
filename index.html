@@ -774,6 +774,9 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 #profileCard.profile-self-modal #profileCardName{font-size:25px!important;font-weight:900!important;margin:12px 0!important;color:#fff!important}
 #profileCard.profile-self-modal #profileCardUsername,#profileCard.profile-self-modal #profileCardRole{font-size:18px!important;line-height:1.9!important}
 #profileCard.profile-self-modal #profileCardStatus{font-size:15px!important}
+
+.message-sender-link{display:inline!important;padding:0!important;margin:0 5px 0 0!important;border:0!important;background:transparent!important;color:#e6a5df!important;font:inherit!important;font-weight:900!important;text-decoration:underline!important;text-underline-offset:3px;cursor:pointer!important;direction:ltr!important}
+.message-sender-link:disabled{opacity:1!important;cursor:default!important}
 </style>
 </head>
 <body>
@@ -1474,6 +1477,31 @@ function listenMessages(type){
  });
 }
 
+async function openMessageSenderProfile(message){
+ const uid=message.senderUid||"";
+ const senderName=String(message.senderName||"").replace(/^@+/,"").trim();
+ let account=(allUsers||[]).find(u=>uid&&u.uid===uid)||null;
+ try{
+  if(!account&&uid){
+   const snap=await getDoc(doc(db,"users",uid));
+   if(snap.exists())account={uid:snap.id,...snap.data()};
+  }
+  if(!account&&senderName){
+   let snap=await getDocs(query(collection(db,"users"),where("displayName","==",senderName)));
+   if(snap.empty)snap=await getDocs(query(collection(db,"users"),where("name","==",senderName)));
+   if(!snap.empty){const d=snap.docs[0];account={uid:d.id,...d.data()};}
+  }
+ }catch(e){
+  alert("دریافت حساب کاربر انجام نشد: "+(e.message||e));
+  return;
+ }
+ if(!account){
+  alert("حساب کاربری با نام «"+(senderName||"نامشخص")+"» در فهرست حساب‌ها پیدا نشد.");
+  return;
+ }
+ window.showProfile(account);
+}
+
 function renderMessages(arr){
  const box=$("messages");
  const clearButton=$("clearAllChatsBtn");
@@ -1483,23 +1511,19 @@ function renderMessages(arr){
   const div=document.createElement("div");
   div.className="msg"+(m.senderUid===me.uid&&!m.bot?" mine":"");
 
-  const name=document.createElement("b");
+  const name=document.createElement("button");
+  name.type="button";
+  name.className="message-sender-link";
   if(m.bot){
-   name.textContent="🌸 هیله: ";
-   name.style.color="#e6a5df";
+   name.textContent="🌸 هیله";
+   name.disabled=true;
    name.title="ربات رسمی چت عشق با وفا";
   }else{
-   const sender=(allUsers||[]).find(u=>u.uid===m.senderUid)||
-    (m.senderUid===me?.uid?{uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole}:null);
+   const sender=(allUsers||[]).find(u=>m.senderUid&&u.uid===m.senderUid);
    const handle=String(sender?.displayName||m.senderName||"کاربر").replace(/^@+/,"");
-   name.textContent="@"+handle+": ";
-   name.style.color="#e6a5df";
-   name.style.cursor="pointer";
-   name.title="برای دیدن پروفایل @"+handle+" بزن";
-   name.onclick=()=>{
-    if(sender)showProfile(sender);
-    else showProfile({uid:m.senderUid,name:m.senderName||handle,displayName:handle,role:"user",lastSeen:Date.now()});
-   };
+   name.textContent="@"+handle;
+   name.title="برای دیدن حساب کاربری "+handle+" بزن";
+   name.onclick=()=>openMessageSenderProfile(m);
   }
 
   const body=document.createElement("span");
