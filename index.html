@@ -947,6 +947,23 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
   }
 }
 
+/* جایگاه هیله: درست زیر کارت مدیر */
+#botProfileSlot{grid-area:bot;display:block!important;margin:0!important;padding:0!important}
+#botProfileSlot .hey-leh-user{
+ display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
+ gap:8px!important;width:100%!important;min-height:64px!important;margin:0!important;padding:8px 10px!important;
+ border:1px solid #a66acb!important;border-radius:17px!important;background:linear-gradient(120deg,#4b2172,#321747)!important;
+ color:#fff!important;text-align:right!important;font-size:13px!important;cursor:pointer!important;
+}
+#botProfileSlot .hey-leh-user span{flex:0 0 36px!important}
+@media(max-width:760px){
+ #botProfileSlot .hey-leh-user{min-height:54px!important;padding:5px!important;gap:5px!important;font-size:10px!important}
+ #botProfileSlot .hey-leh-user span{width:30px!important;height:30px!important;flex-basis:30px!important;font-size:19px!important}
+}
+@media(max-width:430px){
+ #botProfileSlot .hey-leh-user{min-height:48px!important;padding:4px!important;font-size:9px!important}
+ #botProfileSlot .hey-leh-user span{width:27px!important;height:27px!important;flex-basis:27px!important;font-size:17px!important}
+}
 /* تاج کوچک مالک کنار عکس پروفایل */
 #myPhotoWrap{position:relative;display:inline-block;flex:0 0 auto;line-height:0}
 #myProfilePanel.owner-profile #myPhotoWrap::after{
@@ -1019,13 +1036,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <p class="small" id="myUid">شناسه کاربری</p>
 <button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
 </div>
-
-<div class="panel" id="botProfile" role="button" tabindex="0" onclick="showBotProfile()" style="cursor:pointer">
- <div id="botAvatar">👩🏻‍🦰</div>
- <h3>هیله</h3>
- <p class="small"><span class="dot"></span> پاسخگو و آنلاین</p>
- <span class="botTag">پاسخ‌گوی چت عشق با وفا</span>
-</div>
+<div id="botProfileSlot" aria-label="پروفایل هیله"></div>
 
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
@@ -1429,7 +1440,9 @@ function startUsers(){
 
 function renderUsers(){
  const list=$("userList");
+ const botSlot=$("botProfileSlot");
  list.innerHTML="";
+ if(botSlot)botSlot.innerHTML="";
  const now=Date.now();
  const roleOrder={owner:0,bot:1,admin:2,manager:3,moderator:4,user:5};
  const onlineUsers=allUsers.filter(u=>{
@@ -1449,6 +1462,7 @@ function renderUsers(){
   const img=document.createElement("img");
   img.className="avatar";
   if(u.bot){
+   btn.classList.add("hey-leh-user");
    img.style.display="none";
    const botIcon=document.createElement("span");
    botIcon.textContent="🌸";
@@ -1462,14 +1476,14 @@ function renderUsers(){
   info.textContent=u.bot?"🌸 هیله پاسخگو":countryFlag(u.countryCode||"")+" "+(u.displayName||u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
   btn.append(info);
   if(!u.bot)btn.onclick=()=>showProfile(u);
-  list.append(btn);
+  if(u.bot && botSlot)botSlot.append(btn);
+  else list.append(btn);
  });
 
  if(!list.children.length){
   list.textContent="فعلاً کاربر آنلاین دیگری نیست";
  }
 }
-
 let selectedProfile=null;
 window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",role:"bot",bot:true,lastSeen:Date.now()});};
 window.showProfile=function(u){
