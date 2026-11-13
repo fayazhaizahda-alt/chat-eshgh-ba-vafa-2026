@@ -733,6 +733,39 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
  #sendArea input{font-size:13px!important}
 }
 
+
+/* نمایش بزرگ پروفایل خود کاربر به شکل پنجره مرکزی */
+#profileCard.profile-self-modal{
+ position:fixed!important;
+ display:block!important;
+ z-index:99999!important;
+ left:50%!important;top:50%!important;
+ transform:translate(-50%,-50%)!important;
+ width:min(92vw,420px)!important;
+ max-width:420px!important;
+ max-height:85dvh!important;
+ overflow-y:auto!important;
+ margin:0!important;
+ padding:24px 18px!important;
+ border:2px solid #e6a5df!important;
+ border-radius:24px!important;
+ background:linear-gradient(160deg,#30203f,#171321)!important;
+ box-shadow:0 0 0 100vmax rgba(0,0,0,.78),0 18px 60px rgba(0,0,0,.6)!important;
+}
+#profileCard.profile-self-modal #profileCardPhoto{
+ width:150px!important;height:150px!important;
+ border:4px solid #e6a5df!important;
+ box-shadow:0 0 22px rgba(230,165,223,.45)!important;
+}
+#profileCard.profile-self-modal #profileCardName{
+ font-size:25px!important;font-weight:900!important;margin:12px 0!important;color:#fff!important;
+}
+#profileCard.profile-self-modal #profileCardUsername,
+#profileCard.profile-self-modal #profileCardRole{
+ font-size:18px!important;line-height:1.9!important;
+}
+#profileCard.profile-self-modal #profileCardStatus{font-size:15px!important}
+
 </style>
 </head>
 <body>
@@ -1263,8 +1296,10 @@ window.showProfile=function(u){
   $("ownerBanButton").textContent=u.banned?"🔓 آزاد کردن حساب":"🚫 مسدود کردن حساب";
   $("ownerBanButton").style.background=u.banned?"#247a54":"#a83252";
  }
- $("profileCard").style.display="block";
- $("profileCard").scrollIntoView({behavior:"smooth",block:"center"});
+ const profileCard=$("profileCard");
+ profileCard.classList.toggle("profile-self-modal",u.uid===me?.uid);
+ profileCard.style.display="block";
+ if(u.uid!==me?.uid)profileCard.scrollIntoView({behavior:"smooth",block:"center"});
 };
 window.saveUserRole=async function(){
  if(!me||me.uid!==OWNER_UID||!selectedProfile||selectedProfile.uid===OWNER_UID)return alert("فقط مالک اصلی می‌تواند رتبه کاربران را تغییر دهد.");
@@ -1296,6 +1331,7 @@ window.toggleUserBan=async function(){
 };
 window.closeProfile=function(){
  $("profileCard").style.display="none";
+ $("profileCard").classList.remove("profile-self-modal");
  selectedProfile=null;
 };
 window.chatWithProfile=function(){
