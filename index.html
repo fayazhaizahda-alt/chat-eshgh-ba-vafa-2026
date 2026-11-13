@@ -806,22 +806,24 @@ function renderUsers(){
  const list=$("userList");
  list.innerHTML="";
  const now=Date.now();
+ const roleOrder={owner:0,admin:1,manager:2,moderator:3,user:4};
+ const onlineUsers=allUsers.filter(u=>{
+  return u.lastSeen&&now-u.lastSeen<65000;
+ }).sort((a,b)=>{
+  const roleA=a.uid===OWNER_UID?"owner":(a.role||"user");
+  const roleB=b.uid===OWNER_UID?"owner":(b.role||"user");
+  return (roleOrder[roleA]??4)-(roleOrder[roleB]??4)||
+   String(a.name||"").localeCompare(String(b.name||""),"fa");
+ });
 
- allUsers.forEach(u=>{
-  if(!me||u.uid===me.uid)return;
-  const online=u.lastSeen&&now-u.lastSeen<65000;
-  if(!online)return;
-
+ onlineUsers.forEach(u=>{
   const btn=document.createElement("button");
   btn.className="user";
-
   const img=document.createElement("img");
   img.className="avatar";
   img.src=u.photo||"";
-
   const info=document.createElement("span");
-  info.textContent=countryFlag(u.countryCode||"")+" "+u.name+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
-
+  info.textContent=countryFlag(u.countryCode||"")+" "+(u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
   btn.append(img,info);
   btn.onclick=()=>showProfile(u);
   list.append(btn);
