@@ -1484,10 +1484,22 @@ function renderMessages(arr){
   div.className="msg"+(m.senderUid===me.uid&&!m.bot?" mine":"");
 
   const name=document.createElement("b");
-  name.textContent=m.bot?"🌸 هیله: ":(m.senderName+": ");
   if(m.bot){
+   name.textContent="🌸 هیله: ";
    name.style.color="#e6a5df";
    name.title="ربات رسمی چت عشق با وفا";
+  }else{
+   const sender=(allUsers||[]).find(u=>u.uid===m.senderUid)||
+    (m.senderUid===me?.uid?{uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole}:null);
+   const handle=String(sender?.displayName||m.senderName||"کاربر").replace(/^@+/,"");
+   name.textContent="@"+handle+": ";
+   name.style.color="#e6a5df";
+   name.style.cursor="pointer";
+   name.title="برای دیدن پروفایل @"+handle+" بزن";
+   name.onclick=()=>{
+    if(sender)showProfile(sender);
+    else showProfile({uid:m.senderUid,name:m.senderName||handle,displayName:handle,role:"user",lastSeen:Date.now()});
+   };
   }
 
   const body=document.createElement("span");
