@@ -931,6 +931,21 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 #messages .msg .message-avatar{width:27px!important;height:27px!important;flex:0 0 27px!important;border-radius:50%!important;object-fit:cover!important;border:1px solid #d7a5df!important;background:#f4e8fa!important}
 #messages .msg .message-sender-link{align-self:center!important;margin:0 2px!important}
 #messages .msg .message-body{flex:1 1 100%!important;min-width:0!important;overflow-wrap:anywhere!important;white-space:pre-wrap!important;line-height:1.8!important}
+
+/* نام فرستنده پیام‌ها بزرگ و خوانا باشد */
+#messages .msg .message-sender-link{
+  font-size:18px!important;
+  font-weight:800!important;
+  line-height:1.6!important;
+  padding:2px 4px!important;
+  color:#8b35c5!important;
+}
+@media(max-width:700px){
+  #messages .msg .message-sender-link{
+    font-size:16px!important;
+    font-weight:800!important;
+  }
+}
 </style>
 </head>
 <body>
