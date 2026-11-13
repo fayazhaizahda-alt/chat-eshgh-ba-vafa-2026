@@ -1023,7 +1023,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <div class="panel" id="botProfile" role="button" tabindex="0" onclick="showBotProfile()" style="cursor:pointer">
  <div id="botAvatar">👩🏻‍🦰</div>
  <h3>هیله</h3>
- <p class="small"><span class="dot"></span> ربات آنلاین</p>
+ <p class="small"><span class="dot"></span> پاسخگو و آنلاین</p>
  <span class="botTag">پاسخ‌گوی چت عشق با وفا</span>
 </div>
 
@@ -1459,7 +1459,7 @@ function renderUsers(){
    btn.append(img);
   }
   const info=document.createElement("span");
-  info.textContent=u.bot?"🌸 هیله · ربات":countryFlag(u.countryCode||"")+" "+(u.displayName||u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
+  info.textContent=u.bot?"🌸 هیله پاسخگو":countryFlag(u.countryCode||"")+" "+(u.displayName||u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
   btn.append(info);
   if(!u.bot)btn.onclick=()=>showProfile(u);
   list.append(btn);
