@@ -766,6 +766,14 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 }
 #profileCard.profile-self-modal #profileCardStatus{font-size:15px!important}
 
+
+.role-choice{display:flex;align-items:center;gap:8px;padding:11px 9px;border:1px solid #8053a2;border-radius:10px;background:#30233d;color:#fff;font-size:16px;font-weight:bold;cursor:pointer}
+.role-choice input{width:19px;height:19px;accent-color:#e7a1df;cursor:pointer}
+#profileCard.profile-self-modal{position:fixed!important;display:block!important;z-index:99999!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:min(92vw,420px)!important;max-width:420px!important;max-height:85dvh!important;overflow-y:auto!important;margin:0!important;padding:24px 18px!important;border:2px solid #e6a5df!important;border-radius:24px!important;background:linear-gradient(160deg,#30203f,#171321)!important;box-shadow:0 0 0 100vmax rgba(0,0,0,.78),0 18px 60px rgba(0,0,0,.6)!important}
+#profileCard.profile-self-modal #profileCardPhoto{width:150px!important;height:150px!important;border:4px solid #e6a5df!important;box-shadow:0 0 22px rgba(230,165,223,.45)!important}
+#profileCard.profile-self-modal #profileCardName{font-size:25px!important;font-weight:900!important;margin:12px 0!important;color:#fff!important}
+#profileCard.profile-self-modal #profileCardUsername,#profileCard.profile-self-modal #profileCardRole{font-size:18px!important;line-height:1.9!important}
+#profileCard.profile-self-modal #profileCardStatus{font-size:15px!important}
 </style>
 </head>
 <body>
@@ -851,16 +859,15 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
 <p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
 <p id="profileCardStatus" class="small"></p>
-<div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:10px;border:1px solid #8053a2;border-radius:12px;background:#211b32">
- <p style="margin:3px 0 8px;font-weight:bold;color:#f1d7ff">🛡️ مدیریت رتبه کاربر (فقط مدیر)</p>
- <label for="ownerRoleSelect" style="display:block;font-size:12px;margin:5px">تعیین رتبه کاربر</label>
- <select id="ownerRoleSelect" style="width:100%;padding:9px;border-radius:8px">
-  <option value="user">مهمان</option>
-  <option value="moderator">ناظم</option>
-  <option value="manager">ناظر</option>
-  <option value="admin">ادمین</option>
- </select>
- <button type="button" onclick="saveUserRole()" style="width:100%;margin-top:7px">ثبت رتبه</button>
+<div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:12px;border:1px solid #8053a2;border-radius:14px;background:#211b32">
+ <p style="margin:3px 0 12px;font-weight:bold;color:#f1d7ff">🛡️ تعیین رتبه کاربر</p>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;text-align:right">
+  <label class="role-choice"><input type="radio" name="ownerRoleChoice" value="admin"> ☑ ادمین</label>
+  <label class="role-choice"><input type="radio" name="ownerRoleChoice" value="manager"> ☑ ناظر</label>
+  <label class="role-choice"><input type="radio" name="ownerRoleChoice" value="moderator"> ☑ ناظم</label>
+  <label class="role-choice"><input type="radio" name="ownerRoleChoice" value="user"> ☑ مهمان</label>
+ </div>
+ <button type="button" onclick="saveUserRole()" style="width:100%;margin-top:12px">ثبت رتبه انتخاب‌شده</button>
  <button type="button" id="ownerBanButton" onclick="toggleUserBan()" style="width:100%;margin-top:7px;background:#a83252">مسدود کردن حساب</button>
 </div>
 <button type="button" onclick="chatWithProfile()">💬 گفتگوی خصوصی</button>
@@ -1292,18 +1299,21 @@ window.showProfile=function(u){
  const isOwner=me?.uid===OWNER_UID && u.uid!==OWNER_UID;
  ownerControls.style.display=isOwner?"block":"none";
  if(isOwner){
-  $("ownerRoleSelect").value=["user","moderator","manager","admin"].includes(u.role||"user")?(u.role||"user"):"user";
+  const currentRole=["user","moderator","manager","admin"].includes(u.role||"user")?(u.role||"user"):"user";
+  document.querySelectorAll('input[name="ownerRoleChoice"]').forEach(input=>{input.checked=input.value===currentRole;});
   $("ownerBanButton").textContent=u.banned?"🔓 آزاد کردن حساب":"🚫 مسدود کردن حساب";
   $("ownerBanButton").style.background=u.banned?"#247a54":"#a83252";
  }
  const profileCard=$("profileCard");
- profileCard.classList.toggle("profile-self-modal",u.uid===me?.uid);
+ profileCard.classList.add("profile-self-modal");
  profileCard.style.display="block";
- if(u.uid!==me?.uid)profileCard.scrollIntoView({behavior:"smooth",block:"center"});
+
 };
 window.saveUserRole=async function(){
  if(!me||me.uid!==OWNER_UID||!selectedProfile||selectedProfile.uid===OWNER_UID)return alert("فقط مالک اصلی می‌تواند رتبه کاربران را تغییر دهد.");
- const role=$("ownerRoleSelect").value;
+ const selectedRole=document.querySelector('input[name="ownerRoleChoice"]:checked');
+ if(!selectedRole)return alert("لطفاً یکی از رتبه‌ها را انتخاب کن.");
+ const role=selectedRole.value;
  if(!["user","moderator","manager","admin"].includes(role))return alert("رتبه انتخاب‌شده معتبر نیست.");
  try{
   await updateDoc(doc(db,"users",selectedProfile.uid),{role});
