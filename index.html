@@ -870,6 +870,27 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 
 /* حذف کامل نوار شکلک‌ها از صفحه چت */
 #emoji{display:none!important;height:0!important;min-height:0!important;padding:0!important;margin:0!important}
+
+/* کادر تایپ چندخطی؛ متن به خط بعد می‌رود و کادر از پایین به بالا بزرگ می‌شود */
+#sendArea{align-items:flex-end!important}
+#sendArea #message{
+  display:block!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:54px!important;
+  max-height:150px!important;
+  height:54px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  resize:none!important;
+  white-space:pre-wrap!important;
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+  box-sizing:border-box!important;
+  line-height:1.55!important;
+  text-align:right!important;
+}
 </style>
 </head>
 <body>
@@ -909,7 +930,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <div id="messages"></div>
 
 <div id="sendArea">
-<input id="message" placeholder="پیام خود را بنویسید">
+<textarea id="message" rows="1" placeholder="پیام خود را بنویسید" oninput="this.style.height='54px';this.style.height=Math.min(this.scrollHeight,150)+'px'"></textarea>
 <button onclick="sendMessage()">ارسال</button>
 </div>
 </div>
