@@ -369,6 +369,46 @@ body{
 #sendArea input{background:#211725!important;color:#fff4f8!important}
 #emoji button{background:#51283f!important;color:#ffe5ef!important;border-color:#a85b7e!important}
 
+
+/* قلب‌های بزرگ و درخشان؛ فضای عاشقانه */
+body{position:relative;isolation:isolate;overflow-x:hidden}
+body::before,body::after{
+ content:"♥";
+ position:fixed;
+ z-index:-1;
+ pointer-events:none;
+ user-select:none;
+ line-height:1;
+ font-family:Arial,sans-serif;
+ color:rgba(255,72,139,.19);
+ text-shadow:0 0 28px rgba(255,65,139,.32),0 0 75px rgba(255,65,139,.22);
+ animation:heartGlow 5s ease-in-out infinite;
+}
+body::before{
+ content:"♥";
+ font-size:clamp(190px,34vw,390px);
+ top:7%;
+ left:-65px;
+ transform:rotate(-17deg);
+}
+body::after{
+ content:"❤";
+ font-size:clamp(220px,39vw,440px);
+ right:-95px;
+ bottom:2%;
+ color:rgba(255,119,174,.15);
+ text-shadow:0 0 35px rgba(255,105,170,.4),0 0 90px rgba(205,66,150,.28);
+ animation-delay:-2.5s;
+}
+@keyframes heartGlow{
+ 0%,100%{filter:brightness(.85);opacity:.72}
+ 50%{filter:brightness(1.35);opacity:1}
+}
+@media(max-width:600px){
+ body::before{top:13%;left:-80px;font-size:230px}
+ body::after{right:-100px;bottom:8%;font-size:260px}
+}
+
 </style>
 </head>
 <body>
