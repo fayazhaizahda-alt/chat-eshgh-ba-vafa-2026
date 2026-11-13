@@ -948,7 +948,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 }
 
 /* جایگاه هیله: درست زیر کارت مدیر */
-#botProfileSlot{grid-area:bot;display:block!important;margin:0!important;padding:0!important}
+#botProfileSlot{grid-area:auto!important;display:block!important;flex:0 0 100%!important;width:100%!important;margin:8px 0 0!important;padding:0!important}
 #botProfileSlot .hey-leh-user{
  display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
  gap:8px!important;width:100%!important;min-height:64px!important;margin:0!important;padding:8px 10px!important;
@@ -1035,8 +1035,8 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <p id="photoStatus" class="small"></p>
 <p class="small" id="myUid">شناسه کاربری</p>
 <button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
-</div>
 <div id="botProfileSlot" aria-label="پروفایل هیله"></div>
+</div>
 
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
@@ -1475,7 +1475,8 @@ function renderUsers(){
   const info=document.createElement("span");
   info.textContent=u.bot?"🌸 هیله پاسخگو":countryFlag(u.countryCode||"")+" "+(u.displayName||u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
   btn.append(info);
-  if(!u.bot)btn.onclick=()=>showProfile(u);
+  if(u.bot)btn.onclick=()=>showBotProfile();
+  else btn.onclick=()=>showProfile(u);
   if(u.bot && botSlot)botSlot.append(btn);
   else list.append(btn);
  });
