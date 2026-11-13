@@ -1123,6 +1123,187 @@ main{width:100%!important;max-width:1600px!important;margin:8px auto!important;p
  #sendArea button{min-width:42px!important}
 }
 
+
+/* ===== بازطراحی یکپارچه رابط چت مطابق تصویر مرجع ===== */
+:root{
+ --love-purple:#4d168c;--love-deep:#21134e;--love-violet:#7626c8;
+ --love-pink:#e8a4ff;--love-border:#a66aff;--love-text:#fff8ff;
+}
+html,body{min-height:100%;margin:0}
+body{
+ background:
+ radial-gradient(ellipse at 78% 45%,rgba(255,178,225,.75),transparent 38%),
+ radial-gradient(ellipse at 12% 85%,rgba(177,190,255,.7),transparent 42%),
+ linear-gradient(135deg,#f6d8f2 0%,#d9d7ff 52%,#f8d9ef 100%);
+ color:#fff;font-family:Tahoma,sans-serif;
+}
+.love-header{
+ position:relative;height:104px;min-height:104px;padding:10px 22px;
+ display:flex;align-items:center;justify-content:center;gap:22px;
+ background:linear-gradient(110deg,#351078,#5920a0 55%,#3d137d);
+ border-bottom:4px solid #a96aff;box-shadow:0 5px 20px #30105c55;
+}
+.love-header .header-menu-mark{position:absolute;left:24px;top:22px;font-size:40px;color:white}
+.love-header .brand-heart{font-size:58px;line-height:1}
+.love-header .brand-copy{text-align:center}
+.love-header .brand-copy h2{font-size:clamp(23px,3vw,38px);margin:0;font-weight:800}
+.love-header .brand-copy p{font-size:15px;margin:5px 0 0;color:#f8dcff}
+.love-header .header-actions{position:absolute;right:24px;top:22px;display:flex;gap:28px;font-size:35px}
+.love-header .bell{position:relative}
+.love-header .bell i{position:absolute;right:-8px;top:-5px;font-size:13px;font-style:normal;background:#ef234f;border-radius:20px;padding:2px 7px}
+main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
+#chat{width:100%}
+#layout{
+ direction:ltr!important;display:grid!important;
+ grid-template-columns:minmax(230px,30%) minmax(0,1fr)!important;
+ gap:10px!important;align-items:stretch!important;
+}
+#profileSidebar{
+ direction:rtl!important;grid-column:1!important;grid-row:1!important;
+ display:flex!important;flex-direction:column!important;gap:10px!important;
+ min-width:0!important;
+}
+#chatPanel{
+ direction:rtl!important;grid-column:2!important;grid-row:1!important;
+ display:flex!important;flex-direction:column!important;min-width:0!important;
+ padding:12px!important;border-radius:22px!important;
+ background:linear-gradient(145deg,#302064,#24164f)!important;
+ border:2px solid #9861df!important;box-shadow:0 8px 24px #35125d55!important;
+}
+#users{
+ display:block!important;position:static!important;min-height:0!important;
+ max-height:calc(100dvh - 145px)!important;overflow-y:auto!important;
+ padding:12px!important;margin:0!important;border-radius:20px!important;
+ background:linear-gradient(160deg,#35146d,#25134e)!important;
+ border:2px solid #a65cff!important;box-shadow:0 5px 18px #42176a44!important;
+}
+#users h3{font-size:clamp(13px,1.5vw,19px)!important;text-align:center;
+ padding:7px 2px 12px!important;margin:0 0 8px!important;
+ border-bottom:1px solid #8d58c6;color:#fff}
+#userList{display:flex!important;flex-direction:column!important;gap:5px!important}
+#users .user{
+ display:flex!important;flex-direction:row!important;align-items:center!important;
+ justify-content:flex-start!important;gap:10px!important;width:100%!important;
+ min-height:70px!important;padding:8px!important;margin:0!important;
+ border-radius:13px!important;background:#39266e!important;
+ border:1px solid #67429d!important;color:#fff!important;
+ font-size:clamp(12px,1.3vw,16px)!important;text-align:right!important;
+}
+#users .avatar{width:54px!important;height:54px!important;flex:0 0 54px!important;
+ border:2px solid #e8d2ff!important}
+#myProfilePanel{
+ display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;
+ align-items:center!important;justify-content:flex-start!important;gap:9px 14px!important;
+ min-height:96px!important;padding:10px 14px!important;margin:0 0 10px!important;
+ border-radius:18px!important;background:linear-gradient(100deg,#30216f,#38227d)!important;
+ border:1px solid #8054d0!important;text-align:right!important;
+}
+#myPhoto{width:82px!important;height:82px!important;flex:0 0 82px!important;
+ margin:0!important;border:3px solid #dfc2ff!important}
+#myProfilePanel h3{font-size:clamp(14px,1.8vw,22px)!important;margin:0!important;overflow-wrap:anywhere}
+#myProfilePanel p{margin:2px 0!important}
+#myProfilePanel button{
+ width:auto!important;flex:1 1 145px!important;margin:0!important;
+ padding:9px 12px!important;border-radius:24px!important;
+ background:linear-gradient(110deg,#8126c8,#a23bd2)!important;
+ border:1px solid #d69bff!important;font-size:12px!important;
+}
+#myProfilePanel #logoutBtn{flex:0 0 auto!important;width:auto!important;max-width:none!important;
+ height:auto!important;min-height:0!important;padding:8px 13px!important;font-size:11px!important}
+#myUid,#photoStatus{display:none!important}
+#roomTitle{font-size:19px!important;margin:6px 4px 8px!important;color:#fff}
+#returnPublicBtn,#clearAllChatsBtn{align-self:flex-start}
+#messages{
+ position:relative;isolation:isolate;flex:1 1 auto!important;
+ height:calc(100dvh - 390px)!important;min-height:350px!important;max-height:720px!important;
+ overflow-y:auto!important;padding:18px!important;border-radius:22px!important;
+ border:1px solid #c59cff!important;
+ background:
+ radial-gradient(circle at 83% 42%,rgba(255,255,255,.2),transparent 25%),
+ radial-gradient(ellipse at 90% 75%,rgba(255,92,186,.5),transparent 30%),
+ linear-gradient(145deg,#d8c5ff,#a9b8f4 52%,#f3c7e9)!important;
+ color:#24133d!important;
+}
+#messages:before{
+ content:"💗";position:absolute;z-index:-1;right:7%;top:22%;
+ font-size:clamp(100px,18vw,220px);opacity:.34;pointer-events:none;
+}
+#messages:after{
+ content:"💖";position:absolute;z-index:-1;right:28%;bottom:9%;
+ font-size:clamp(55px,9vw,110px);opacity:.3;pointer-events:none;
+}
+.msg{
+ display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+ gap:7px!important;width:fit-content!important;max-width:86%!important;
+ padding:12px 15px!important;margin:10px 0!important;border:0!important;
+ border-radius:20px 20px 20px 5px!important;background:#fff!important;
+ color:#211337!important;box-shadow:0 3px 12px #34154a22!important;
+ font-size:clamp(14px,1.5vw,18px)!important;line-height:1.8!important;
+}
+.msg b,.message-sender-link{color:#6820a5!important}
+.msg.mine{
+ margin-right:auto!important;margin-left:0!important;
+ background:#caffb8!important;color:#19351c!important;
+ border-radius:20px 20px 5px 20px!important;
+}
+.msg.mine .message-sender-link{color:#1453a5!important}
+.message-avatar{width:42px!important;height:42px!important;border-radius:50%!important;
+ object-fit:cover!important;border:2px solid #fff!important}
+.message-sender-link{padding:0!important;background:transparent!important;
+ border:0!important;font-weight:800!important;font-size:inherit!important}
+#sendArea{
+ display:flex!important;align-items:center!important;gap:10px!important;
+ margin-top:10px!important;padding:8px!important;border-radius:35px!important;
+ background:#f8f3ff!important;border:2px solid #d7b7ff!important;
+}
+#sendArea textarea{
+ flex:1 1 auto!important;min-width:0!important;min-height:58px!important;
+ max-height:130px!important;margin:0!important;padding:16px 18px!important;
+ border:0!important;border-radius:30px!important;background:#fff!important;
+ color:#24143b!important;font:16px Tahoma!important;resize:none!important;
+}
+#sendArea button{min-width:76px!important;padding:14px 18px!important;
+ border-radius:28px!important;background:linear-gradient(135deg,#8b2bd1,#5e16a5)!important;
+ font-size:15px!important}
+#botProfile{border-radius:16px!important}
+#profileCard{width:100%!important}
+@media(max-width:760px){
+ main{margin:5px auto!important;padding:0 5px!important}
+ .love-header{height:82px;min-height:82px;padding:6px}
+ .love-header .header-menu-mark{left:12px;top:17px;font-size:30px}
+ .love-header .brand-heart{font-size:38px}
+ .love-header .brand-copy h2{font-size:21px}
+ .love-header .brand-copy p{font-size:10px}
+ .love-header .header-actions{right:12px;top:15px;font-size:26px;gap:12px}
+ #layout{grid-template-columns:minmax(88px,27%) minmax(0,1fr)!important;gap:5px!important}
+ #profileSidebar{gap:5px!important}
+ #users{padding:6px!important;border-radius:13px!important;max-height:calc(100dvh - 100px)!important}
+ #users h3{font-size:10px!important;padding:4px 1px 7px!important}
+ #users .user{min-height:54px!important;padding:4px!important;gap:5px!important;font-size:9px!important}
+ #users .avatar{width:34px!important;height:34px!important;flex-basis:34px!important}
+ #chatPanel{padding:6px!important;border-radius:14px!important}
+ #myProfilePanel{min-height:55px!important;gap:4px!important;padding:5px!important;margin-bottom:5px!important}
+ #myPhoto{width:42px!important;height:42px!important;flex-basis:42px!important}
+ #myProfilePanel h3{font-size:10px!important}
+ #myProfilePanel p{font-size:8px!important}
+ #myProfilePanel button{flex:1 1 100%!important;font-size:8px!important;padding:5px 3px!important}
+ #myProfilePanel #logoutBtn{flex:0 0 auto!important;width:auto!important}
+ #roomTitle{font-size:11px!important;margin:3px!important}
+ #messages{height:calc(100dvh - 300px)!important;min-height:230px!important;max-height:none!important;padding:7px!important}
+ .msg{max-width:95%!important;font-size:11px!important;padding:7px 9px!important;margin:6px 0!important}
+ .message-avatar{width:28px!important;height:28px!important}
+ #sendArea{gap:4px!important;padding:4px!important}
+ #sendArea textarea{min-height:46px!important;font-size:11px!important;padding:11px 9px!important}
+ #sendArea button{min-width:48px!important;font-size:9px!important;padding:9px 7px!important}
+ #botProfile{padding:6px!important}
+}
+@media(max-width:390px){
+ #layout{grid-template-columns:78px minmax(0,1fr)!important}
+ #users .user{flex-direction:column!important;justify-content:center!important;text-align:center!important;font-size:8px!important}
+ #users .avatar{width:30px!important;height:30px!important;flex-basis:30px!important}
+ .love-header .brand-heart{display:none}
+}
+
 </style>
 </head>
 <body>
