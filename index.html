@@ -1527,11 +1527,12 @@ window.clearAllChats=async function(){
   alert("فقط مالک اصلی چت اجازه پاک کردن همه پیام‌ها را دارد.");
   return;
  }
- if(!confirm("⚠️ مطمئنی؟ تمام پیام‌های عمومی و خصوصی همه کاربران برای همیشه پاک می‌شود. این کار برگشت‌پذیر نیست."))return;
+ if(!confirm("⚠️ مطمئنی؟ فقط تمام پیام‌های چت عمومی برای همیشه پاک می‌شود. پیام‌های خصوصی دست‌نخورده می‌مانند."))return;
  const button=$("clearAllChatsBtn");
  if(button){button.disabled=true;button.textContent="در حال پاک کردن...";}
  try{
-  const snap=await getDocs(collection(db,"messages"));
+  const publicMessages=query(collection(db,"messages"),where("type","==","public"));
+  const snap=await getDocs(publicMessages);
   const docs=snap.docs;
   for(let i=0;i<docs.length;i+=450){
    const batch=writeBatch(db);
@@ -1539,7 +1540,7 @@ window.clearAllChats=async function(){
    await batch.commit();
   }
   $("messages").innerHTML="";
-  alert("تمام پیام‌های عمومی و خصوصی پاک شد. کاربران می‌توانند چت تازه شروع کنند.");
+  alert("تمام پیام‌های عمومی پاک شد. پیام‌های خصوصی و حساب کاربران باقی ماندند.");
  }catch(e){
   alert("پاک کردن چت‌ها انجام نشد: "+(e.message||e));
  }finally{
