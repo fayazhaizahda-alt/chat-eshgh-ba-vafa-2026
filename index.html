@@ -806,13 +806,15 @@ function renderUsers(){
  const list=$("userList");
  list.innerHTML="";
  const now=Date.now();
- const roleOrder={owner:0,admin:1,manager:2,moderator:3,user:4};
+ const roleOrder={owner:0,bot:1,admin:2,manager:3,moderator:4,user:5};
  const onlineUsers=allUsers.filter(u=>{
   return u.lastSeen&&now-u.lastSeen<65000;
- }).sort((a,b)=>{
-  const roleA=a.uid===OWNER_UID?"owner":(a.role||"user");
-  const roleB=b.uid===OWNER_UID?"owner":(b.role||"user");
-  return (roleOrder[roleA]??4)-(roleOrder[roleB]??4)||
+ });
+ onlineUsers.push({uid:"CHAT_BOT",name:"هیله",bot:true,lastSeen:now});
+ onlineUsers.sort((a,b)=>{
+  const roleA=a.uid===OWNER_UID?"owner":(a.bot?"bot":(a.role||"user"));
+  const roleB=b.uid===OWNER_UID?"owner":(b.bot?"bot":(b.role||"user"));
+  return (roleOrder[roleA]??5)-(roleOrder[roleB]??5)||
    String(a.name||"").localeCompare(String(b.name||""),"fa");
  });
 
@@ -821,11 +823,20 @@ function renderUsers(){
   btn.className="user";
   const img=document.createElement("img");
   img.className="avatar";
-  img.src=u.photo||"";
+  if(u.bot){
+   img.style.display="none";
+   const botIcon=document.createElement("span");
+   botIcon.textContent="🌸";
+   botIcon.style.cssText="width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#70418c;font-size:22px";
+   btn.append(botIcon);
+  }else{
+   img.src=u.photo||"";
+   btn.append(img);
+  }
   const info=document.createElement("span");
-  info.textContent=countryFlag(u.countryCode||"")+" "+(u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
-  btn.append(img,info);
-  btn.onclick=()=>showProfile(u);
+  info.textContent=u.bot?"🌸 هیله · ربات":countryFlag(u.countryCode||"")+" "+(u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
+  btn.append(info);
+  if(!u.bot)btn.onclick=()=>showProfile(u);
   list.append(btn);
  });
 
