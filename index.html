@@ -1068,7 +1068,7 @@ window.sendMessage=async function(){
 };
 
 function canManageUsers(){return ["owner","admin"].includes(myRole);}
-function roleLabel(role){const labels={owner:"مالک اصلی",admin:"ادمین",manager:"مدیر ناظر",moderator:"ناظم",user:"مهمان"};return labels[role]||"مهمان";}
+function roleLabel(role){const labels={owner:"مدیر",admin:"ادمین",manager:"مدیر ناظر",moderator:"ناظم",user:"مهمان"};return labels[role]||"مهمان";}
 function allowedRoles(){
  if(myRole==="owner")return ["user","moderator","manager","admin"];
  if(myRole==="admin")return ["user","moderator","manager"];
