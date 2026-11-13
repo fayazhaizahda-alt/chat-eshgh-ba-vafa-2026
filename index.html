@@ -1524,26 +1524,40 @@ function renderAdminPanel(){
 }
 window.clearAllChats=async function(){
  if(!me||me.uid!==OWNER_UID){
-  alert("فقط مالک اصلی چت اجازه پاک کردن همه پیام‌ها را دارد.");
+  alert("فقط مالک اصلی چت اجازه پاک کردن پیام‌های عمومی را دارد.");
   return;
  }
- if(!confirm("⚠️ مطمئنی؟ فقط تمام پیام‌های چت عمومی برای همیشه پاک می‌شود. پیام‌های خصوصی دست‌نخورده می‌مانند."))return;
+ if(!confirm("⚠️ مطمئنی؟ فقط تمام پیام‌های چت عمومی پاک می‌شود. پیام‌های خصوصی باقی می‌مانند."))return;
  const button=$("clearAllChatsBtn");
+ const wasPrivate=!!activePeer;
  if(button){button.disabled=true;button.textContent="در حال پاک کردن...";}
+ // شنونده زنده را موقتاً متوقف می‌کنیم تا پیام‌های قدیمی دوباره در صفحه رندر نشوند.
+ stopMessages();
  try{
   const publicMessages=query(collection(db,"messages"),where("type","==","public"));
-  const snap=await getDocs(publicMessages);
-  const docs=snap.docs;
-  for(let i=0;i<docs.length;i+=450){
-   const batch=writeBatch(db);
-   docs.slice(i,i+450).forEach(item=>batch.delete(item.ref));
-   await batch.commit();
+  let remaining=0;
+  // پس از هر دسته دوباره بررسی می‌کنیم تا هیچ پیام عمومی باقی نماند.
+  for(let pass=0;pass<20;pass++){
+   const snap=await getDocs(publicMessages);
+   const docs=snap.docs;
+   remaining=docs.length;
+   if(!remaining)break;
+   for(let i=0;i<docs.length;i+=450){
+    const batch=writeBatch(db);
+    docs.slice(i,i+450).forEach(item=>batch.delete(item.ref));
+    await batch.commit();
+   }
   }
+  const verify=await getDocs(publicMessages);
+  if(!verify.empty)throw new Error("هنوز "+verify.size+" پیام عمومی باقی مانده؛ دسترسی حذف در فایربیس را بررسی کنید.");
   $("messages").innerHTML="";
-  alert("تمام پیام‌های عمومی پاک شد. پیام‌های خصوصی و حساب کاربران باقی ماندند.");
+  alert("همه پیام‌های عمومی پاک شدند. پیام‌های خصوصی و حساب کاربران باقی ماندند.");
  }catch(e){
-  alert("پاک کردن چت‌ها انجام نشد: "+(e.message||e));
+  alert("پاک کردن پیام‌های عمومی کامل نشد: "+(e.message||e));
  }finally{
+  // نمایش را با داده تازه از فایربیس دوباره فعال می‌کنیم.
+  if(wasPrivate&&activePeer)listenMessages("private");
+  else listenMessages("public");
   if(button){button.disabled=false;button.textContent="🗑️ پاک کردن تمام چت‌ها";}
  }
 };
