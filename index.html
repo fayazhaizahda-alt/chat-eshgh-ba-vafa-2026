@@ -719,29 +719,49 @@ window.changeDisplayName=async function(){
  }catch(e){alert("تغییر نام نمایشی انجام نشد: "+(e.message||"خطای نامشخص"));}
 };
 
-window.changePassword=async function(){
+window.changePassword=function(){
  if(!me){alert("ابتدا وارد چت شوید.");return;}
- const currentPassword=prompt("رمز عبور فعلی خود را وارد کنید:");
- if(currentPassword===null||!currentPassword)return;
- const newPassword=prompt("رمز عبور جدید را وارد کنید (حداقل ۶ حرف یا عدد):");
- if(newPassword===null||!newPassword)return;
- if(newPassword.length<6){alert("رمز جدید باید حداقل ۶ حرف یا عدد داشته باشد.");return;}
- const confirmPassword=prompt("رمز عبور جدید را دوباره وارد کنید:");
- if(confirmPassword===null||!confirmPassword)return;
- if(newPassword!==confirmPassword){alert("دو رمز جدید با هم یکسان نیستند.");return;}
- if(newPassword===currentPassword){alert("رمز جدید باید با رمز فعلی فرق داشته باشد.");return;}
+ const modal=document.getElementById("passwordChangeModal");
+ modal.style.display="flex";
+ document.getElementById("currentPassField").value="";
+ document.getElementById("newPassField").value="";
+ document.getElementById("confirmPassField").value="";
+ document.getElementById("passwordChangeStatus").textContent="رمزها را در کادرها بنویسید؛ هنگام نوشتن می‌توانید نوشته را ببینید.";
+ document.getElementById("passwordChangeSubmit").disabled=false;
+};
+window.closePasswordModal=function(){document.getElementById("passwordChangeModal").style.display="none";};
+window.togglePasswordVisibility=function(id,btn){
+ const field=document.getElementById(id);
+ field.type=field.type==="password"?"text":"password";
+ btn.textContent=field.type==="password"?"نمایش":"پنهان";
+};
+window.submitPasswordChange=async function(event){
+ event.preventDefault();
+ const currentPassword=document.getElementById("currentPassField").value;
+ const newPassword=document.getElementById("newPassField").value;
+ const confirmPassword=document.getElementById("confirmPassField").value;
+ const status=document.getElementById("passwordChangeStatus");
+ const submit=document.getElementById("passwordChangeSubmit");
+ if(!currentPassword||!newPassword||!confirmPassword){status.textContent="لطفاً هر سه کادر را پُر کنید.";return;}
+ if(newPassword.length<6){status.textContent="رمز جدید باید حداقل ۶ حرف یا عدد باشد.";return;}
+ if(newPassword!==confirmPassword){status.textContent="تکرار رمز جدید یکسان نیست.";return;}
+ if(newPassword===currentPassword){status.textContent="رمز جدید باید با رمز فعلی فرق داشته باشد.";return;}
+ submit.disabled=true;status.textContent="در حال بررسی و تغییر رمز...";
  try{
   const credential=EmailAuthProvider.credential(me.email,currentPassword);
   await reauthenticateWithCredential(me,credential);
   await updatePassword(me,newPassword);
-  alert("رمز عبور با موفقیت تغییر کرد. از این پس با رمز جدید وارد شوید.");
+  status.textContent="✅ رمز عبور با موفقیت تغییر کرد. از این پس با رمز جدید وارد شوید.";
+  document.getElementById("currentPassField").value="";
+  document.getElementById("newPassField").value="";
+  document.getElementById("confirmPassField").value="";
+  setTimeout(()=>window.closePasswordModal(),1800);
  }catch(e){
-  let message=e.message||"خطای نامشخص";
-  if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential")message="رمز عبور فعلی درست نیست.";
-  else if(e.code==="auth/weak-password")message="رمز جدید باید حداقل ۶ حرف یا عدد داشته باشد.";
-  else if(e.code==="auth/requires-recent-login")message="لطفاً از حساب خارج شوید و دوباره وارد شوید، سپس تغییر رمز را انجام دهید.";
-  alert("تغییر رمز عبور انجام نشد: "+message);
- }
+  if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential")status.textContent="❌ رمز فعلی درست نیست.";
+  else if(e.code==="auth/weak-password")status.textContent="❌ رمز جدید ضعیف است؛ حداقل ۶ حرف یا عدد وارد کنید.";
+  else if(e.code==="auth/requires-recent-login")status.textContent="❌ لطفاً خارج شوید و دوباره وارد شوید، سپس تغییر رمز را انجام دهید.";
+  else status.textContent="❌ تغییر رمز انجام نشد: "+(e.message||"خطای نامشخص");
+ }finally{submit.disabled=false;}
 };
 
 window.changeProfilePhoto=async function(event){
@@ -1234,6 +1254,22 @@ window.exitChat=async function(){
  $("password").value="";
 };
 </script>
+
+<div id="passwordChangeModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:18px">
+ <form onsubmit="submitPasswordChange(event)" style="width:100%;max-width:390px;background:#281729;color:#fff;border:1px solid #d66b9d;border-radius:18px;padding:20px;box-shadow:0 12px 40px #000">
+  <h3 style="text-align:center;margin:0 0 16px">🔐 تغییر رمز عبور</h3>
+  <label for="currentPassField">رمز عبور فعلی</label>
+  <div style="display:flex;gap:6px;margin:6px 0 13px"><input id="currentPassField" type="password" autocomplete="current-password" placeholder="رمز فعلی را بنویسید" style="flex:1;min-width:0;padding:12px;border-radius:9px;border:1px solid #bd7298" required><button type="button" onclick="togglePasswordVisibility('currentPassField',this)">نمایش</button></div>
+  <label for="newPassField">رمز عبور جدید</label>
+  <div style="display:flex;gap:6px;margin:6px 0 13px"><input id="newPassField" type="password" autocomplete="new-password" placeholder="حداقل ۶ حرف یا عدد" style="flex:1;min-width:0;padding:12px;border-radius:9px;border:1px solid #bd7298" required><button type="button" onclick="togglePasswordVisibility('newPassField',this)">نمایش</button></div>
+  <label for="confirmPassField">تکرار رمز جدید</label>
+  <div style="display:flex;gap:6px;margin:6px 0 13px"><input id="confirmPassField" type="password" autocomplete="new-password" placeholder="رمز جدید را دوباره بنویسید" style="flex:1;min-width:0;padding:12px;border-radius:9px;border:1px solid #bd7298" required><button type="button" onclick="togglePasswordVisibility('confirmPassField',this)">نمایش</button></div>
+  <p id="passwordChangeStatus" style="font-size:13px;line-height:1.8;color:#ffd4e7">رمزها را وارد کنید.</p>
+  <button id="passwordChangeSubmit" type="submit" style="width:100%;padding:12px;background:#a83f76;color:white;border:0;border-radius:10px">ثبت رمز جدید</button>
+  <button type="button" onclick="closePasswordModal()" style="width:100%;margin-top:8px;padding:10px">بستن</button>
+ </form>
+</div>
+
 </body>
 </html>
 
