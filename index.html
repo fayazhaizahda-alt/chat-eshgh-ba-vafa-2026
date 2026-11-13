@@ -510,12 +510,12 @@ header{
 <p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
 <p id="profileCardStatus" class="small"></p>
 <div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:10px;border:1px solid #8053a2;border-radius:12px;background:#211b32">
- <p style="margin:3px 0 8px;font-weight:bold;color:#f1d7ff">🛡️ مدیریت کاربر (فقط مالک)</p>
+ <p style="margin:3px 0 8px;font-weight:bold;color:#f1d7ff">🛡️ مدیریت رتبه کاربر (فقط مدیر)</p>
  <label for="ownerRoleSelect" style="display:block;font-size:12px;margin:5px">تعیین رتبه کاربر</label>
  <select id="ownerRoleSelect" style="width:100%;padding:9px;border-radius:8px">
   <option value="user">مهمان</option>
   <option value="moderator">ناظم</option>
-  <option value="manager">مدیر ناظر</option>
+  <option value="manager">ناظر</option>
   <option value="admin">ادمین</option>
  </select>
  <button type="button" onclick="saveUserRole()" style="width:100%;margin-top:7px">ثبت رتبه</button>
@@ -1068,7 +1068,7 @@ window.sendMessage=async function(){
 };
 
 function canManageUsers(){return ["owner","admin"].includes(myRole);}
-function roleLabel(role){const labels={owner:"مدیر",admin:"ادمین",manager:"مدیر ناظر",moderator:"ناظم",user:"مهمان"};return labels[role]||"مهمان";}
+function roleLabel(role){const labels={owner:"مدیر",admin:"ادمین",manager:"ناظر",moderator:"ناظم",user:"مهمان"};return labels[role]||"مهمان";}
 function allowedRoles(){
  if(myRole==="owner")return ["user","moderator","manager","admin"];
  if(myRole==="admin")return ["user","moderator","manager"];
