@@ -486,6 +486,7 @@ header{
 <p class="small"><span class="dot"></span> آنلاین</p>
 <button type="button" onclick="changeUsername()">✏️ تغییر نام کاربری</button>
 <button type="button" onclick="changeDisplayName()">🌸 تغییر نام نمایشی</button>
+<button type="button" onclick="changePassword()">🔐 تغییر رمز عبور</button>
 <button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
 <input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
 <p id="photoStatus" class="small"></p>
@@ -537,7 +538,7 @@ from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {
  getAuth,createUserWithEmailAndPassword,
  signInWithEmailAndPassword,signOut,onAuthStateChanged,
- EmailAuthProvider,reauthenticateWithCredential,updateEmail,
+ EmailAuthProvider,reauthenticateWithCredential,updateEmail,updatePassword,
  setPersistence,browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 
@@ -716,6 +717,31 @@ window.changeDisplayName=async function(){
   renderUsers();
   alert("نام نمایشی با موفقیت ذخیره شد. نام ورود و رمز عبور شما هیچ تغییری نکرد.");
  }catch(e){alert("تغییر نام نمایشی انجام نشد: "+(e.message||"خطای نامشخص"));}
+};
+
+window.changePassword=async function(){
+ if(!me){alert("ابتدا وارد چت شوید.");return;}
+ const currentPassword=prompt("رمز عبور فعلی خود را وارد کنید:");
+ if(currentPassword===null||!currentPassword)return;
+ const newPassword=prompt("رمز عبور جدید را وارد کنید (حداقل ۶ حرف یا عدد):");
+ if(newPassword===null||!newPassword)return;
+ if(newPassword.length<6){alert("رمز جدید باید حداقل ۶ حرف یا عدد داشته باشد.");return;}
+ const confirmPassword=prompt("رمز عبور جدید را دوباره وارد کنید:");
+ if(confirmPassword===null||!confirmPassword)return;
+ if(newPassword!==confirmPassword){alert("دو رمز جدید با هم یکسان نیستند.");return;}
+ if(newPassword===currentPassword){alert("رمز جدید باید با رمز فعلی فرق داشته باشد.");return;}
+ try{
+  const credential=EmailAuthProvider.credential(me.email,currentPassword);
+  await reauthenticateWithCredential(me,credential);
+  await updatePassword(me,newPassword);
+  alert("رمز عبور با موفقیت تغییر کرد. از این پس با رمز جدید وارد شوید.");
+ }catch(e){
+  let message=e.message||"خطای نامشخص";
+  if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential")message="رمز عبور فعلی درست نیست.";
+  else if(e.code==="auth/weak-password")message="رمز جدید باید حداقل ۶ حرف یا عدد داشته باشد.";
+  else if(e.code==="auth/requires-recent-login")message="لطفاً از حساب خارج شوید و دوباره وارد شوید، سپس تغییر رمز را انجام دهید.";
+  alert("تغییر رمز عبور انجام نشد: "+message);
+ }
 };
 
 window.changeProfilePhoto=async function(event){
