@@ -768,6 +768,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 <div class="panel" id="chatPanel">
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
 <button id="returnPublicBtn" onclick="openPublic()">بازگشت به گفت‌وگوی عمومی</button>
+<button id="clearAllChatsBtn" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:8px 12px;font-size:12px;margin:4px 0">🗑️ پاک کردن تمام چت‌ها</button>
 <div id="messages"></div>
 <div id="emoji">
 <button onclick="addEmoji('❤️')">❤️</button>
@@ -850,7 +851,7 @@ import {
 import {
  getFirestore,collection,doc,setDoc,updateDoc,
  addDoc,query,where,onSnapshot,serverTimestamp,
- getDoc,deleteDoc
+ getDoc,deleteDoc,getDocs,writeBatch
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -1428,6 +1429,8 @@ function listenMessages(type){
 
 function renderMessages(arr){
  const box=$("messages");
+ const clearButton=$("clearAllChatsBtn");
+ if(clearButton)clearButton.style.display=me?.uid===OWNER_UID?"inline-block":"none";
  box.innerHTML="";
  arr.forEach(m=>{
   const div=document.createElement("div");
@@ -1519,6 +1522,31 @@ function renderAdminPanel(){
   list.append(row);
  });
 }
+window.clearAllChats=async function(){
+ if(!me||me.uid!==OWNER_UID){
+  alert("فقط مالک اصلی چت اجازه پاک کردن همه پیام‌ها را دارد.");
+  return;
+ }
+ if(!confirm("⚠️ مطمئنی؟ تمام پیام‌های عمومی و خصوصی همه کاربران برای همیشه پاک می‌شود. این کار برگشت‌پذیر نیست."))return;
+ const button=$("clearAllChatsBtn");
+ if(button){button.disabled=true;button.textContent="در حال پاک کردن...";}
+ try{
+  const snap=await getDocs(collection(db,"messages"));
+  const docs=snap.docs;
+  for(let i=0;i<docs.length;i+=450){
+   const batch=writeBatch(db);
+   docs.slice(i,i+450).forEach(item=>batch.delete(item.ref));
+   await batch.commit();
+  }
+  $("messages").innerHTML="";
+  alert("تمام پیام‌های عمومی و خصوصی پاک شد. کاربران می‌توانند چت تازه شروع کنند.");
+ }catch(e){
+  alert("پاک کردن چت‌ها انجام نشد: "+(e.message||e));
+ }finally{
+  if(button){button.disabled=false;button.textContent="🗑️ پاک کردن تمام چت‌ها";}
+ }
+};
+
 async function removeMessage(messageId){
  if(myRole==="user")return;if(!confirm("این پیام حذف شود؟"))return;
  try{await deleteDoc(doc(db,"messages",messageId));}
