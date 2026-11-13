@@ -1315,6 +1315,23 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
 </header>
 
 <main>
+<div id="poetryNav" style="max-width:950px;margin:8px auto;text-align:center">
+ <button type="button" onclick="showPoetry()" style="padding:11px 22px;border-radius:22px;background:linear-gradient(135deg,#a33bd0,#7023a5);font-size:15px">📚 بخش شعر</button>
+</div>
+<section id="poetrySection" dir="rtl" style="display:none;max-width:950px;margin:12px auto;padding:16px;border:1px solid #a96aff;border-radius:20px;background:linear-gradient(145deg,#29204b,#1d1b38);color:#fff">
+ <h2 style="text-align:center;color:#f4c8f0;margin:4px 0 16px">🌹 بخش شعر</h2>
+ <article style="padding:16px;margin:12px 0;border-radius:16px;background:linear-gradient(135deg,#4b286d,#30224f);border:1px solid #a96aff;text-align:center;line-height:2.2">
+  <h3 style="color:#ffd5ef;margin:0 0 8px">❤️ عشق باوفا</h3>
+  <p style="white-space:pre-line;margin:0">عشق آن نیست که هر روز به زبان آوریم
+عشق آن است که در سختی کنارت بمانیم ❤️</p>
+ </article>
+ <article style="padding:16px;margin:12px 0;border-radius:16px;background:linear-gradient(135deg,#4b286d,#30224f);border:1px solid #a96aff;text-align:center;line-height:2.2">
+  <h3 style="color:#ffd5ef;margin:0 0 8px">🌸 دلتنگی</h3>
+  <p style="white-space:pre-line;margin:0">دلم تنگ است برای لحظه‌های دیدنت
+برای خنده‌های شیرین و صدای شنیدنت 🌹</p>
+ </article>
+ <button type="button" onclick="hidePoetry()" style="display:block;margin:16px auto 2px;padding:10px 24px;border-radius:22px">بازگشت به چت</button>
+</section>
 <div class="panel" id="login">
 <h3>خوش آمدید ❤️</h3>
 
@@ -2234,6 +2251,24 @@ window.exitChat=async function(){
  $("login").style.display="block";
  $("message").value="";
  $("password").value="";
+};
+
+window.showPoetry=function(){
+ const p=document.getElementById("poetrySection");
+ const login=document.getElementById("login");
+ const chat=document.getElementById("chat");
+ if(p)p.style.display="block";
+ if(login)login.style.display="none";
+ if(chat)chat.style.display="none";
+ window.scrollTo({top:0,behavior:"smooth"});
+};
+window.hidePoetry=function(){
+ const p=document.getElementById("poetrySection");
+ const login=document.getElementById("login");
+ const chat=document.getElementById("chat");
+ if(p)p.style.display="none";
+ if(window.me){if(login)login.style.display="none";if(chat)chat.style.display="block";}
+ else{if(login)login.style.display="block";if(chat)chat.style.display="none";}
 };
 </script>
 
