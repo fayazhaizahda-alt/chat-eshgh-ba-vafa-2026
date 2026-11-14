@@ -781,7 +781,10 @@ function startBotModeration(){
  },error=>console.error("Bot moderation listener failed:",error));
 }
 
+let messageListenerVersion=0;
+
 function stopMessages(){
+ messageListenerVersion++;
  if(messagesUnsub){
   messagesUnsub();
   messagesUnsub=null;
@@ -789,18 +792,27 @@ function stopMessages(){
 }
 
 window.openPublic=function(){
- activePeer=null;activeGroup=null;
+ // هر بار بازگشت به صفحه اصلی، مقصد خصوصی قبلی کاملاً پاک شود.
+ activePeer=null;
+ activeGroup=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
  listenMessages("public");
 };
 window.openPrivate=function(u){
- activeGroup=null;activePeer=u;
+ if(!u||!u.uid||u.uid===me?.uid)return;
+ activeGroup=null;
+ activePeer=u;
  $("roomTitle").textContent="گفت‌وگوی خصوصی با "+(u.displayName||u.name);
  listenMessages("private");
 };
 
 function listenMessages(type){
  stopMessages();
+ const thisListener=messageListenerVersion;
+ // شناسه مقصد را برای همین شنونده ثابت نگه می‌داریم تا پاسخ شنونده قدیمی
+ // نتواند بعد از جابه‌جایی اتاق، پیام‌های خصوصی را در صفحه عمومی نشان بدهد.
+ const peerUid=activePeer?.uid||null;
+ const groupId=activeGroup?.id||null;
  $("messages").innerHTML="در حال دریافت پیام‌ها...";
  let q;
 
@@ -809,17 +821,22 @@ function listenMessages(type){
  }else if(type==="group"){
   q=query(collection(db,"messages"),where("type","==","group"));
  }else{
+  if(!peerUid){
+   $("messages").textContent="برای دیدن پیام خصوصی، ابتدا یک کاربر را انتخاب کن.";
+   return;
+  }
   q=query(collection(db,"messages"),
    where("members","array-contains",me.uid));
  }
 
  messagesUnsub=onSnapshot(q,snap=>{
+  if(thisListener!==messageListenerVersion)return;
   let arr=snap.docs.map(d=>({id:d.id,...d.data()}));
 
   if(type==="private"){
-   arr=arr.filter(m=>m.members?.includes(activePeer.uid));
+   arr=arr.filter(m=>m.members?.includes(peerUid));
   }else if(type==="group"){
-   arr=arr.filter(m=>m.groupId===activeGroup?.id);
+   arr=arr.filter(m=>m.groupId===groupId);
   }
 
   arr.sort((a,b)=>
@@ -828,6 +845,7 @@ function listenMessages(type){
   arr=arr.slice(-100);
   renderMessages(arr);
  },e=>{
+  if(thisListener!==messageListenerVersion)return;
   $("messages").textContent="خطا در دریافت پیام‌ها: "+e.message;
  });
 }
