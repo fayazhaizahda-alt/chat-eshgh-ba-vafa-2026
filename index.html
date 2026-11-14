@@ -177,8 +177,7 @@ main{max-width:1500px;width:100%;margin:0 auto;padding:8px}
 #sendArea button{min-width:78px;padding:12px 17px;border-radius:24px;background:linear-gradient(135deg,#8b2bd1,#5e16a5);font-size:14px}
 #botProfile{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 13px!important;border-radius:15px;background:#321b55!important}
 #botAvatar{width:46px;height:46px;flex:0 0 46px;font-size:25px;margin:0}
-#botProfile h3{margin:0;font-size:14px}
-#botProfile .small{margin:0;font-size:11px}
+#botProfile h3{margin:0;font-size:14px}#botProfile .small{margin:0;font-size:11px}
 .botTag{font-size:9px}
 #profileCard{position:relative;z-index:2}
 button{cursor:pointer}
@@ -357,8 +356,7 @@ body{
 #messages{
  background:
   radial-gradient(circle at 12% 18%,rgba(255,165,190,.10) 0 2px,transparent 3px),
-  radial-gradient(circle at 82% 72%,rgba(255,120,170,.11) 0 3px,transparent 4px),
-  radial-gradient(ellipse at 10% 90%,rgba(137,44,89,.24),transparent 45%),
+  radial-gradient(circle at 82% 72%,rgba(255,120,170,.11) 0 3px,transparent 4px),  radial-gradient(ellipse at 10% 90%,rgba(137,44,89,.24),transparent 45%),
   linear-gradient(145deg,rgba(52,25,48,.96),rgba(35,24,48,.97)) !important;
  background-size:72px 72px,96px 96px,auto,auto !important;
  border:1px solid #a85b7e !important;
@@ -537,8 +535,7 @@ header{
  opacity:.48;
  filter:drop-shadow(0 8px 12px rgba(190,35,125,.25));
  transform:rotate(8deg);
- pointer-events:none;
-}
+ pointer-events:none;}
 #messages::after{
  content:"🌹  💕  🌷";
  position:absolute;
@@ -717,8 +714,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 .msg b{font-size:17px!important}
 @media(max-width:760px){
  .msg{font-size:16px!important;line-height:1.9!important;padding:11px 12px!important}
- .msg b{font-size:15px!important}
-}
+ .msg b{font-size:15px!important}}
 @media(max-width:430px){
  .msg{font-size:15px!important;line-height:1.9!important;padding:10px 11px!important}
  .msg b{font-size:14px!important}
@@ -897,8 +893,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 #sendArea #message:focus,
 #sendArea #message:active{
   border:0!important;
-  outline:0!important;
-  box-shadow:none!important;
+  outline:0!important;  box-shadow:none!important;
 }
 #sendArea:focus-within{
   outline:0!important;
@@ -1077,8 +1072,7 @@ main{width:100%!important;max-width:1600px!important;margin:8px auto!important;p
 .msg.mine b{color:#1647a5!important}
 #sendArea{display:flex!important;flex:0 0 auto!important;align-items:center!important;gap:9px!important;margin-top:10px!important;padding:9px!important;border-radius:30px!important;background:#f9f2ff!important;border:1px solid #d8b8f2!important}
 #sendArea textarea,#sendArea input{flex:1 1 auto!important;min-width:0!important;width:auto!important;min-height:52px!important;max-height:130px!important;margin:0!important;padding:13px 16px!important;resize:none!important;border:0!important;border-radius:26px!important;background:#fff!important;color:#24143b!important;font-family:Tahoma!important;font-size:16px!important}
-#sendArea button{flex:0 0 auto!important;min-width:86px!important;padding:13px 18px!important;border-radius:26px!important;background:linear-gradient(135deg,#8b2bd1,#5e16a5)!important;font-size:15px!important}
-#botProfile{border-radius:16px!important;background:linear-gradient(110deg,#3a1c62,#281b4d)!important;border:1px solid #9361ba!important;color:#fff!important}
+#sendArea button{flex:0 0 auto!important;min-width:86px!important;padding:13px 18px!important;border-radius:26px!important;background:linear-gradient(135deg,#8b2bd1,#5e16a5)!important;font-size:15px!important}#botProfile{border-radius:16px!important;background:linear-gradient(110deg,#3a1c62,#281b4d)!important;border:1px solid #9361ba!important;color:#fff!important}
 #botProfile h3{color:#ffd7f3!important}
 #profileCard{background:#302052!important;color:#fff!important;border:1px solid #a66aff!important;border-radius:18px!important}
 @media(max-width:760px){
@@ -1257,8 +1251,7 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
  background:#f8f3ff!important;border:2px solid #d7b7ff!important;
 }
 #sendArea textarea{
- flex:1 1 auto!important;min-width:0!important;min-height:58px!important;
- max-height:130px!important;margin:0!important;padding:16px 18px!important;
+ flex:1 1 auto!important;min-width:0!important;min-height:58px!important; max-height:130px!important;margin:0!important;padding:16px 18px!important;
  border:0!important;border-radius:30px!important;background:#fff!important;
  color:#24143b!important;font:16px Tahoma!important;resize:none!important;
 }
@@ -1302,6 +1295,74 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
  #users .user{flex-direction:column!important;justify-content:center!important;text-align:center!important;font-size:8px!important}
  #users .avatar{width:30px!important;height:30px!important;flex-basis:30px!important}
  .love-header .brand-heart{display:none}
+}
+
+
+/* FIX PROFILE VISIBILITY: keep the signed-in user's profile visible above the chat */
+#chatPanel > #myProfilePanel{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:relative!important;
+  z-index:5!important;
+  order:-20!important;
+  flex:0 0 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:96px!important;
+  height:auto!important;
+  overflow:visible!important;
+  margin:0 0 10px!important;
+  padding:12px!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+}
+#chatPanel > #myProfilePanel #myPhotoWrap{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:relative!important;
+  flex:0 0 76px!important;
+  width:76px!important;
+  height:76px!important;
+  min-width:76px!important;
+}
+#chatPanel > #myProfilePanel #myPhoto{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:76px!important;
+  height:76px!important;
+  min-width:76px!important;
+  max-width:76px!important;
+  flex:0 0 76px!important;
+  margin:0!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+}
+#chatPanel > #myProfilePanel h3,
+#chatPanel > #myProfilePanel p,
+#chatPanel > #myProfilePanel button{
+  visibility:visible!important;
+  opacity:1!important;
+}
+@media(max-width:760px){
+  #chatPanel > #myProfilePanel{
+    min-height:72px!important;
+    flex-wrap:wrap!important;
+    gap:6px!important;
+    padding:7px!important;
+  }
+  #chatPanel > #myProfilePanel #myPhotoWrap,
+  #chatPanel > #myProfilePanel #myPhoto{
+    width:48px!important;
+    height:48px!important;
+    min-width:48px!important;
+    flex:0 0 48px!important;
+  }
+  #chatPanel > #myProfilePanel h3{font-size:12px!important}
+  #chatPanel > #myProfilePanel button{font-size:9px!important}
 }
 
 </style>
@@ -1437,8 +1498,7 @@ const OWNER_UID="eaZWtnAluVMZ1bjDMrKcu8hye6t1";
 
 let me=null;
 let myRole="user";
-let myName="";
-let myDisplayName="";
+let myName="";let myDisplayName="";
 let myPhoto="";
 let activePeer=null;
 let usersUnsub=null;
@@ -1617,8 +1677,7 @@ window.submitPasswordChange=async function(event){
  if(!currentPassword||!newPassword||!confirmPassword){status.textContent="لطفاً هر سه کادر را پُر کنید.";return;}
  if(newPassword.length<6){status.textContent="رمز جدید باید حداقل ۶ حرف یا عدد باشد.";return;}
  if(newPassword!==confirmPassword){status.textContent="تکرار رمز جدید یکسان نیست.";return;}
- if(newPassword===currentPassword){status.textContent="رمز جدید باید با رمز فعلی فرق داشته باشد.";return;}
- submit.disabled=true;status.textContent="در حال بررسی و تغییر رمز...";
+ if(newPassword===currentPassword){status.textContent="رمز جدید باید با رمز فعلی فرق داشته باشد.";return;} submit.disabled=true;status.textContent="در حال بررسی و تغییر رمز...";
  try{
   const credential=EmailAuthProvider.credential(me.email,currentPassword);
   await reauthenticateWithCredential(me,credential);
@@ -1797,8 +1856,7 @@ function renderUsers(){
   if(u.bot){
    btn.classList.add("hey-leh-user");
    img.style.display="none";
-   const botIcon=document.createElement("span");
-   botIcon.textContent="🌸";
+   const botIcon=document.createElement("span");   botIcon.textContent="🌸";
    botIcon.style.cssText="width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#70418c;font-size:22px";
    btn.append(botIcon);
   }else{
@@ -1977,7 +2035,6 @@ window.openPublic=function(){
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
  listenMessages("public");
 };
-
 window.openPrivate=function(u){
  activePeer=u;
  $("roomTitle").textContent="گفت‌وگوی خصوصی با "+(u.displayName||u.name);
@@ -2157,8 +2214,7 @@ function renderAdminPanel(){
    ban.onclick=async()=>{if(!confirm("این حساب مسدود شود؟ کاربر دیگر نمی‌تواند وارد چت شود."))return;
     try{await updateDoc(doc(db,"users",u.uid),{banned:true,bannedBy:me.uid,bannedAt:Date.now()});alert("حساب مسدود شد.");}
     catch(e){alert("مسدودسازی انجام نشد: "+e.message);}
-   };row.append(ban);
-  }
+   };row.append(ban);  }
   list.append(row);
  });
 }
