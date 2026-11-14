@@ -54,6 +54,11 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
     <div><h2>شعر سعدی</h2><p>غزل‌ها و سخنان سعدی</p></div>
     <span class="arrow">‹</span>
   </button>
+  <button class="choice" id="wisdomButton" type="button">
+    <div class="symbol">💎</div>
+    <div><h2>سخن‌های ناب</h2><p>جمله‌های زیبا و پندهای ارزشمند زندگی</p></div>
+    <span class="arrow">‹</span>
+  </button>
   <section class="panel" id="poetryPanel">
     <h2>🌷 گنجینه شعر</h2>
     <div class="category-tabs" id="categoryTabs" aria-label="دسته‌بندی شعرها">
@@ -65,6 +70,7 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
       <button type="button" class="category" data-category="hope">🌱 امید</button>
       <button type="button" class="category" data-category="molana">📜 مولانا</button>
       <button type="button" class="category" data-category="saadi">🌿 سعدی</button>
+      <button type="button" class="category" data-category="wisdom">💎 سخن‌های ناب</button>
     </div>
     <div id="poemList"></div>
     <div id="ownerPoemArea" style="display:none;margin:14px 0;padding:15px;border:1px solid #e7bfd2;border-radius:16px;background:#fff1f7">
@@ -217,6 +223,18 @@ poems.push(
 {id:'saadi4',title:'دیدار',body:'هر که دلارام دید از دلش آرام رفت\nچشم ندارد خلاص هر که در این دام رفت',category:'saadi',author:'سعدی'},
 {id:'saadi5',title:'راه و کوشش',body:'به راه بادیه رفتن به از نشستن باطل\nو گر مراد نیابم به قدر وسع بکوشم',category:'saadi',author:'سعدی'}
 );
+poems.push(
+{id:'wisdom1',title:'ارزش انسان',body:'ارزش آدمی به چیزی نیست که دارد؛ به خوبی‌ای است که در دل و رفتارش می‌پرورد.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom2',title:'دوستی واقعی',body:'دوست واقعی کسی است که در روزهای سخت، حضوری آرام و دلی مهربان داشته باشد.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom3',title:'قدرت سکوت',body:'گاهی سکوت، پاسخِ زیباتری از هزاران کلمه است.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom4',title:'گذشت',body:'گذشت نشانهٔ ناتوانی نیست؛ بزرگیِ دلی است که می‌تواند ببخشد.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom5',title:'زمان',body:'زمان را با نگرانی از دست نده؛ آن را با کارهای نیک و لحظه‌های ارزشمند پُر کن.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom6',title:'صداقت',body:'با صداقت شاید دل همه را به دست نیاوری، اما وجدان خودت را آرام نگه می‌داری.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom7',title:'امید',body:'تا وقتی امید در دل زنده است، هیچ شبی پایان راه نیست.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom8',title:'مهربانی',body:'مهربانی زبانی است که دل‌ها آن را بی‌نیاز از ترجمه می‌فهمند.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom9',title:'خودشناسی',body:'پیش از آن‌که دنیا را تغییر بدهی، از شناختن و ساختن خویش آغاز کن.',category:'wisdom',author:'سخن ناب'},
+{id:'wisdom10',title:'آرامش',body:'آرامش از جایی آغاز می‌شود که دل، اسیر هر حرف و هر نگاه نمی‌ماند.',category:'wisdom',author:'سخن ناب'}
+);
 const storageKey='shear-liked-poems-v1';
 function getLikes(){try{return JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(e){return {}}}
 let activeCategory='all';
@@ -247,6 +265,7 @@ function openPoetSection(category){
 }
 document.getElementById('molanaButton').addEventListener('click',()=>openPoetSection('molana'));
 document.getElementById('saadiButton').addEventListener('click',()=>openPoetSection('saadi'));
+document.getElementById('wisdomButton').addEventListener('click',()=>openPoetSection('wisdom'));
 renderPoems();
 
 document.getElementById("showPoemForm").addEventListener("click",()=>{document.getElementById("poemForm").style.display="block";});
