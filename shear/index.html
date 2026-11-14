@@ -75,14 +75,15 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
-import {getFirestore,collection,addDoc,getDocs,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+import {getFirestore,collection,addDoc,onSnapshot,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyBuj3nb-ACIwFVkCnuzRqFRwCRz323nQ9I",authDomain:"chat-eshgh-ba-vafa.firebaseapp.com",projectId:"chat-eshgh-ba-vafa",storageBucket:"chat-eshgh-ba-vafa.firebasestorage.app",messagingSenderId:"235744727404",appId:"1:235744727404:web:8f02d62853698462cba349",measurementId:"G-NR1076K019"};
 const firebaseApp=initializeApp(firebaseConfig);
 const auth=getAuth(firebaseApp); const db=getFirestore(firebaseApp);
 const OWNER_UID="eaZWtnAluVMZ1bjDMrKcu8hye6t1";
 let sharedPoems=[];
 onAuthStateChanged(auth,user=>{document.getElementById("ownerPoemArea").style.display=user&&user.uid===OWNER_UID?"block":"none";});
-async function loadSharedPoems(){try{const snap=await getDocs(collection(db,"poems"));sharedPoems=snap.docs.map(d=>({id:"cloud-"+d.id,...d.data()}));renderPoems();}catch(e){console.warn("Could not load shared poems:",e);}}
+let stopWatchingPoems=null;
+function watchSharedPoems(){if(stopWatchingPoems)stopWatchingPoems();stopWatchingPoems=onSnapshot(collection(db,"poems"),snap=>{sharedPoems=snap.docs.map(d=>({id:"cloud-"+d.id,...d.data()}));renderPoems();},error=>{console.warn("Could not watch shared poems:",error);});}
 const button=document.getElementById('poetryButton');
 const panel=document.getElementById('poetryPanel');
 const poems=[
@@ -228,11 +229,11 @@ document.getElementById("poemForm").addEventListener("submit",async event=>{
   if(!poem.title||!poem.body)throw new Error("عنوان و متن شعر را وارد کنید.");
   await addDoc(collection(db,"poems"),poem);
   status.textContent="شعر ذخیره شد و برای همه نمایش داده می‌شود 🌹";
-  document.getElementById("poemForm").reset();await loadSharedPoems();
+  document.getElementById("poemForm").reset();
  }catch(error){console.error(error);status.textContent="ذخیره نشد. ممکن است دسترسی ذخیره‌سازی Firebase تنظیم نشده باشد.";}
  finally{save.disabled=false;}
 });
-loadSharedPoems();
+watchSharedPoems();
 
 button.addEventListener('click',()=>{
   const opened=panel.classList.toggle('show');
