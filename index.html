@@ -1544,6 +1544,7 @@ main{max-width:1600px!important;width:100%;padding:10px!important;margin:0 auto!
 }
 
 #groupsPanel{display:block!important}#groupList{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow:auto}#groupList button{width:100%;text-align:right;padding:10px;border:1px solid #8c50c7;border-radius:13px;background:#47217b;color:#fff}#chatSettingsModal{display:none;position:fixed;inset:0;z-index:100000;background:#090018d9;align-items:center;justify-content:center;padding:16px}#chatSettingsModal .settings-card{width:100%;max-width:440px;max-height:88dvh;overflow:auto;background:linear-gradient(145deg,#351364,#1c103b);border:2px solid #bb73ff;border-radius:22px;padding:18px;color:#fff}#chatSettingsModal button{width:100%;margin:5px 0;padding:11px;border-radius:14px;background:#7817c9;color:white;border:1px solid #d8a6ff}#chatSettingsModal .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}#chatSettingsModal input[type=file]{width:100%;margin:8px 0;background:white;color:#32134d;padding:9px;border-radius:10px}#chatSettingsStatus{font-size:12px;color:#f3d7ff;line-height:1.8}
+#chatEmojiPanel{background:#f7eaff;border:1px solid #d8b5f4;border-radius:16px}#chatEmojiPanel button{border:1px solid #d4b0ef!important;background:#f4e5ff!important;color:#63239c!important;border-radius:18px!important;padding:6px 9px!important}#sendArea>button:first-child,#sendArea>button:nth-child(2){min-width:42px!important;padding:8px!important;background:#7020bd!important;border-radius:50%!important;color:#fff!important}@media(max-width:760px){#sendArea>button:first-child,#sendArea>button:nth-child(2){min-width:30px!important;padding:5px!important;font-size:12px!important}}
 </style>
 </head>
 <body>
@@ -1587,7 +1588,13 @@ main{max-width:1600px!important;width:100%;padding:10px!important;margin:0 auto!
 <button id="clearAllChatsBtn" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:8px 12px;font-size:12px;margin:4px 0">🗑️ پاک کردن تمام چت‌ها</button>
 <div id="messages"></div>
 
+<div id="chatEmojiPanel" style="display:none;flex-wrap:wrap;gap:5px;padding:6px">
+<button type="button" onclick="addEmoji('❤️')">❤️</button><button type="button" onclick="addEmoji('😍')">😍</button><button type="button" onclick="addEmoji('😘')">😘</button><button type="button" onclick="addEmoji('🌹')">🌹</button><button type="button" onclick="addEmoji('🥰')">🥰</button><button type="button" onclick="addEmoji('😂')">😂</button><button type="button" onclick="addEmoji('😭')">😭</button><button type="button" onclick="addEmoji('💔')">💔</button><button type="button" onclick="addEmoji('💕')">💕</button><button type="button" onclick="addEmoji('🌸')">🌸</button><button type="button" onclick="addEmoji('👍')">👍</button><button type="button" onclick="addEmoji('🙏')">🙏</button>
+</div>
 <div id="sendArea">
+<button type="button" onclick="toggleChatEmoji()" aria-label="شکلک">☺️</button>
+<button type="button" onclick="document.getElementById('chatPhotoInput').click()" aria-label="فرستادن عکس">📎</button>
+<input id="chatPhotoInput" type="file" accept="image/*" hidden onchange="sendPhotoMessage(event)">
 <textarea id="message" rows="1" placeholder="پیام خود را بنویسید" oninput="this.style.height='54px';this.style.height=Math.min(this.scrollHeight,150)+'px'"></textarea>
 <button onclick="sendMessage()">ارسال</button>
 </div>
@@ -2327,6 +2334,7 @@ function renderMessages(arr){
    div.append(avatar);
   }
   div.append(name,body);
+  if(m.image){const photo=document.createElement('img');photo.src=m.image;photo.alt='عکس فرستاده‌شده';photo.style.cssText='display:block;max-width:min(100%,360px);max-height:320px;object-fit:contain;border-radius:14px;margin-top:8px;cursor:zoom-in';photo.onclick=()=>window.open(photo.src,'_blank');div.append(photo);}
   if(canManageUsers()){
    const del=document.createElement("button");
    del.textContent="حذف پیام"; del.style.marginTop="6px";
@@ -2387,6 +2395,23 @@ window.setChatBackground=function(k){$("messages").style.backgroundImage=chatBac
 window.uploadChatBackground=function(ev){const f=ev.target.files?.[0];if(!f)return;if(!f.type.startsWith("image/")||f.size>6*1024*1024)return alert("یک عکس کمتر از ۶ مگابایت انتخاب کن.");const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const scale=Math.min(1,1400/im.width,1000/im.height),c=document.createElement("canvas");c.width=im.width*scale;c.height=im.height*scale;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const data=c.toDataURL("image/jpeg",.7);try{localStorage.setItem("loveChatCustomBackground",data);localStorage.removeItem("loveChatBackground");$("messages").style.backgroundImage="url('"+data+"')";$("chatSettingsStatus").textContent="عکس در همین گوشی ذخیره شد.";}catch(e){$("chatSettingsStatus").textContent="حجم عکس زیاد است؛ عکس کوچک‌تری انتخاب کن."}};im.src=r.result;};r.readAsDataURL(f);ev.target.value="";};
 function applySavedChatBackground(){try{const custom=localStorage.getItem("loveChatCustomBackground"),key=localStorage.getItem("loveChatBackground");if(custom)$("messages").style.backgroundImage="url('"+custom+"')";else if(chatBackgrounds[key])$("messages").style.backgroundImage=chatBackgrounds[key];}catch(e){}}
 window.resetChatBackground=function(){try{localStorage.removeItem("loveChatBackground");localStorage.removeItem("loveChatCustomBackground");}catch(e){}$("messages").style.backgroundImage="";$("chatSettingsStatus").textContent="پس‌زمینه پیش‌فرض فعال شد.";};
+window.toggleChatEmoji=function(){const p=$("chatEmojiPanel");p.style.display=p.style.display==="flex"?"none":"flex";};
+window.addEmoji=function(emoji){$("message").value+=emoji;$("message").focus();};
+window.sendPhotoMessage=async function(event){
+ const file=event.target.files?.[0];if(!file)return;
+ if(!file.type.startsWith("image/")){alert("فقط عکس انتخاب کن.");event.target.value="";return;}
+ if(!me){alert("ابتدا وارد چت شو.");event.target.value="";return;}
+ try{
+  const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const scale=Math.min(1,760/image.width,760/image.height),canvas=document.createElement("canvas");canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.58));};image.onerror=reject;image.src=reader.result;};reader.onerror=reject;reader.readAsDataURL(file);});
+  if(dataUrl.length>750000){alert("این عکس هنوز بزرگ است؛ لطفاً عکس کوچک‌تری انتخاب کن.");return;}
+  const data={senderUid:me.uid,senderName:myDisplayName||myName,text:$("message").value.trim(),image:dataUrl,createdAt:serverTimestamp()};
+  if(activePeer){data.type="private";data.members=[me.uid,activePeer.uid];}
+  else if(activeGroup){data.type="group";data.groupId=activeGroup.id;data.groupName=activeGroup.name;}
+  else data.type="public";
+  await addDoc(collection(db,"messages"),data);$("message").value="";
+ }catch(e){alert("فرستادن عکس انجام نشد: "+(e.message||e));}
+ finally{event.target.value="";}
+};
 function canManageUsers(){return ["owner","admin"].includes(myRole);}
 function roleLabel(role){const labels={owner:"مدیر",admin:"ادمین",manager:"ناظر",moderator:"ناظم",user:"مهمان"};return labels[role]||"مهمان";}
 function allowedRoles(){
