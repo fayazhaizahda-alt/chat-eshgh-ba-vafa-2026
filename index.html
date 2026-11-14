@@ -177,8 +177,7 @@ main{max-width:1500px;width:100%;margin:0 auto;padding:8px}
 #sendArea button{min-width:78px;padding:12px 17px;border-radius:24px;background:linear-gradient(135deg,#8b2bd1,#5e16a5);font-size:14px}
 #botProfile{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 13px!important;border-radius:15px;background:#321b55!important}
 #botAvatar{width:46px;height:46px;flex:0 0 46px;font-size:25px;margin:0}
-#botProfile h3{margin:0;font-size:14px}#botProfile .small{margin:0;font-size:11px}
-.botTag{font-size:9px}
+#botProfile h3{margin:0;font-size:14px}#botProfile .small{margin:0;font-size:11px}.botTag{font-size:9px}
 #profileCard{position:relative;z-index:2}
 button{cursor:pointer}
 @media(max-width:700px){
@@ -357,8 +356,7 @@ body{
  background:
   radial-gradient(circle at 12% 18%,rgba(255,165,190,.10) 0 2px,transparent 3px),
   radial-gradient(circle at 82% 72%,rgba(255,120,170,.11) 0 3px,transparent 4px),  radial-gradient(ellipse at 10% 90%,rgba(137,44,89,.24),transparent 45%),
-  linear-gradient(145deg,rgba(52,25,48,.96),rgba(35,24,48,.97)) !important;
- background-size:72px 72px,96px 96px,auto,auto !important;
+  linear-gradient(145deg,rgba(52,25,48,.96),rgba(35,24,48,.97)) !important; background-size:72px 72px,96px 96px,auto,auto !important;
  border:1px solid #a85b7e !important;
  color:#fff4f8 !important;
 }
@@ -537,8 +535,7 @@ header{
  transform:rotate(8deg);
  pointer-events:none;}
 #messages::after{
- content:"🌹  💕  🌷";
- position:absolute;
+ content:"🌹  💕  🌷"; position:absolute;
  z-index:0;
  right:8%;
  bottom:9%;
@@ -717,8 +714,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
  .msg b{font-size:15px!important}}
 @media(max-width:430px){
  .msg{font-size:15px!important;line-height:1.9!important;padding:10px 11px!important}
- .msg b{font-size:14px!important}
-}
+ .msg b{font-size:14px!important}}
 
 
 /* بزرگ‌تر شدن نوشته‌های پیام چت */
@@ -897,8 +893,7 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px!important}
 }
 #sendArea:focus-within{
   outline:0!important;
-  box-shadow:none!important;
-}
+  box-shadow:none!important;}
 
 /* نشان تاج مخصوص پروفایل مالک؛ جای نقطه نارنجی */
 #profileCard.profile-self-modal #profileOnlineDot{display:none!important}
@@ -1077,8 +1072,7 @@ main{width:100%!important;max-width:1600px!important;margin:8px auto!important;p
 #profileCard{background:#302052!important;color:#fff!important;border:1px solid #a66aff!important;border-radius:18px!important}
 @media(max-width:760px){
  .love-header{height:78px!important;min-height:78px!important;padding:6px 42px!important}
- .header-menu-mark{left:8px!important;top:19px!important;font-size:26px!important}
- .brand-heart{left:42px!important;font-size:29px!important}
+ .header-menu-mark{left:8px!important;top:19px!important;font-size:26px!important} .brand-heart{left:42px!important;font-size:29px!important}
  .brand-copy h2{font-size:20px!important}
  .brand-copy p{font-size:10px!important}
  .header-actions{right:8px!important;gap:10px!important;font-size:23px!important}
@@ -1257,8 +1251,7 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
 }
 #sendArea button{min-width:76px!important;padding:14px 18px!important;
  border-radius:28px!important;background:linear-gradient(135deg,#8b2bd1,#5e16a5)!important;
- font-size:15px!important}
-#botProfile{border-radius:16px!important}
+ font-size:15px!important}#botProfile{border-radius:16px!important}
 #profileCard{width:100%!important}
 @media(max-width:760px){
  main{margin:5px auto!important;padding:0 5px!important}
@@ -1365,6 +1358,32 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
   #chatPanel > #myProfilePanel button{font-size:9px!important}
 }
 
+
+/* ساختار پایدار پروفایل و هیله: هر دو در ستون کناری، بیرون از پنجره پیام */
+#layout{display:grid!important;grid-template-columns:minmax(105px,30%) minmax(0,1fr)!important;grid-template-areas:"side chat"!important;align-items:start!important}
+#profileSidebar{grid-area:side!important;display:flex!important;flex-direction:column!important;gap:10px!important;min-width:0!important}
+#chatPanel{grid-area:chat!important;min-width:0!important}
+#profileSidebar > #myProfilePanel{display:flex!important;visibility:visible!important;opacity:1!important;position:static!important;width:100%!important;height:auto!important;min-height:0!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;margin:0!important;padding:12px!important;overflow:visible!important}
+#profileSidebar > #myProfilePanel #myPhotoWrap{display:block!important;width:88px!important;height:88px!important;flex:0 0 88px!important}
+#profileSidebar > #myProfilePanel #myPhoto{display:block!important;width:88px!important;height:88px!important;min-width:88px!important;max-width:88px!important;flex:0 0 88px!important;object-fit:cover!important;border-radius:50%!important}
+#profileSidebar > #myProfilePanel h3,#profileSidebar > #myProfilePanel p,#profileSidebar > #myProfilePanel button{display:block!important;visibility:visible!important;opacity:1!important;max-width:100%!important}
+#profileSidebar > #myProfilePanel button{width:100%!important;flex:0 0 auto!important}
+#profileSidebar > #myProfilePanel #logoutBtn{width:100%!important;margin:2px 0!important}
+#botProfileSlot{display:block!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important}
+#botProfileSlot .hey-leh-user{display:flex!important;visibility:visible!important;width:100%!important;min-height:58px!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:8px!important;border-radius:15px!important;background:linear-gradient(120deg,#4b2172,#321747)!important;color:#fff!important;border:1px solid #a66acb!important;font-size:13px!important}
+@media(max-width:760px){
+ #layout{grid-template-columns:minmax(88px,30%) minmax(0,1fr)!important;gap:5px!important}
+ #profileSidebar{gap:5px!important}
+ #profileSidebar > #myProfilePanel{padding:6px!important;gap:4px!important}
+ #profileSidebar > #myProfilePanel #myPhotoWrap,
+ #profileSidebar > #myProfilePanel #myPhoto{width:46px!important;height:46px!important;min-width:46px!important;flex-basis:46px!important}
+ #profileSidebar > #myProfilePanel h3{font-size:10px!important}
+ #profileSidebar > #myProfilePanel p{font-size:8px!important}
+ #profileSidebar > #myProfilePanel button{font-size:7px!important;padding:5px 2px!important}
+ #botProfileSlot .hey-leh-user{font-size:9px!important;min-height:48px!important;padding:5px!important}
+}
+@media(max-width:390px){#layout{grid-template-columns:78px minmax(0,1fr)!important}#profileSidebar > #myProfilePanel button{font-size:6px!important}}
+
 </style>
 </head>
 <body>
@@ -1402,21 +1421,6 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
 <div id="layout">
 <div class="panel" id="chatPanel">
 
-<div class="panel" id="myProfilePanel">
-<div id="myPhotoWrap"><img id="myPhoto" class="avatar" alt="عکس پروفایل"></div>
-<h3 id="welcome"></h3>
-<p id="myRoleBadge" class="role-badge">رتبه: در حال بررسی...</p>
-<p class="small"><span class="dot"></span> آنلاین</p>
-<button type="button" onclick="changeUsername()">✏️ تغییر نام کاربری</button>
-<button type="button" onclick="changeDisplayName()">🌸 تغییر نام نمایشی</button>
-<button type="button" onclick="changePassword()">🔐 تغییر رمز عبور</button>
-<button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
-<input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
-<p id="photoStatus" class="small"></p>
-<p class="small" id="myUid">شناسه کاربری</p>
-<button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
-<div id="botProfileSlot" aria-label="پروفایل هیله"></div>
-</div>
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
 
 <button id="returnPublicBtn" onclick="openPublic()">بازگشت به گفت‌وگوی عمومی</button>
@@ -1430,6 +1434,23 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
 </div>
 
 <aside id="profileSidebar">
+<div class="panel" id="myProfilePanel">
+<div id="myPhotoWrap"><img id="myPhoto" class="avatar" alt="عکس پروفایل"></div>
+<h3 id="welcome"></h3>
+<p id="myRoleBadge" class="role-badge">رتبه: در حال بررسی...</p>
+<p class="small"><span class="dot"></span> آنلاین</p>
+<button type="button" onclick="changeUsername()">✏️ تغییر نام کاربری</button>
+<button type="button" onclick="changeDisplayName()">🌸 تغییر نام نمایشی</button>
+<button type="button" onclick="changePassword()">🔐 تغییر رمز عبور</button>
+<button type="button" onclick="document.getElementById('profilePhotoInput').click()">📷 تغییر عکس</button>
+<input id="profilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
+<p id="photoStatus" class="small"></p>
+<p class="small" id="myUid">شناسه کاربری</p>
+<button id="logoutBtn" onclick="exitChat()">خروج از چت</button>
+
+</div>
+<div id="botProfileSlot" aria-label="پروفایل هیله"></div>
+
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
 <div id="userList"></div>
@@ -1437,8 +1458,7 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
 
 <div class="panel" id="profileCard" style="display:none;text-align:center">
 <div id="profilePhotoWrap" style="position:relative;display:inline-block;line-height:0">
-<img id="profileCardPhoto" alt="عکس پروفایل" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff">
-<span id="profileOnlineDot" aria-label="وضعیت آنلاین" title="وضعیت حساب" style="position:absolute;right:5px;bottom:5px;width:19px;height:19px;border-radius:50%;border:3px solid #211b32;background:#f59e0b;box-sizing:border-box"></span>
+<img id="profileCardPhoto" alt="عکس پروفایل" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff"><span id="profileOnlineDot" aria-label="وضعیت آنلاین" title="وضعیت حساب" style="position:absolute;right:5px;bottom:5px;width:19px;height:19px;border-radius:50%;border:3px solid #211b32;background:#f59e0b;box-sizing:border-box"></span>
 </div>
 <h3 id="profileCardName"></h3>
 <p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
@@ -1617,8 +1637,7 @@ window.changeUsername=async function(){
  if(nextName.toLowerCase()===myName.toLowerCase()){alert("این همان نام کاربری فعلی شماست.");return;}
  const password=prompt("برای تأیید هویت، رمز عبور فعلی خود را وارد کنید:");
  if(password===null||!password)return;
- try{
-  const identity=await usernameEmail(nextName);
+ try{  const identity=await usernameEmail(nextName);
   const credential=EmailAuthProvider.credential(me.email,password);
   await reauthenticateWithCredential(me,credential);
   await updateEmail(me,identity.email);
@@ -1797,8 +1816,7 @@ window.enterChat=async function(){
   heartbeat=setInterval(async()=>{
    if(me){
     try{
-     await updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()});
-    }catch(e){}
+     await updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()});    }catch(e){}
    }
   },20000);
 
@@ -1977,8 +1995,7 @@ async function sendBotMessage(message){
   // برای سازگاری با قوانین Firestore، پیام ربات با حساب واردشده ثبت می‌شود
   // اما فیلد bot باعث می‌شود در صفحه با نام و ظاهر هیله نمایش داده شود.
   await addDoc(collection(db,"messages"),{
-   senderUid:me.uid,
-   senderName:"هیله",
+   senderUid:me.uid,   senderName:"هیله",
    text:message,
    type:"public",
    bot:true,
@@ -2157,8 +2174,7 @@ window.sendMessage=async function(){
 
   if(activePeer){
    data.type="private";
-   data.members=[me.uid,activePeer.uid];
-  }else{
+   data.members=[me.uid,activePeer.uid];  }else{
    data.type="public";
   }
 
