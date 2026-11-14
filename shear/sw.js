@@ -1,10 +1,29 @@
-const CACHE='shear-app-v1';
+const CACHE='shear-app-v2';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg'];
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES))));
-self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key))))));
+self.addEventListener('install',event=>{
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
+  self.skipWaiting();
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil(
+    caches.keys()
+      .then(keys=>Promise.all(keys.filter(key=>key.startsWith('shear-app-')&&key!==CACHE).map(key=>caches.delete(key))))
+      .then(()=>self.clients.claim())
+  );
+});
 self.addEventListener('fetch',event=>{
-  const url=new URL(event.request.url);
-  if(url.origin===self.location.origin && url.pathname.includes('/shear/')){
-    event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request)));
+  const request=event.request;
+  const url=new URL(request.url);
+  if(url.origin!==self.location.origin || !url.pathname.includes('/shear/')) return;
+  if(request.mode==='navigate' || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/')){
+    event.respondWith(fetch(request).then(response=>{
+      if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy));}
+      return response;
+    }).catch(()=>caches.match(request).then(cached=>cached||caches.match('./index.html'))));
+    return;
   }
+  event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(response=>{
+    if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy));}
+    return response;
+  })));
 });
