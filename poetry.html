@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>اتاق شعر | عشق با وفا</title>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>اتاق شعر | عشق با وفا</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:Tahoma,sans-serif;color:#fff;background:radial-gradient(ellipse at top right,#503078,transparent 45%),linear-gradient(145deg,#17132d,#28143f 55%,#171b37)}
-header{padding:22px 14px;text-align:center;background:linear-gradient(110deg,#401477,#59238e 55%,#32105f);border-bottom:3px solid #b879ff;box-shadow:0 5px 22px #0006}
-header h1{font-size:clamp(23px,5vw,34px);margin:0}
-header p{margin:8px 0 0;color:#f6d8ff}
-main{width:min(760px,100%);margin:22px auto;padding:12px}
-.actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
-a,button{font-family:Tahoma;text-decoration:none;border:0;border-radius:22px;padding:11px 17px;background:#7130a8;color:white;font-size:14px}
-.poem{margin:16px 0;padding:22px 16px;border-radius:20px;background:linear-gradient(145deg,#43245f,#292044);border:1px solid #a96aff;box-shadow:0 8px 24px #0004;text-align:center}
-.poem h2{font-size:20px;color:#ffd5ef;margin:0 0 12px}
-.poem p{font-size:17px;line-height:2.4;white-space:pre-line;margin:0;color:#fff}
-footer{text-align:center;color:#c9b7dc;font-size:12px;padding:24px}
-</style>
-</head>
-<body>
-<header><h1>🌹 اتاق شعر</h1><p>شعرهای زیبا در خانهٔ عشق با وفا ❤️</p></header>
-<main>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Tahoma,sans-serif;color:#fff;background:radial-gradient(ellipse at top right,#503078,transparent 45%),linear-gradient(145deg,#17132d,#28143f 55%,#171b37)}
+header{padding:22px 14px;text-align:center;background:linear-gradient(110deg,#401477,#59238e 55%,#32105f);border-bottom:3px solid #b879ff}header h1{font-size:clamp(23px,5vw,34px);margin:0}header p{margin:8px 0 0;color:#f6d8ff}
+main{width:min(760px,100%);margin:22px auto;padding:12px}.actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+a,button{font-family:Tahoma;text-decoration:none;border:0;border-radius:22px;padding:11px 17px;background:#7130a8;color:white;font-size:14px;cursor:pointer}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.filters button{background:#38244f;border:1px solid #9865bd;padding:9px 13px}.filters button.active{background:#a04bd0}
+.section-title{margin:28px 2px 8px;color:#f0c8ff;font-size:19px}.poem{margin:16px 0;padding:22px 16px;border-radius:20px;background:linear-gradient(145deg,#43245f,#292044);border:1px solid #a96aff;box-shadow:0 8px 24px #0004;text-align:center}
+.poem h2{font-size:20px;color:#ffd5ef;margin:0 0 12px}.poem p{font-size:17px;line-height:2.4;white-space:pre-line;margin:0;color:#fff}.author{display:inline-block;margin-top:13px;padding:6px 13px;border-radius:20px;background:#6d3b89;color:#ffe0fa;font-size:12px}
+footer{text-align:center;color:#c9b7dc;font-size:12px;padding:24px}@media(max-width:480px){.poem p{font-size:15px}}
+</style></head>
+<body><header><h1>🌹 اتاق شعر</h1><p>شعرهای زیبا در خانهٔ عشق با وفا ❤️</p></header><main>
 <div class="actions"><a href="./">← بازگشت به صفحه اصلی چت</a><span>📚 مجموعه شعر</span></div>
-<article class="poem"><h2>❤️ عشق باوفا</h2><p>عشق آن نیست که هر روز به زبان آوریم
+<div class="filters"><button class="active" data-filter="all">همه شعرها</button><button data-filter="molana">مولانا</button><button data-filter="saadi">سعدی</button><button data-filter="site">شعرهای عشق با وفا</button></div>
+<h2 class="section-title">🌿 گزیده اشعار مولانا</h2>
+<article class="poem" data-author="molana"><h2>نی‌نامه</h2><p>بشنو این نی چون شکایت می‌کند
+از جدایی‌ها حکایت می‌کند</p><span class="author">مولانا</span></article>
+<article class="poem" data-author="molana"><h2>بازگشت به اصل</h2><p>هر کسی کو دور ماند از اصل خویش
+باز جوید روزگار وصل خویش</p><span class="author">مولانا</span></article>
+<article class="poem" data-author="molana"><h2>نیروی محبت</h2><p>از محبت تلخ‌ها شیرین شود
+از محبت مس‌ها زرین شود</p><span class="author">مولانا</span></article>
+<h2 class="section-title">🌸 گزیده اشعار سعدی</h2>
+<article class="poem" data-author="saadi"><h2>بنی‌آدم</h2><p>بنی‌آدم اعضای یک پیکرند
+که در آفرینش ز یک گوهرند
+چو عضوی به درد آورد روزگار
+دگر عضوها را نماند قرار</p><span class="author">سعدی</span></article>
+<article class="poem" data-author="saadi"><h2>عشق به جهان</h2><p>به جهان خرم از آنم که جهان خرم از اوست
+عاشقم بر همه عالم که همه عالم از اوست</p><span class="author">سعدی</span></article>
+<article class="poem" data-author="saadi"><h2>نام نیک</h2><p>سعدیا مرد نکونام نمیرد هرگز
+مرده آن است که نامش به نکویی نبرند</p><span class="author">سعدی</span></article>
+<h2 class="section-title">❤️ شعرهای عشق با وفا</h2>
+<article class="poem" data-author="site"><h2>❤️ عشق باوفا</h2><p>عشق آن نیست که هر روز به زبان آوریم
 عشق آن است که در سختی کنارت بمانیم ❤️</p></article>
-<article class="poem"><h2>🌸 دلتنگی</h2><p>دلم تنگ است برای لحظه‌های دیدنت
+<article class="poem" data-author="site"><h2>🌸 دلتنگی</h2><p>دلم تنگ است برای لحظه‌های دیدنت
 برای خنده‌های شیرین و صدای شنیدنت 🌹</p></article>
-</main>
-<footer>چت عشق با وفا · اتاق شعر</footer>
-</body>
-</html>
+</main><footer>چت عشق با وفا · اتاق شعر</footer>
+<script>
+document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{
+ const filter=button.dataset.filter;
+ document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===button));
+ document.querySelectorAll('.poem').forEach(poem=>poem.hidden=filter!=='all'&&poem.dataset.author!==filter);
+ document.querySelectorAll('.section-title').forEach(title=>{
+  const next=title.nextElementSibling;
+  title.hidden=filter!=='all'&&(!next||next.dataset.author!==filter);
+ });
+}));
+</script></body></html>
