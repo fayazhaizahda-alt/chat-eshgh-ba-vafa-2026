@@ -44,6 +44,16 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
     <div><h2>بخش شعر</h2><p>خواندن شعرها و پسندیدن شعرهای دلخواه</p></div>
     <span class="arrow">‹</span>
   </button>
+  <button class="choice" id="molanaButton" type="button">
+    <div class="symbol">📜</div>
+    <div><h2>شعر مولانا</h2><p>غزل‌ها و حکایت‌های مولانا</p></div>
+    <span class="arrow">‹</span>
+  </button>
+  <button class="choice" id="saadiButton" type="button">
+    <div class="symbol">🌿</div>
+    <div><h2>شعر سعدی</h2><p>غزل‌ها و سخنان سعدی</p></div>
+    <span class="arrow">‹</span>
+  </button>
   <section class="panel" id="poetryPanel">
     <h2>🌷 گنجینه شعر</h2>
     <div class="category-tabs" id="categoryTabs" aria-label="دسته‌بندی شعرها">
@@ -53,6 +63,8 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
       <button type="button" class="category" data-category="loyalty">🤍 وفاداری</button>
       <button type="button" class="category" data-category="betrayal">💔 بی‌وفایی</button>
       <button type="button" class="category" data-category="hope">🌱 امید</button>
+      <button type="button" class="category" data-category="molana">📜 مولانا</button>
+      <button type="button" class="category" data-category="saadi">🌿 سعدی</button>
     </div>
     <div id="poemList"></div>
     <div id="ownerPoemArea" style="display:none;margin:14px 0;padding:15px;border:1px solid #e7bfd2;border-radius:16px;background:#fff1f7">
@@ -193,6 +205,18 @@ const poems=[
 {id:'p99',title:'صبر شیرین',body:'صبر کن، گل در زمان خود می‌شکفد\nنور از دل تاریکی پیدا می‌شود\nدل امیدوار به مقصد می‌رسد',category:'hope'},
 {id:'p100',title:'فصل نو',body:'برگ‌های خسته دوباره سبز می‌شوند\nآرزوهای خاموش دوباره زنده می‌شوند\nبا امید، روزهای نو از راه می‌رسند',category:'hope'}
 ];
+poems.push(
+{id:'molana1',title:'بشنو از نی',body:'بشنو از نی چون حکایت می‌کند\nوز جدایی‌ها شکایت می‌کند',category:'molana',author:'مولانا'},
+{id:'molana2',title:'دور ماندن از اصل',body:'هر کسی کو دور ماند از اصل خویش\nباز جوید روزگار وصل خویش',category:'molana',author:'مولانا'},
+{id:'molana3',title:'از محبت',body:'از محبت تلخ‌ها شیرین شود\nاز محبت مس‌ها زرین شود',category:'molana',author:'مولانا'},
+{id:'molana4',title:'عشق',body:'علت عاشق ز علت‌ها جداست\nعشق اسطرلاب اسرار خداست',category:'molana',author:'مولانا'},
+{id:'molana5',title:'خاموشی',body:'چون قلم اندر نوشتن می‌شتافت\nچون به عشق آمد قلم بر خود شکافت',category:'molana',author:'مولانا'},
+{id:'saadi1',title:'بنی‌آدم',body:'بنی‌آدم اعضای یک پیکرند\nکه در آفرینش ز یک گوهرند\nچو عضوی به درد آورد روزگار\nدگر عضوها را نماند قرار',category:'saadi',author:'سعدی'},
+{id:'saadi2',title:'به جهان خرم',body:'به جهان خرم از آنم که جهان خرم از اوست\nعاشقم بر همه عالم که همه عالم از اوست',category:'saadi',author:'سعدی'},
+{id:'saadi3',title:'نیکی',body:'تو نیکی می‌کن و در دجله انداز\nکه ایزد در بیابانت دهد باز',category:'saadi',author:'سعدی'},
+{id:'saadi4',title:'دیدار',body:'هر که دلارام دید از دلش آرام رفت\nچشم ندارد خلاص هر که در این دام رفت',category:'saadi',author:'سعدی'},
+{id:'saadi5',title:'راه و کوشش',body:'به راه بادیه رفتن به از نشستن باطل\nو گر مراد نیابم به قدر وسع بکوشم',category:'saadi',author:'سعدی'}
+);
 const storageKey='shear-liked-poems-v1';
 function getLikes(){try{return JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(e){return {}}}
 let activeCategory='all';
@@ -214,6 +238,15 @@ function renderPoems(){
 document.querySelectorAll('.category').forEach(btn=>btn.addEventListener('click',()=>{
  activeCategory=btn.dataset.category;renderPoems();
 }));
+function openPoetSection(category){
+ activeCategory=category;
+ panel.classList.add('show');
+ button.setAttribute('aria-expanded','true');
+ renderPoems();
+ panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.getElementById('molanaButton').addEventListener('click',()=>openPoetSection('molana'));
+document.getElementById('saadiButton').addEventListener('click',()=>openPoetSection('saadi'));
 renderPoems();
 
 document.getElementById("showPoemForm").addEventListener("click",()=>{document.getElementById("poemForm").style.display="block";});
