@@ -1413,6 +1413,7 @@ body{
  border-bottom:2px solid #b44dff!important;box-shadow:0 5px 25px #070014aa!important
 }
 .header-menu-mark,.header-actions{font-size:38px!important;color:#fff;text-align:center;cursor:pointer}
+.love-header .header-menu-mark,.love-header .header-actions button{background:transparent!important;border:0!important;color:white!important;padding:0!important;box-shadow:none!important}
 .brand-heart{font-size:66px!important;line-height:1;filter:drop-shadow(0 0 9px #ff35cb)}
 .brand-copy{text-align:center}
 .brand-copy h2{font-size:clamp(23px,3.2vw,42px)!important;color:#fff;text-shadow:0 2px 12px #e05bff}
@@ -2220,12 +2221,12 @@ function stopMessages(){
 }
 
 window.openPublic=function(){
- activePeer=null;
+ activePeer=null;activeGroup=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
  listenMessages("public");
 };
 window.openPrivate=function(u){
- activePeer=u;
+ activeGroup=null;activePeer=u;
  $("roomTitle").textContent="گفت‌وگوی خصوصی با "+(u.displayName||u.name);
  listenMessages("private");
 };
@@ -2238,7 +2239,7 @@ function listenMessages(type){
  if(type==="public"){
   q=query(collection(db,"messages"),where("type","==","public"));
  }else if(type==="group"){
-  q=query(collection(db,"messages"),where("type","==","group"),where("groupId","==",activeGroup.id));
+  q=query(collection(db,"messages"),where("type","==","group"));
  }else{
   q=query(collection(db,"messages"),
    where("members","array-contains",me.uid));
@@ -2249,6 +2250,8 @@ function listenMessages(type){
 
   if(type==="private"){
    arr=arr.filter(m=>m.members?.includes(activePeer.uid));
+  }else if(type==="group"){
+   arr=arr.filter(m=>m.groupId===activeGroup?.id);
   }
 
   arr.sort((a,b)=>
