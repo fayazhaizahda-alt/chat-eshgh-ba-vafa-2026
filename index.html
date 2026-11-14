@@ -1480,6 +1480,7 @@ async function restoreSavedSession(user){
   myRole=user.uid===OWNER_UID?"owner":(profile.role||"user");
   $("login").style.display="none";
   $("chat").style.display="block";
+  $("poetryQuickSections").style.display="none";
    $("myProfilePanel").classList.toggle("owner-profile",me?.uid===OWNER_UID);
   $("welcome").textContent="خوش آمدی دوباره "+myDisplayName+" عزیز ❤️ "+countryFlag(profile.countryCode||"");
    $("myRoleBadge").textContent="رتبه حساب: "+roleLabel(myRole);
@@ -1733,6 +1734,7 @@ window.enterChat=async function(){
 
   $("login").style.display="none";
   $("chat").style.display="block";
+  $("poetryQuickSections").style.display="none";
    $("myProfilePanel").classList.toggle("owner-profile",me?.uid===OWNER_UID);
   $("welcome").textContent="سلام "+myDisplayName+" عزیز ❤️ "+countryFlag(country.countryCode||profileData.countryCode||"");
   $("myPhoto").src=myPhoto||"";
@@ -2248,6 +2250,7 @@ window.exitChat=async function(){
 
  $("chat").style.display="none";
  $("login").style.display="block";
+ $("poetryQuickSections").style.display="block";
  $("message").value="";
  $("password").value="";
 };
