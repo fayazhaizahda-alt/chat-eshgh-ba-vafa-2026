@@ -77,7 +77,7 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-
 import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import {getFirestore,collection,addDoc,getDocs,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyBuj3nb-ACIwFVkCnuzRqFRwCRz323nQ9I",authDomain:"chat-eshgh-ba-vafa.firebaseapp.com",projectId:"chat-eshgh-ba-vafa",storageBucket:"chat-eshgh-ba-vafa.firebasestorage.app",messagingSenderId:"235744727404",appId:"1:235744727404:web:8f02d62853698462cba349",measurementId:"G-NR1076K019"};
-const firebaseApp=initializeApp(firebaseConfig,"shear-poetry");
+const firebaseApp=initializeApp(firebaseConfig);
 const auth=getAuth(firebaseApp); const db=getFirestore(firebaseApp);
 const OWNER_UID="eaZWtnAluVMZ1bjDMrKcu8hye6t1";
 let sharedPoems=[];
@@ -203,7 +203,7 @@ function renderPoems(){
   const liked=!!likes[poem.id];
   const safe=value=>String(value??'').replace(/[&<>\"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[ch]));\n  return '<article class=\"poem\"><h3>🌷 '+safe(poem.title)+'</h3><p>'+safe(poem.body)+'</p>'+(poem.author?'<small>✍️ '+safe(poem.author)+'</small><br>':'')+'<button class=\"like '+(liked?'liked':'')+'" type="button" data-id="'+poem.id+'" aria-pressed="'+liked+'">'+(liked?'♥ پسندیده شد':'♡ پسندیدن')+'</button></article>';
  }).join(''):'<p class="note">هنوز شعری در این بخش نیست.</p>';
- document.querySelectorAll('.like').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.like[data-id]').forEach(btn=>btn.addEventListener('click',()=>{
   const current=getLikes();const id=btn.dataset.id;
   if(current[id]) delete current[id]; else current[id]=true;
   localStorage.setItem(storageKey,JSON.stringify(current));renderPoems();
