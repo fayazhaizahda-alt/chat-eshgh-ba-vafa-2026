@@ -1384,6 +1384,16 @@ main{max-width:1500px;width:100%;margin:12px auto;padding:0 10px}
 }
 @media(max-width:390px){#layout{grid-template-columns:78px minmax(0,1fr)!important}#profileSidebar > #myProfilePanel button{font-size:6px!important}}
 
+
+/* Restore clickable online-user profiles */
+#users{display:block!important;visibility:visible!important;position:relative!important;max-height:260px!important;overflow-y:auto!important;margin:10px 0!important;padding:10px!important;border:1px solid #7653a5!important;border-radius:14px!important;background:linear-gradient(145deg,#242044,#1b1b30)!important}
+#userList{display:flex!important;flex-direction:column!important;gap:6px!important}
+#users .user{display:flex!important;width:100%!important;min-height:48px!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;padding:7px!important;font-size:12px!important;cursor:pointer!important}
+#users .user span{overflow-wrap:anywhere;text-align:right}
+@media(max-width:760px){
+ #users{max-height:180px!important;padding:6px!important;margin:6px 0!important}
+ #users .user{min-height:42px!important;font-size:10px!important}
+}
 </style>
 </head>
 <body>
