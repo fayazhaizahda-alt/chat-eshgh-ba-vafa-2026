@@ -2513,6 +2513,8 @@ window.exitChat=async function(){
   moderationUnsub();
   moderationUnsub=null;
  }
+ if(groupsUnsub){groupsUnsub();groupsUnsub=null;}
+ activeGroup=null;
 
  if(me){
   try{
