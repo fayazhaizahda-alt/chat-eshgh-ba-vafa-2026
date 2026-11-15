@@ -401,6 +401,14 @@ onAuthStateChanged(auth,user=>{
  if(user&&!loginInProgress&&!me)restoreSavedSession(user);
 });
 
+// اگر صفحه از حافظهٔ مرورگر یا وب‌ویو بازگردانده شد، اتاق عمومی را دوباره فعال کن.
+window.addEventListener("pageshow",event=>{
+ if(event.persisted && me && auth.currentUser){
+  activeGroup=null;
+  openPublic();
+ }
+});
+
 const $=id=>document.getElementById(id);
 window.setMode=function(value){
  mode=value;
