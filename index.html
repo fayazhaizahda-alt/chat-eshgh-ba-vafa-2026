@@ -58,7 +58,7 @@ main{width:100%;max-width:1600px;margin:0 auto;padding:10px}
 #sendArea button{flex:0 0 auto;min-width:60px;min-height:48px;padding:10px 13px;border:0;border-radius:28px;background:linear-gradient(135deg,#8e2bd2,#5913a2);color:white;font-size:14px}
 #chatEmojiPanel{display:none;flex-wrap:wrap;gap:5px;padding:7px;background:#f7eaff;border-radius:15px}
 #chatEmojiPanel button{min-width:0!important;padding:7px 10px!important;background:#f2ddff!important;color:#64239b!important;border:1px solid #d4a4ef!important;border-radius:18px!important}
-#loveBottomNav{grid-area:nav;display:grid;grid-template-columns:minmax(0,1fr);width:100%;margin:0;border:1px solid #a94dff;border-radius:18px;overflow:hidden;background:linear-gradient(100deg,#31006d,#4d0ca0,#31006d);box-shadow:0 5px 20px #07001488}
+#loveBottomNav{grid-area:nav;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;margin:0;border:1px solid #a94dff;border-radius:18px;overflow:hidden;background:linear-gradient(100deg,#31006d,#4d0ca0,#31006d);box-shadow:0 5px 20px #07001488}
 #loveBottomNav button{min-width:0;padding:12px 5px;border:0;border-left:1px solid #8e42ca;border-radius:0;background:transparent;color:white;font-size:13px}
 #loveBottomNav button span{display:block;font-size:25px;margin-bottom:3px}
 #chatSettingsModal{display:none;position:fixed;inset:0;z-index:100000;background:#090018d9;align-items:center;justify-content:center;padding:16px}
@@ -186,6 +186,11 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 #sendArea textarea{min-height:48px}
 .love-header{background:linear-gradient(100deg,#350078,#6500bd 52%,#390080);border-bottom:2px solid #a94dff}
 #loveBottomNav{border-radius:14px}
+
+body.private-chat-page #profileSidebar{display:none!important}
+body.private-chat-page #loveBottomNav{display:none!important}
+body.private-chat-page #layout{grid-template-areas:"chat";grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+body.private-chat-page #chatPanel{grid-area:chat;width:100%;min-height:0;height:100%;}
 @media(max-width:760px){
  #profileSidebar{position:fixed;display:none;top:8px;right:8px;bottom:8px;width:min(320px,88vw);z-index:9000}
  #chatPanel{min-height:0}
@@ -199,7 +204,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
  <button class="header-menu-mark" type="button" onclick="openMainMenu()">☰</button>
  <div class="brand-heart" aria-hidden="true">💞</div>
  <div class="brand-copy"><h2>عشق با وفا</h2><p>❤️ چت دوستانه و صمیمی</p></div>
- <div class="header-actions"><button class="header-profile" type="button" onclick="openMyProfile()" aria-label="پروفایل من"><img id="headerMyPhoto" alt="پروفایل من"></button></div>
+ <div class="header-actions"><button class="header-profile" type="button" onclick="openMyProfile()" aria-label="پروفایل من"><img id="headerMyPhoto" alt="پروفایل من"></button><button class="bell" type="button" onclick="openPrivateInbox()" aria-label="پیام خصوصی">♧</button></div>
 </header>
 
 <main>
@@ -229,6 +234,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 <div id="layout">
 <div class="panel" id="chatPanel">
 
+<button id="privateBackBtn" type="button" onclick="openPublic()" style="display:none;width:100%;margin:0 0 10px;padding:11px;border:1px solid #d8a5ff;border-radius:12px;background:#4b167e;color:white;font-size:14px">← بازگشت به گفت‌وگوی عمومی</button>
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
 <button id="clearAllChatsBtn" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:8px 12px;font-size:12px;margin:4px 0">🗑️ پاک کردن تمام چت‌ها</button>
 <div id="messages"></div>
@@ -303,6 +309,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 </aside>
 
 <nav id="loveBottomNav" aria-label="منوی اصلی">
+ <button type="button" onclick="openPrivateInbox()"><span>▣</span>پیام خصوصی</button>
  <button type="button" onclick="openMyProfile()"><span>👤</span>پروفایل</button>
 </nav>
 </div>
@@ -906,6 +913,8 @@ window.openPublic=function(){
  if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
  if(typeof selectedProfile!=="undefined")selectedProfile=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
+ document.body.classList.remove("private-chat-page");
+ const backBtn=$("privateBackBtn");if(backBtn)backBtn.style.display="none";
  $("chat").style.display="block";
  $("login").style.display="none";
  listenMessages("public");
@@ -923,7 +932,13 @@ window.openPrivate=function(u){
  if(!u||!u.uid||u.uid===me?.uid)return;
  activeGroup=null;
  activePeer=u;
- $("roomTitle").textContent="گفت‌وگوی خصوصی با "+(u.displayName||u.name);
+ $("profileSidebar").style.display="none";
+ $("profileCard").style.display="none";
+ $("chat").style.display="block";
+ $("login").style.display="none";
+ document.body.classList.add("private-chat-page");
+ const backBtn=$("privateBackBtn");if(backBtn)backBtn.style.display="block";
+ $("roomTitle").textContent="💌 گفت‌وگوی خصوصی با "+(u.displayName||u.name);
  listenMessages("private");
 };
 
