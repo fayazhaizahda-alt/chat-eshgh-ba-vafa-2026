@@ -58,7 +58,7 @@ main{width:100%;max-width:1600px;margin:0 auto;padding:10px}
 #sendArea button{flex:0 0 auto;min-width:60px;min-height:48px;padding:10px 13px;border:0;border-radius:28px;background:linear-gradient(135deg,#8e2bd2,#5913a2);color:white;font-size:14px}
 #chatEmojiPanel{display:none;flex-wrap:wrap;gap:5px;padding:7px;background:#f7eaff;border-radius:15px}
 #chatEmojiPanel button{min-width:0!important;padding:7px 10px!important;background:#f2ddff!important;color:#64239b!important;border:1px solid #d4a4ef!important;border-radius:18px!important}
-#loveBottomNav{grid-area:nav;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;margin:0;border:1px solid #a94dff;border-radius:18px;overflow:hidden;background:linear-gradient(100deg,#31006d,#4d0ca0,#31006d);box-shadow:0 5px 20px #07001488}
+#loveBottomNav{grid-area:nav;display:grid;grid-template-columns:minmax(0,1fr);width:100%;margin:0;border:1px solid #a94dff;border-radius:18px;overflow:hidden;background:linear-gradient(100deg,#31006d,#4d0ca0,#31006d);box-shadow:0 5px 20px #07001488}
 #loveBottomNav button{min-width:0;padding:12px 5px;border:0;border-left:1px solid #8e42ca;border-radius:0;background:transparent;color:white;font-size:13px}
 #loveBottomNav button span{display:block;font-size:25px;margin-bottom:3px}
 #chatSettingsModal{display:none;position:fixed;inset:0;z-index:100000;background:#090018d9;align-items:center;justify-content:center;padding:16px}
@@ -199,7 +199,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
  <button class="header-menu-mark" type="button" onclick="openMainMenu()">☰</button>
  <div class="brand-heart" aria-hidden="true">💞</div>
  <div class="brand-copy"><h2>عشق با وفا</h2><p>❤️ چت دوستانه و صمیمی</p></div>
- <div class="header-actions"><button class="header-profile" type="button" onclick="openMyProfile()" aria-label="پروفایل من"><img id="headerMyPhoto" alt="پروفایل من"></button><button class="bell" type="button" onclick="openPrivateInbox()">♧</button></div>
+ <div class="header-actions"><button class="header-profile" type="button" onclick="openMyProfile()" aria-label="پروفایل من"><img id="headerMyPhoto" alt="پروفایل من"></button></div>
 </header>
 
 <main>
@@ -303,7 +303,6 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 </aside>
 
 <nav id="loveBottomNav" aria-label="منوی اصلی">
- <button type="button" onclick="openPrivateInbox()"><span>▣</span>پیام خصوصی</button>
  <button type="button" onclick="openMyProfile()"><span>👤</span>پروفایل</button>
 </nav>
 </div>
