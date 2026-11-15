@@ -106,6 +106,69 @@ main{width:100%;max-width:1600px;margin:0 auto;padding:10px}
  #users .avatar{width:27px;height:27px;flex-basis:27px}
  #sendArea button{min-width:27px;padding:5px 3px}
 }
+
+/* تثبیت صفحه چت؛ فقط فهرست پیام‌ها اسکرول می‌شود */
+html,body{height:100%;min-height:0}
+body:has(#chat[style*="display: block"]){height:100dvh;overflow:hidden}
+body:has(#chat[style*="display: block"]) main{
+ height:calc(100dvh - 112px);
+ min-height:0;
+ overflow:hidden;
+ display:flex;
+ flex-direction:column;
+}
+body:has(#chat[style*="display: block"]) #chat{
+ display:flex!important;
+ flex:1 1 auto;
+ min-height:0;
+ height:100%;
+ overflow:hidden;
+}
+body:has(#chat[style*="display: block"]) #layout{
+ height:100%;
+ min-height:0;
+ grid-template-rows:minmax(0,1fr) auto;
+ overflow:hidden;
+}
+body:has(#chat[style*="display: block"]) #chatPanel{
+ height:100%;
+ min-height:0;
+ overflow:hidden;
+}
+body:has(#chat[style*="display: block"]) #messages{
+ flex:1 1 0;
+ min-height:0;
+ max-height:none;
+ overflow-y:auto;
+ overscroll-behavior:contain;
+ touch-action:pan-y;
+}
+body:has(#chat[style*="display: block"]) #profileSidebar{
+ min-height:0;
+ overflow-y:auto;
+ overscroll-behavior:contain;
+}
+@media(max-width:760px){
+ body:has(#chat[style*="display: block"]) main{
+  height:calc(100dvh - 86px);
+  padding:5px;
+ }
+ body:has(#chat[style*="display: block"]) #layout{
+  min-height:0;
+  grid-template-rows:minmax(0,1fr) auto;
+ }
+ body:has(#chat[style*="display: block"]) #chatPanel{
+  min-height:0;
+  padding:7px;
+ }
+ body:has(#chat[style*="display: block"]) #messages{
+  min-height:0;
+  max-height:none;
+  flex:1 1 0;
+  overflow-y:auto;
+ }
+}
+
 </style>
 </head>
 <body>
