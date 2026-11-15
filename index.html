@@ -772,7 +772,7 @@ window.toggleUserBan=async function(){
   alert(banning?"حساب کاربر مسدود شد.":"حساب کاربر آزاد شد.");
  }catch(e){alert("عملیات انجام نشد: "+e.message);}
 };
-window.openMyProfile=function(){if(!me)return;closeSidebar();const headerPhoto=$("headerMyPhoto");if(headerPhoto)headerPhoto.src=myPhoto||$("myPhoto")?.src||"";window.showProfile({uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole,lastSeen:Date.now()});};
+window.openMyProfile=function(){if(!me)return;$("profileSidebar").style.display="flex";const headerPhoto=$("headerMyPhoto");if(headerPhoto)headerPhoto.src=myPhoto||$("myPhoto")?.src||"";window.showProfile({uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole,lastSeen:Date.now()});};
 window.closeSidebar=function(){$("profileSidebar").style.display="none";};
 window.closeProfile=function(){
  $("profileCard").style.display="none";
