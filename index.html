@@ -806,6 +806,13 @@ window.openPublic=function(){
  }
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
  listenMessages("public");
+ // اگر شنونده در بارگذاری اولیه زودتر از آماده‌شدن صفحه اجرا شد، یک بار دوباره بارگذاری کن.
+ setTimeout(()=>{
+  if($("chat").style.display!=="none" && !activePeer && !activeGroup){
+   $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
+   listenMessages("public");
+  }
+ },700);
 };
 window.openPrivate=function(u){
  if(!u||!u.uid||u.uid===me?.uid)return;
