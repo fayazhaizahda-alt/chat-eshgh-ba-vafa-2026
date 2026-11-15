@@ -62,8 +62,8 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
   <section class="panel" id="poetryPanel">
     <h2>🌷 گنجینه شعر</h2>
     <div class="category-tabs" id="categoryTabs" aria-label="دسته‌بندی شعرها">
-      <button type="button" class="category active" data-category="all">همه شعرها</button>
-      <button type="button" class="category" data-category="romantic">❤️ عاشقانه</button>
+      <button type="button" class="category active" data-category="romantic">❤️ عاشقانه</button>
+      
       <button type="button" class="category" data-category="longing">🥀 دلتنگی</button>
       <button type="button" class="category" data-category="loyalty">🤍 وفاداری</button>
       <button type="button" class="category" data-category="betrayal">💔 بی‌وفایی</button>
@@ -237,7 +237,7 @@ poems.push(
 );
 const storageKey='shear-liked-poems-v1';
 function getLikes(){try{return JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(e){return {}}}
-let activeCategory='all';
+let activeCategory='romantic';
 function renderPoems(){
  const likes=getLikes();
  document.querySelectorAll('.category').forEach(btn=>btn.classList.toggle('active',btn.dataset.category===activeCategory));
