@@ -792,9 +792,14 @@ function stopMessages(){
 }
 
 window.openPublic=function(){
- // هر بار بازگشت به صفحه اصلی، مقصد خصوصی قبلی کاملاً پاک شود.
+ // صفحه پیش‌فرض اتاق همیشه عمومی است؛ مقصد خصوصی یا گروه قبلی نباید باقی بماند.
  activePeer=null;
  activeGroup=null;
+ if(typeof selectedProfile!=="undefined" && selectedProfile){
+  $("profileCard").style.display="none";
+  $("profileCard").classList.remove("profile-self-modal");
+  selectedProfile=null;
+ }
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
  listenMessages("public");
 };
