@@ -845,6 +845,18 @@ function listenMessages(type){
    where("members","array-contains",me.uid));
  }
 
+ // دریافت مستقیم پیام‌های موجود هنگام ورود؛ منتظر اولین رویداد شنونده نمی‌مانیم.
+ getDocs(q).then(initialSnap=>{
+  if(thisListener!==messageListenerVersion)return;
+  let initialMessages=initialSnap.docs.map(d=>({id:d.id,...d.data()}));
+  if(type==="private")initialMessages=initialMessages.filter(m=>m.members?.includes(peerUid));
+  else if(type==="group")initialMessages=initialMessages.filter(m=>m.groupId===groupId);
+  initialMessages.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+  renderMessages(initialMessages.slice(-100));
+ }).catch(error=>{
+  if(thisListener===messageListenerVersion){$("messages").textContent="دریافت پیام‌ها ممکن نشد: "+error.message;}
+ });
+
  messagesUnsub=onSnapshot(q,snap=>{
   if(thisListener!==messageListenerVersion)return;
   let arr=snap.docs.map(d=>({id:d.id,...d.data()}));
