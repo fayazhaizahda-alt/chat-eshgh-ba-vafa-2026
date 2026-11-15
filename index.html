@@ -187,10 +187,6 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 .love-header{background:linear-gradient(100deg,#350078,#6500bd 52%,#390080);border-bottom:2px solid #a94dff}
 #loveBottomNav{border-radius:14px}
 
-body.private-chat-page #profileSidebar{display:none!important}
-body.private-chat-page #loveBottomNav{display:none!important}
-body.private-chat-page #layout{grid-template-areas:"chat";grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
-body.private-chat-page #chatPanel{grid-area:chat;width:100%;min-height:0;height:100%;}
 @media(max-width:760px){
  #profileSidebar{position:fixed;display:none;top:8px;right:8px;bottom:8px;width:min(320px,88vw);z-index:9000}
  #chatPanel{min-height:0}
@@ -234,7 +230,6 @@ body.private-chat-page #chatPanel{grid-area:chat;width:100%;min-height:0;height:
 <div id="layout">
 <div class="panel" id="chatPanel">
 
-<button id="privateBackBtn" type="button" onclick="openPublic()" style="display:none;width:100%;margin:0 0 10px;padding:11px;border:1px solid #d8a5ff;border-radius:12px;background:#4b167e;color:white;font-size:14px">← بازگشت به گفت‌وگوی عمومی</button>
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
 <button id="clearAllChatsBtn" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:8px 12px;font-size:12px;margin:4px 0">🗑️ پاک کردن تمام چت‌ها</button>
 <div id="messages"></div>
@@ -913,8 +908,6 @@ window.openPublic=function(){
  if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
  if(typeof selectedProfile!=="undefined")selectedProfile=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
- document.body.classList.remove("private-chat-page");
- const backBtn=$("privateBackBtn");if(backBtn)backBtn.style.display="none";
  $("chat").style.display="block";
  $("login").style.display="none";
  listenMessages("public");
@@ -936,8 +929,6 @@ window.openPrivate=function(u){
  $("profileCard").style.display="none";
  $("chat").style.display="block";
  $("login").style.display="none";
- document.body.classList.add("private-chat-page");
- const backBtn=$("privateBackBtn");if(backBtn)backBtn.style.display="block";
  $("roomTitle").textContent="💌 گفت‌وگوی خصوصی با "+(u.displayName||u.name);
  listenMessages("private");
 };
