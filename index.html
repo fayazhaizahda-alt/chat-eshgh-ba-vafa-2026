@@ -305,8 +305,6 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 </aside>
 
 <nav id="loveBottomNav" aria-label="منوی اصلی">
- <button type="button" onclick="openPublic()"><span>⌂</span>صفحه اصلی</button>
- <button type="button" onclick="showGroups()"><span>♧</span>گروه‌ها</button>
  <button type="button" onclick="openPrivateInbox()"><span>▣</span>پیام خصوصی</button>
  <button type="button" onclick="openMyProfile()"><span>👤</span>پروفایل</button>
 </nav>
@@ -387,7 +385,6 @@ async function restoreSavedSession(user){
   $("myPhoto").src=myPhoto;
   $("myUid").textContent=me.uid;
   startUsers();
-   startGroups();
    applySavedChatBackground();
   renderAdminPanel();
   openPublic();
@@ -648,7 +645,6 @@ window.enterChat=async function(){
   $("myUid").textContent=me.uid;
 
   startUsers();
-   startGroups();
    applySavedChatBackground();
   renderAdminPanel();
   openPublic();
