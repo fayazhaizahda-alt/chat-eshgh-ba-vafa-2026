@@ -385,8 +385,8 @@ async function restoreSavedSession(user){
   startUsers();
    applySavedChatBackground();
   renderAdminPanel();
+  // ورود مستقیم به اتاق عمومی؛ بدون صفحه یا انتقالِ تأخیری
   openPublic();
-  setTimeout(()=>{if(me)openPublic();},900);
   startBotModeration();
   if(heartbeat)clearInterval(heartbeat);
   heartbeat=setInterval(async()=>{
@@ -646,14 +646,12 @@ window.enterChat=async function(){
   startUsers();
    applySavedChatBackground();
   renderAdminPanel();
-  openPublic();
   startBotModeration();
   await sendBotMessage("سلام "+myDisplayName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
-  // پس از پیام خوش‌آمدگویی، مقصد چت را روی عمومی تثبیت می‌کنیم.
+  // پس از تکمیل ورود، مستقیم و فقط یک‌بار اتاق عمومی را باز کن.
   activePeer=null;
   activeGroup=null;
   openPublic();
-  setTimeout(()=>{if(me)openPublic();},900);
 
   if(heartbeat)clearInterval(heartbeat);
   heartbeat=setInterval(async()=>{
@@ -898,7 +896,7 @@ function stopMessages(){
 }
 
 window.openPublic=function(){
- // هنگام ورود و بازگشت، همیشه خود اتاق عمومی را مستقیم نمایش بده.
+ // نمایش مستقیم اتاق عمومی؛ بدون صفحه واسطه و بدون اجرای دوباره شنونده
  activePeer=null;
  activeGroup=null;
  const sidebar=$("profileSidebar");
@@ -907,18 +905,9 @@ window.openPublic=function(){
  if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
  if(typeof selectedProfile!=="undefined")selectedProfile=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
- $("chat").style.display="block";
  $("login").style.display="none";
+ $("chat").style.display="block";
  listenMessages("public");
- // مقصد عمومی را پس از بارگذاری اولیه نیز تثبیت کن.
- setTimeout(()=>{
-  if(me && $("chat").style.display!=="none"){
-   activePeer=null;
-   activeGroup=null;
-   $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
-   listenMessages("public");
-  }
- },500);
 };
 window.openPrivate=function(u){
  if(!u||!u.uid||u.uid===me?.uid)return;
