@@ -173,7 +173,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 /* بازطراحی خلوت صفحه چت بر اساس نمونه تصویری */
 @media(min-width:761px){
  #layout{grid-template-columns:minmax(230px,29%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"sidebar chat" "nav nav";gap:8px}
- #profileSidebar{position:static;grid-area:sidebar;display:flex!important;width:auto;min-width:0;max-height:100%;top:auto;right:auto;bottom:auto;overflow-y:auto;border-radius:18px}
+ #profileSidebar{position:static;grid-area:sidebar;display:flex;width:auto;min-width:0;max-height:100%;top:auto;right:auto;bottom:auto;overflow-y:auto;border-radius:18px}
  #chatPanel{grid-area:chat;min-height:0;height:100%;padding:10px}
  #users{max-height:none;min-height:0;flex:1 1 auto}
  #groupsPanel{flex:0 0 auto}
@@ -796,7 +796,7 @@ window.toggleUserBan=async function(){
  }catch(e){alert("عملیات انجام نشد: "+e.message);}
 };
 window.openMyProfile=function(){if(!me)return;$("profileSidebar").style.display="flex";const headerPhoto=$("headerMyPhoto");if(headerPhoto)headerPhoto.src=myPhoto||$("myPhoto")?.src||"";window.showProfile({uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole,lastSeen:Date.now()});};
-window.closeSidebar=function(){const side=$("profileSidebar");if(window.matchMedia("(min-width: 761px)").matches){side.style.display="flex";}else{side.style.display="none";}};
+window.closeSidebar=function(){$("profileSidebar").style.display="none";};
 window.closeProfile=function(){
  $("profileCard").style.display="none";
  $("profileCard").classList.remove("profile-self-modal");
