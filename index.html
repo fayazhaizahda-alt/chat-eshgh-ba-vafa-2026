@@ -398,13 +398,7 @@ async function restoreSavedSession(user){
  }
 }
 onAuthStateChanged(auth,user=>{
- if(user&&!loginInProgress){
-  // نمایش مستقیم اتاق عمومی، بدون انتظار برای پایان بارگذاری پروفایل
-  $("login").style.display="none";
-  $("chat").style.display="block";
-  if(typeof window.openPublic==="function")window.openPublic();
-  if(!me)restoreSavedSession(user);
- }
+ if(user&&!loginInProgress&&!me)restoreSavedSession(user);
 });
 
 // اگر صفحه از حافظهٔ مرورگر یا وب‌ویو بازگردانده شد، اتاق عمومی را دوباره فعال کن.
