@@ -552,6 +552,10 @@ window.enterChat=async function(){
   openPublic();
   startBotModeration();
   await sendBotMessage("سلام "+myDisplayName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
+  // پس از پیام خوش‌آمدگویی، مقصد چت را روی عمومی تثبیت می‌کنیم.
+  activePeer=null;
+  activeGroup=null;
+  openPublic();
 
   if(heartbeat)clearInterval(heartbeat);
   heartbeat=setInterval(async()=>{
