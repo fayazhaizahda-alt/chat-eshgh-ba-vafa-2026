@@ -354,7 +354,7 @@ let allUsers=[];
 let mode="login";
 let moderationUnsub=null;
 const botProcessed=new Set();
-let activeGroup=null,groupsUnsub=null,chatGroups=[];
+// تنها اتاق فعال برنامه، گفت‌وگوی عمومی است.
 let loginInProgress=false;
 
 // با باز شدن دوباره صفحه، حساب کاربر از حافظه محلی Firebase بازیابی می‌شود.
@@ -404,7 +404,7 @@ onAuthStateChanged(auth,user=>{
 // اگر صفحه از حافظهٔ مرورگر یا وب‌ویو بازگردانده شد، اتاق عمومی را دوباره فعال کن.
 window.addEventListener("pageshow",event=>{
  if(event.persisted && me && auth.currentUser){
-  activeGroup=null;
+
   openPublic();
  }
 });
@@ -658,7 +658,6 @@ window.enterChat=async function(){
   await sendBotMessage("سلام "+myDisplayName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
   // پس از پیام خوش‌آمدگویی، مقصد چت را روی عمومی تثبیت می‌کنیم.
 
-  activeGroup=null;
   openPublic();
   setTimeout(()=>{if(me)openPublic();},900);
 
@@ -900,7 +899,6 @@ function stopMessages(){
 window.openPublic=function(){
  // هنگام ورود و بازگشت، همیشه خود اتاق عمومی را مستقیم نمایش بده.
 
- activeGroup=null;
  const sidebar=$("profileSidebar");
  if(sidebar)sidebar.style.display="none";
  const card=$("profileCard");
@@ -914,39 +912,33 @@ window.openPublic=function(){
  setTimeout(()=>{
   if(me && $("chat").style.display!=="none"){
 
-   activeGroup=null;
    $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
    listenMessages("public");
   }
  },500);
 };
-function listenMessages(type){
- stopMessages();
- const thisListener=messageListenerVersion;
- const groupId=activeGroup?.id||null;
- $("messages").innerHTML="در حال دریافت پیام‌ها...";
- const q=type==="group"
-  ?query(collection(db,"messages"),where("type","==","group"))
-  :query(collection(db,"messages"),where("type","==","public"));
- getDocs(q).then(initialSnap=>{
-  if(thisListener!==messageListenerVersion)return;
-  let arr=initialSnap.docs.map(d=>({id:d.id,...d.data()}));
-  if(type==="group")arr=arr.filter(m=>m.groupId===groupId);
-  arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
-  renderMessages(arr.slice(-100));
- }).catch(error=>{
-  if(thisListener===messageListenerVersion)$("messages").textContent="دریافت پیام‌ها ممکن نشد: "+error.message;
- });
- messagesUnsub=onSnapshot(q,snap=>{
-  if(thisListener!==messageListenerVersion)return;
-  let arr=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(type==="group")arr=arr.filter(m=>m.groupId===groupId);
-  arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
-  renderMessages(arr.slice(-100));
- },e=>{
-  if(thisListener!==messageListenerVersion)return;
-  $("messages").textContent="خطا در دریافت پیام‌ها: "+e.message;
- });
+function listenMessages(){
+  stopMessages();
+  const thisListener=messageListenerVersion;
+  $("messages").innerHTML="در حال دریافت پیام‌ها...";
+  const q=query(collection(db,"messages"),where("type","==","public"));
+  getDocs(q).then(initialSnap=>{
+   if(thisListener!==messageListenerVersion)return;
+   const arr=initialSnap.docs.map(d=>({id:d.id,...d.data()}));
+   arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+   renderMessages(arr.slice(-100));
+  }).catch(error=>{
+   if(thisListener===messageListenerVersion)$("messages").textContent="دریافت پیام‌ها ممکن نشد: "+error.message;
+  });
+  messagesUnsub=onSnapshot(q,snap=>{
+   if(thisListener!==messageListenerVersion)return;
+   const arr=snap.docs.map(d=>({id:d.id,...d.data()}));
+   arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+   renderMessages(arr.slice(-100));
+  },e=>{
+   if(thisListener!==messageListenerVersion)return;
+   $("messages").textContent="خطا در دریافت پیام‌ها: "+e.message;
+  });
 }
 
 async function openMessageSenderProfile(message){
@@ -1034,9 +1026,7 @@ window.sendMessage=async function(){
    text:text,
    createdAt:serverTimestamp()
   };
-   if(activeGroup){
-   data.type="group";data.groupId=activeGroup.id;data.groupName=activeGroup.name;
-  }else{data.type="public";}
+   data.type="public";
  
 
   await addDoc(collection(db,"messages"),data);
@@ -1046,11 +1036,6 @@ window.sendMessage=async function(){
  }
 };
 
-function startGroups(){if(groupsUnsub)groupsUnsub();groupsUnsub=onSnapshot(query(collection(db,"messages"),where("type","==","groupMeta")),snap=>{chatGroups=snap.docs.map(d=>({id:d.id,...d.data()}));renderChatGroups();},e=>{const el=$("groupList");if(el)el.textContent="دریافت گروه‌ها ممکن نشد: "+e.message;});}
-function renderChatGroups(){const el=$("groupList");if(!el)return;el.innerHTML="";if(!chatGroups.length){el.textContent="هنوز گروهی ساخته نشده است.";return;}chatGroups.forEach(g=>{const b=document.createElement("button");b.textContent="👥 "+g.name;b.onclick=()=>openGroup(g);el.append(b);});}
-window.createChatGroup=async function(){if(!me)return alert("ابتدا وارد شو.");const name=(prompt("نام گروه (۲ تا ۳۰ حرف):")||"").trim();if(name.length<2||name.length>30)return alert("نام گروه معتبر نیست.");try{const ref=await addDoc(collection(db,"messages"),{type:"groupMeta",name,creatorUid:me.uid,createdAt:serverTimestamp()});openGroup({id:ref.id,name});}catch(e){alert("ساخت گروه ممکن نشد: "+e.message);}};
-window.openGroup=function(g){activeGroup=g;$("roomTitle").textContent="👥 گروه "+g.name;listenMessages("group");};
-window.showGroups=function(){$("profileSidebar").style.display="flex";$("groupsPanel").scrollIntoView({behavior:"smooth",block:"center"});};
 
 window.openMainMenu=function(){const side=$("profileSidebar");if(side.style.display==="flex"){closeSidebar();return;}side.style.display="flex";};
 window.openSettings=function(){if(!me||me.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر تنظیمات چت را دارد.");return;}const ownerControls=$("ownerBackgroundControls");if(ownerControls)ownerControls.style.display="block";$("chatSettingsModal").style.display="flex";};window.closeSettings=function(){$("chatSettingsModal").style.display="none";};
@@ -1069,8 +1054,7 @@ window.sendPhotoMessage=async function(event){
   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const scale=Math.min(1,760/image.width,760/image.height),canvas=document.createElement("canvas");canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.58));};image.onerror=reject;image.src=reader.result;};reader.onerror=reject;reader.readAsDataURL(file);});
   if(dataUrl.length>750000){alert("این عکس هنوز بزرگ است؛ لطفاً عکس کوچک‌تری انتخاب کن.");return;}
   const data={senderUid:me.uid,senderName:myDisplayName||myName,text:$("message").value.trim(),image:dataUrl,createdAt:serverTimestamp()};
-  if(activeGroup){data.type="group";data.groupId=activeGroup.id;data.groupName=activeGroup.name;}
-  else data.type="public";
+  data.type="public";
   await addDoc(collection(db,"messages"),data);$("message").value="";
  }catch(e){alert("فرستادن عکس انجام نشد: "+(e.message||e));}
  finally{event.target.value="";}
@@ -1176,8 +1160,6 @@ window.exitChat=async function(){
   moderationUnsub();
   moderationUnsub=null;
  }
- if(groupsUnsub){groupsUnsub();groupsUnsub=null;}
- activeGroup=null;
 
  if(me){
   try{
