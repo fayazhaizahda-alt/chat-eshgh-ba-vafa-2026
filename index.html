@@ -896,23 +896,27 @@ function stopMessages(){
 }
 
 window.openPublic=function(){
- // صفحه پیش‌فرض اتاق همیشه عمومی است؛ مقصد خصوصی یا گروه قبلی نباید باقی بماند.
+ // هنگام ورود و بازگشت، همیشه خود اتاق عمومی را مستقیم نمایش بده.
  activePeer=null;
  activeGroup=null;
- if(typeof selectedProfile!=="undefined" && selectedProfile){
-  $("profileCard").style.display="none";
-  $("profileCard").classList.remove("profile-self-modal");
-  selectedProfile=null;
- }
+ const sidebar=$("profileSidebar");
+ if(sidebar)sidebar.style.display="none";
+ const card=$("profileCard");
+ if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
+ if(typeof selectedProfile!=="undefined")selectedProfile=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
+ $("chat").style.display="block";
+ $("login").style.display="none";
  listenMessages("public");
- // اگر شنونده در بارگذاری اولیه زودتر از آماده‌شدن صفحه اجرا شد، یک بار دوباره بارگذاری کن.
+ // مقصد عمومی را پس از بارگذاری اولیه نیز تثبیت کن.
  setTimeout(()=>{
-  if($("chat").style.display!=="none" && !activePeer && !activeGroup){
+  if(me && $("chat").style.display!=="none"){
+   activePeer=null;
+   activeGroup=null;
    $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
    listenMessages("public");
   }
- },700);
+ },500);
 };
 window.openPrivate=function(u){
  if(!u||!u.uid||u.uid===me?.uid)return;
