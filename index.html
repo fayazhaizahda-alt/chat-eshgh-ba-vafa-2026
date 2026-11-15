@@ -1039,7 +1039,7 @@ function renderMessages(arr){
   }
   div.append(name,body);
   if(m.image){const photo=document.createElement('img');photo.src=m.image;photo.alt='عکس فرستاده‌شده';photo.style.cssText='display:block;max-width:min(100%,360px);max-height:320px;object-fit:contain;border-radius:14px;margin-top:8px;cursor:zoom-in';photo.onclick=()=>window.open(photo.src,'_blank');div.append(photo);}
-  if(canManageUsers()){
+  if(me?.uid===OWNER_UID){
    const del=document.createElement("button");
    del.textContent="حذف پیام"; del.style.marginTop="6px";
    del.onclick=()=>removeMessage(m.id); div.append(del);
@@ -1195,7 +1195,8 @@ window.clearAllChats=async function(){
 };
 
 async function removeMessage(messageId){
- if(myRole==="user")return;if(!confirm("این پیام حذف شود؟"))return;
+ if(!me||me.uid!==OWNER_UID){alert("فقط مالک اصلی اجازه حذف پیام را دارد.");return;}
+ if(!confirm("این پیام برای همه کاربران حذف شود؟"))return;
  try{await deleteDoc(doc(db,"messages",messageId));}
  catch(e){alert("حذف پیام انجام نشد: "+e.message);}
 }
