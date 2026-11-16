@@ -524,7 +524,7 @@ import {
 
 import {
  getFirestore,collection,doc,setDoc,updateDoc,
- addDoc,query,where,onSnapshot,serverTimestamp,runTransaction,
+ addDoc,query,where,onSnapshot,serverTimestamp,
  getDoc,deleteDoc,getDocs,writeBatch
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
@@ -1181,24 +1181,15 @@ function isOffensiveMessage(value){
  });
 }
 
-async function sendBotMessage(message, uniqueReplyId=null){
+async function sendBotMessage(message){
  try{
   if(!me)throw new Error("کاربر هنوز وارد حساب نشده است");
-  const payload={
+  // پاسخ از حساب همان کاربری فرستاده می‌شود که سلام کرده؛ بنابراین نیازی به آنلاین بودن مالک نیست.
+  await addDoc(collection(db,"messages"),{
    senderUid:me.uid,senderName:"هیله",
    text:message,type:"public",bot:true,
    createdAt:serverTimestamp()
-  };
-  if(uniqueReplyId){
-   const replyRef=doc(db,"messages","bot_reply_"+uniqueReplyId);
-   // همه دستگاه‌ها می‌توانند پاسخ دهند، اما برای هر پیام فقط یک پاسخ ساخته می‌شود.
-   await runTransaction(db,async transaction=>{
-    const existing=await transaction.get(replyRef);
-    if(!existing.exists())transaction.set(replyRef,payload);
-   });
-  }else{
-   await addDoc(collection(db,"messages"),payload);
-  }
+  });
  }catch(e){
   console.error("Bot message failed:",e);
   const title=$("roomTitle");
@@ -1223,7 +1214,14 @@ function startBotModeration(){
    if(!message.senderUid || message.bot || botProcessed.has(message.id))return;
    botProcessed.add(message.id);
 
-   if(message.senderUid!==OWNER_UID && isOffensiveMessage(message.text)){
+   // پاسخ‌گویی فقط روی دستگاه فرستندهٔ همان پیام انجام می‌شود.
+   // پس هر کاربر عادی هم بدون نیاز به حضور مدیر پاسخ می‌گیرد.
+   if(message.senderUid===me.uid && /سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(message.text))){
+    await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!");
+   }
+
+   // مدیریت و مسدودسازی فقط بر عهدهٔ حساب مالک اصلی است.
+   if(me.uid===OWNER_UID && message.senderUid!==OWNER_UID && isOffensiveMessage(message.text)){
     try{
      await deleteDoc(doc(db,"messages",message.id));
      await updateDoc(doc(db,"users",message.senderUid),{
@@ -1232,11 +1230,6 @@ function startBotModeration(){
      });
      await sendBotMessage("🛡️ هیله: پیام توهین‌آمیز حذف شد و حساب فرستنده مسدود گردید.");
     }catch(e){console.error("Bot moderation failed:",e);}
-    return;
-   }
-
-   if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(message.text))){
-    await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!",message.id);
    }
   });
  },error=>{
