@@ -986,7 +986,7 @@ function renderUsers(){
   }
   img.onerror=()=>{img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
   btn.append(info,img);
-  btn.onclick=()=>showUserPhotoZoom(img.src,info.textContent);
+  btn.onclick=()=>window.showProfile(u);
   list.append(btn);
  });
  if(!me&&profiles.length===1)list.textContent="ابتدا وارد چت شوید";
