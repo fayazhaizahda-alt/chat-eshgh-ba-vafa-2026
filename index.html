@@ -1104,6 +1104,13 @@ function renderMessages(arr){
    : "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');
   avatar.src=m.bot?fallbackAvatar:(m.senderPhoto||sender?.photo||fallbackAvatar);
   avatar.onerror=()=>{avatar.src=fallbackAvatar;};
+  avatar.style.cursor="pointer";
+  avatar.title=m.bot?"دیدن پروفایل هیله":"برای دیدن پروفایل این شخص بزن";
+  avatar.setAttribute("role","button");
+  avatar.tabIndex=0;
+  const openAvatarProfile=()=>m.bot?window.showBotProfile():openMessageSenderProfile(m);
+  avatar.addEventListener("click",openAvatarProfile);
+  avatar.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openAvatarProfile();}});
   div.append(avatar);
   const content=document.createElement("div");
   content.className="message-content";
