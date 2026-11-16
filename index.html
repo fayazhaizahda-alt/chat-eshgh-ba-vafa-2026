@@ -904,6 +904,8 @@ window.enterChat=async function(){
 
 function startUsers(){
  if(usersUnsub)usersUnsub();
+ // فهرست را پیش از رسیدن پاسخ Firebase نیز با پروفایل خود کاربر و هیله نمایش بده.
+ renderUsers();
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
   allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
   // عکس هیله را از همان فهرست عمومی کاربران نیز بگیر؛ خواندن جداگانه سند مالک
@@ -923,7 +925,25 @@ function startUsers(){
   renderUsers();
   if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
   renderAdminPanel();
- },e=>console.error(e));
+ },async e=>{
+  console.error("Users list listener failed:",e);
+  // اگر خواندن کل مجموعه کاربران مجاز نبود، دست‌کم پروفایل خود کاربر را جداگانه بازیابی کن.
+  try{
+   if(me){
+    const ownSnap=await getDoc(doc(db,"users",me.uid));
+    if(ownSnap.exists()){
+     const own={uid:me.uid,...ownSnap.data()};
+     allUsers=[...allUsers.filter(u=>u.uid!==me.uid),own];
+     myName=own.name||myName;
+     myDisplayName=own.displayName||myDisplayName||myName;
+     myPhoto=own.photo||myPhoto;
+    }
+   }
+  }catch(profileError){console.error("Own profile load failed:",profileError);}
+  renderUsers();
+  const status=$("messageSendStatus");
+  if(status)status.textContent="فهرست همه کاربران بارگذاری نشد؛ پروفایل خودت جداگانه نمایش داده می‌شود.";
+ });
 }
 
 
@@ -1316,11 +1336,12 @@ async function loadBotReplies(){
 function getBotReply(message){
  const normalized=normalizeBotText(message);
  const custom=botCustomReplies.find(item=>item.trigger&&(
-  item.trigger.includes(" ") ? normalized.includes(item.trigger) : normalizeBotText(message).split(/[^\\p{L}\\p{N}]+/u).includes(item.trigger)
+  item.trigger.includes(" ") ? normalized.includes(item.trigger) : normalizeBotText(message).split(/[^\p{L}\p{N}]+/u).includes(item.trigger)
  ));
  if(custom)return custom.response;
- if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalized))return "وعلیکم‌السلام ❤️ خوش آمدی!";
- return "";
+ if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalized))return "وعلیکم‌السلام ❤️ خوش آمدی! من هیله هستم؛ بگو چه کمکی از دستم برمی‌آید؟";
+ // پاسخ پیش‌فرض تا هیله به پیام‌های معمولی هم بی‌جواب نماند.
+ return "❤️ پیامت را خواندم. کمی بیشتر برایم بگو تا بهتر با تو گفتگو کنم.";
 }
 
 window.saveModerationTerms=async function(){
