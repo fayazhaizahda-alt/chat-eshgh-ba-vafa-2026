@@ -383,15 +383,22 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
 #profileCard.profile-self-modal>button:last-child{background:#4b285f}
 #otherProfileControls button{width:100%;margin:5px 0;padding:11px;border-radius:14px;background:#7817c9;color:white;border:1px solid #d8a6ff}
 @media(max-width:760px){#profileCard.profile-self-modal{max-height:82dvh!important;padding:13px!important}}
+
+/* حذف سربرگ تزئینی و استفاده از تمام فضای صفحه چت */
+body:has(#chat[style*="display: block"]) main{
+ width:100%!important;max-width:none!important;margin:0!important;
+ padding:0!important;height:100dvh!important;min-height:0!important;
+}
+body:has(#chat[style*="display: block"]) #chat{
+ width:100%!important;height:100%!important;min-height:0!important;
+}
+body:has(#chat[style*="display: block"]) #layout{
+ width:100%!important;height:100%!important;min-height:0!important;
+}
 </style>
 </head>
 <body>
-<header class="love-header">
- <button class="header-menu-mark" type="button" onclick="openMainMenu()">☰</button>
- <div class="brand-heart" aria-hidden="true">💞</div>
- <div class="brand-copy"><h2>عشق با وفا</h2><p>❤️ چت دوستانه و صمیمی</p></div>
- <div class="header-actions"><button class="header-profile" type="button" onclick="openMyProfile()" aria-label="پروفایل من"><img id="headerMyPhoto" alt="پروفایل من"></button></div>
-</header>
+
 
 <main>
 
