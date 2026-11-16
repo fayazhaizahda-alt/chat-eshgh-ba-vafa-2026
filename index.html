@@ -1041,7 +1041,20 @@ function renderUsers(){
   status.style.setProperty("text-align","center","important");
   status.style.setProperty("color",online?"#35ef8b":"#c5c1ce","important");
   status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
-  btn.append(info,img,status);
+  if(u.self){
+   const avatarRow=document.createElement("span");
+   avatarRow.style.cssText="display:flex;align-items:center;justify-content:center;gap:3px;order:1;width:100%;height:44px";
+   img.style.setProperty("order","0","important");
+   const crown=document.createElement("span");
+   crown.textContent="👑";
+   crown.title="مدیر اصلی";
+   crown.setAttribute("aria-label","تاج مدیر اصلی");
+   crown.style.cssText="display:inline-block;font-size:19px;line-height:1";
+   avatarRow.append(img,crown);
+   btn.append(info,avatarRow,status);
+  }else{
+   btn.append(info,img,status);
+  }
   btn.setAttribute("aria-label",(u.displayName||u.name||"کاربر")+"، "+(online?"آنلاین":"آفلاین"));
   btn.onclick=()=>window.showProfile(u);
   list.append(btn);
