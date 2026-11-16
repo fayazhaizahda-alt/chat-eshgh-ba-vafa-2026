@@ -1701,11 +1701,12 @@ window.exitChat=async function(){
  <input id="botAvatarFile" type="file" accept="image/*" onchange="uploadBotAvatar(event)">
  <p id="botAvatarStatus" class="small">عکس فعلی در صورت وجود بارگذاری می‌شود.</p>
  <hr style="border-color:#8053a2;margin:14px 0">
- <h4 style="margin:0 0 8px;text-align:center">🛡️ تنظیمات نگهبانی هیله</h4>
- <p class="small">هر کلمه یا جمله ممنوعه را در یک خط بنویس. پیام اول حذف و اخطار داده می‌شود؛ تکرار توهین، باعث اخراج و مسدود شدن حساب می‌شود.</p>
- <textarea id="moderationWordsInput" rows="5" placeholder="مثلاً: کلمه توهین‌آمیز\nجمله توهین‌آمیز" style="width:100%;padding:10px;border-radius:10px;background:#fff;color:#24133d;resize:vertical"></textarea>
- <button type="button" onclick="saveModerationTerms()">💾 ذخیره فهرست کلمات ممنوعه</button>
- <p id="moderationWordsStatus" class="small">هر مورد را در یک خط وارد کن.</p>
+ <h4 style="margin:0 0 8px;text-align:center">🛡️ تنظیمات پاسخ و نگهبانی هیله</h4>
+ <p class="small">در این قسمت مشخص کن هیله با دیدن کدام کلمه یا عبارت توهین‌آمیز واکنش نشان بدهد. هر کلمه یا عبارت را جداگانه در یک خط بنویس. کلمات پیش‌فرض نگهبانی هم فعال می‌مانند.</p>
+ <textarea id="moderationWordsInput" rows="7" placeholder="نمونه‌ها را هر کدام در یک خط بنویس:\nتوهین دلخواه اول\nعبارت توهین‌آمیز دوم" style="width:100%;min-height:130px;padding:10px;border-radius:10px;background:#fff;color:#24133d;resize:vertical"></textarea>
+ <p class="small">واکنش هیله: پیام دارای کلمه ممنوعه حذف می‌شود و اخطار اول داده می‌شود؛ اگر همان کاربر دوباره تکرار کند، حسابش مسدود می‌شود.</p>
+ <button type="button" onclick="saveModerationTerms()">💾 ذخیره کلمات و عبارت‌های ممنوعه</button>
+ <p id="moderationWordsStatus" class="small">کلمات دلخواهت را بنویس و ذخیره کن.</p>
 </div>
 <div id="ownerBackgroundControls">
 <hr style="border-color:#8053a2;margin:14px 0">
