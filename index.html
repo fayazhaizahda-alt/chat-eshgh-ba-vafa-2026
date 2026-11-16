@@ -1339,9 +1339,9 @@ function getBotReply(message){
   item.trigger.includes(" ") ? normalized.includes(item.trigger) : normalizeBotText(message).split(/[^\p{L}\p{N}]+/u).includes(item.trigger)
  ));
  if(custom)return custom.response;
- if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalized))return "وعلیکم‌السلام ❤️ خوش آمدی! من هیله هستم؛ بگو چه کمکی از دستم برمی‌آید؟";
- // پاسخ پیش‌فرض تا هیله به پیام‌های معمولی هم بی‌جواب نماند.
- return "❤️ پیامت را خواندم. کمی بیشتر برایم بگو تا بهتر با تو گفتگو کنم.";
+ if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalized))return "وعلیکم‌السلام ❤️ خوش آمدی!";
+ // به پیام‌هایی که کلمهٔ سفارشی یا سلام ندارند پاسخ خودکار نده.
+ return "";
 }
 
 window.saveModerationTerms=async function(){
