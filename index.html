@@ -1250,7 +1250,9 @@ async function sendBotMessage(message){
 }
 
 function startBotModeration(){
- if(!me || me.uid!==OWNER_UID)return;
+ if(!me)return;
+ loadBotAvatar();
+ if(me.uid!==OWNER_UID)return;
  if(moderationUnsub)moderationUnsub();
  loadModerationTerms();
  const publicQuery=query(collection(db,"messages"),where("type","==","public"));
