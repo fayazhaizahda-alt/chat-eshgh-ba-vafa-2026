@@ -1178,9 +1178,14 @@ async function loadBotAvatar(){
  if(!me)return;
  try{
   const snap=await getDoc(doc(db,"users",OWNER_UID));
-  botAvatarPhoto=snap.exists()?String(snap.data().botAvatar||""):"";
+  // اگر سند مالک یا فیلد عکس در دسترس نبود، عکس دریافت‌شده از فهرست عمومی
+  // کاربران را خالی نکن؛ این کار مانع ناپدید شدن عکس بر اثر پاسخ دیررس می‌شود.
+  if(snap.exists()){
+   const saved= snap.data().botAvatar;
+   if(typeof saved==="string" && saved.length>0)botAvatarPhoto=saved;
+  }
   if(typeof renderUsers==="function")renderUsers();
-  if(window.__loveLastMessages)renderMessages(window.__loveLastMessages);
+  if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
  }catch(e){console.error("Bot avatar load failed:",e);}
 }
 window.uploadBotAvatar=async function(event){
