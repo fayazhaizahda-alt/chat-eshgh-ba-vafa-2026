@@ -1214,12 +1214,6 @@ function startBotModeration(){
    if(!message.senderUid || message.bot || botProcessed.has(message.id))return;
    botProcessed.add(message.id);
 
-   // پاسخ‌گویی فقط روی دستگاه فرستندهٔ همان پیام انجام می‌شود.
-   // پس هر کاربر عادی هم بدون نیاز به حضور مدیر پاسخ می‌گیرد.
-   if(message.senderUid===me.uid && /سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(message.text))){
-    await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!");
-   }
-
    // مدیریت و مسدودسازی فقط بر عهدهٔ حساب مالک اصلی است.
    if(me.uid===OWNER_UID && message.senderUid!==OWNER_UID && isOffensiveMessage(message.text)){
     try{
@@ -1402,6 +1396,10 @@ window.sendMessage=async function(){
   const data={senderUid:me.uid,senderName:myDisplayName||myName,senderPhoto:myPhoto||"",text:textValue,createdAt:serverTimestamp(),type:"public"};
   await addDoc(collection(db,"messages"),data);
   input.value="";
+  // پاسخ هیله مستقیماً پس از ثبت سلام همان کاربر فرستاده می‌شود؛ وابسته به شنوندهٔ زنده نیست.
+  if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(textValue))){
+   await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!");
+  }
   if(status)status.textContent="پیام ثبت شد؛ در حال تازه‌سازی اتاق عمومی...";
   // دریافت مستقیم پیام‌ها برای اطمینان از نمایش فوری در صورت تأخیر شنونده زنده
   try{
