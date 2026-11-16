@@ -992,9 +992,13 @@ let selectedProfile=null;
 window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",role:"bot",bot:true,lastSeen:Date.now()});};
 window.showProfile=function(u){
  selectedProfile=u;
- if(u.bot){
-  $("profileCardPhoto").src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100">🌸</text></svg>');
- }else $("profileCardPhoto").src=u.photo||"";
+ const profilePhoto=$("profileCardPhoto");
+ const fallbackPhoto="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100" fill="white">👤</text></svg>');
+ const botPhoto="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100">🌸</text></svg>');
+ const savedPhoto=u.bot?botPhoto:(u.photo||(u.uid===me?.uid?(myPhoto||$("myPhoto")?.src||$("headerMyPhoto")?.src):"")||fallbackPhoto);
+ profilePhoto.style.cssText="display:block!important;visibility:visible!important;opacity:1!important;width:110px!important;height:110px!important;min-width:110px;min-height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff;background:#70418c";
+ profilePhoto.onerror=()=>{profilePhoto.onerror=null;profilePhoto.src=fallbackPhoto;};
+ profilePhoto.src=savedPhoto;
  $("profileCardName").textContent=u.bot?"🌸 هیله":(u.displayName||u.name||"کاربر");
  $("profileCardUsername").textContent=u.bot?"نام کاربری: @HEYLE":"نام ثبت‌نامی: "+(u.name||"user");
  $("profileCardRole").textContent=u.bot?"رتبه حساب: ربات رسمی":"رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
