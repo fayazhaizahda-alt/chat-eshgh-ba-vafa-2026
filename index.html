@@ -376,6 +376,13 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
  body:has(#chat[style*="display: block"]) #profileSidebar #userList .avatar{display:block!important;position:static!important;order:1!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex:0 0 42px!important;transform:none!important;border-radius:50%!important;object-fit:cover!important;visibility:visible!important;opacity:1!important}
 }
 
+/* اصلاح نمایش پروفایل و پنجره امکانات */
+#myProfilePanel{display:block!important}
+#profileCard.profile-self-modal{display:block!important;position:fixed!important;z-index:100001!important;top:50%!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(420px,92vw)!important;max-height:85dvh!important;overflow:auto!important;background:linear-gradient(155deg,#32145f,#211544)!important;padding:18px!important;border:2px solid #c17aff!important;border-radius:20px!important}
+#profileCard.profile-self-modal button{width:100%;margin:5px 0;padding:10px;border-radius:14px;background:#7817c9;color:white;border:1px solid #d8a6ff}
+#profileCard.profile-self-modal>button:last-child{background:#4b285f}
+#otherProfileControls button{width:100%;margin:5px 0;padding:11px;border-radius:14px;background:#7817c9;color:white;border:1px solid #d8a6ff}
+@media(max-width:760px){#profileCard.profile-self-modal{max-height:82dvh!important;padding:13px!important}}
 </style>
 </head>
 <body>
@@ -450,11 +457,11 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
 <div id="userList">
-<button type="button" class="user" id="sidebarFallbackSelf" onclick="showUserPhotoZoom(document.getElementById('headerMyPhoto')?.src||document.getElementById('myPhoto')?.src||'',document.getElementById('welcome')?.textContent||'فیاض')">
+<button type="button" class="user" id="sidebarFallbackSelf" onclick="openMyProfile()">
 <span class="user-profile-name" id="sidebarFallbackSelfName">فیاض</span>
 <img class="avatar" id="sidebarFallbackSelfPhoto" alt="پروفایل فیاض" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%238b68ad'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='54' fill='white'%3E👤%3C/text%3E%3C/svg%3E">
 </button>
-<button type="button" class="user" onclick="showUserPhotoZoom(this.querySelector('img').src,'هیله')">
+<button type="button" class="user" onclick="showBotProfile()">
 <span class="user-profile-name">هیله</span>
 <img class="avatar" alt="پروفایل هیله" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%2370418c'/%3E%3Ctext x='50' y='70' text-anchor='middle' font-size='62'%3E🌸%3C/text%3E%3C/svg%3E">
 </button>
@@ -481,6 +488,10 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
 <hr style="border-color:#8053a2;margin:12px 0">
 <button type="button" onclick="openSettings()">🎨 تنظیمات صفحه چت</button>
 
+</div>
+<div id="otherProfileControls" style="display:none;margin:12px 0;padding:12px;border:1px solid #9b65c6;border-radius:14px;background:#241044">
+ <button type="button" onclick="openPrivateChat()">💌 پیام شخصی</button>
+ <button type="button" onclick="rateSelectedUser()">⭐ رتبه دادن به کاربر</button>
 </div>
 <div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:12px;border:1px solid #8053a2;border-radius:14px;background:#211b32">
  <p style="margin:3px 0 12px;font-weight:bold;color:#f1d7ff">🛡️ تعیین رتبه کاربر</p>
@@ -1010,6 +1021,8 @@ window.showProfile=function(u){
  onlineDot.setAttribute("aria-label",online?"آنلاین":"آفلاین");
  const isSelf=u.uid===me?.uid;
  $("selfProfileControls").style.display=isSelf?"block":"none";
+ const otherControls=$("otherProfileControls");
+ if(otherControls)otherControls.style.display=(!isSelf&&!u.bot&&!!u.uid)?"block":"none";
  const clearButton=$("clearAllChatsBtn");
  if(clearButton)clearButton.style.display=(isSelf && me?.uid===OWNER_UID)?"block":"none";
  const ownerControls=$("ownerUserControls");
@@ -1057,6 +1070,70 @@ window.toggleUserBan=async function(){
  }catch(e){alert("عملیات انجام نشد: "+e.message);}
 };
 window.openMyProfile=function(){if(!me)return;$("profileSidebar").style.display="flex";const headerPhoto=$("headerMyPhoto");if(headerPhoto)headerPhoto.src=myPhoto||$("myPhoto")?.src||"";window.showProfile({uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole,lastSeen:Date.now()});};
+
+let privateTarget=null;
+let privateMessagesUnsub=null;
+window.openPrivateChat=function(){
+ if(!me||!selectedProfile||!selectedProfile.uid||selectedProfile.bot||selectedProfile.uid===me.uid)return;
+ privateTarget=selectedProfile;
+ $("privateChatTitle").textContent="💌 گفت‌وگوی خصوصی با "+(privateTarget.displayName||privateTarget.name||"کاربر");
+ $("privateMessages").innerHTML="";
+ $("privateMessageInput").value="";
+ $("privateChatStatus").textContent="در حال دریافت پیام‌ها...";
+ $("privateChatModal").style.display="flex";
+ if(privateMessagesUnsub){privateMessagesUnsub();privateMessagesUnsub=null;}
+ try{
+  const q=query(collection(db,"messages"),where("participants","array-contains",me.uid));
+  privateMessagesUnsub=onSnapshot(q,snap=>{
+   const items=snap.docs.map(d=>({id:d.id,...d.data()}))
+    .filter(m=>m.type==="private"&&Array.isArray(m.participants)&&m.participants.includes(privateTarget.uid))
+    .sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+   const box=$("privateMessages");box.innerHTML="";
+   if(!items.length){box.textContent="هنوز پیامی در این گفت‌وگو نیست. اولین پیام را بفرست ❤️";}
+   items.forEach(m=>{
+    const line=document.createElement("div");
+    line.style.cssText="margin:6px 0;padding:8px 10px;border-radius:12px;background:"+(m.senderUid===me.uid?"#ead8ff":"#35204f")+";color:"+(m.senderUid===me.uid?"#24133d":"#fff")+";max-width:90%;margin-right:"+(m.senderUid===me.uid?"auto":"0");
+    const who=document.createElement("b");who.textContent=m.senderUid===me.uid?"شما":"طرف مقابل";
+    const body=document.createElement("div");body.textContent=m.text||"";
+    line.append(who,body);box.append(line);
+   });
+   box.scrollTop=box.scrollHeight;
+   $("privateChatStatus").textContent="گفت‌وگوی خصوصی";
+  },e=>{$("privateChatStatus").textContent="دریافت پیام‌ها ممکن نشد: "+(e.message||e);});
+ }catch(e){$("privateChatStatus").textContent="خطا: "+(e.message||e);}
+};
+window.sendPrivateMessage=async function(){
+ if(!me||!privateTarget)return;
+ const input=$("privateMessageInput"),value=input.value.trim();
+ if(!value)return;
+ $("privateChatStatus").textContent="در حال ارسال...";
+ try{
+  await addDoc(collection(db,"messages"),{
+   type:"private",participants:[me.uid,privateTarget.uid],
+   senderUid:me.uid,senderName:myDisplayName||myName,
+   senderPhoto:myPhoto||"",receiverUid:privateTarget.uid,
+   text:value,createdAt:serverTimestamp()
+  });
+  input.value="";$("privateChatStatus").textContent="پیام شخصی ارسال شد ❤️";
+ }catch(e){$("privateChatStatus").textContent="ارسال نشد؛ دسترسی پیام خصوصی در قوانین Firebase را بررسی کنید: "+(e.message||e);}
+};
+window.closePrivateChat=function(){
+ $("privateChatModal").style.display="none";
+ if(privateMessagesUnsub){privateMessagesUnsub();privateMessagesUnsub=null;}
+ privateTarget=null;
+};
+window.rateSelectedUser=async function(){
+ if(!me||!selectedProfile||selectedProfile.bot||selectedProfile.uid===me.uid)return;
+ const value=Number(prompt("به این کاربر از ۱ تا ۵ ستاره بده:","5"));
+ if(!Number.isInteger(value)||value<1||value>5)return;
+ try{
+  await setDoc(doc(db,"ratings",selectedProfile.uid+"_"+me.uid),{
+   userUid:selectedProfile.uid,raterUid:me.uid,rating:value,updatedAt:Date.now()
+  });
+  alert("رتبه شما ثبت شد ⭐");
+ }catch(e){alert("ثبت رتبه انجام نشد؛ قوانین دسترسی Firebase را بررسی کنید: "+(e.message||e));}
+};
+
 window.closeSidebar=function(){$("profileSidebar").style.display="none";};
 window.closeProfile=function(){
  $("profileCard").style.display="none";
@@ -1501,5 +1578,15 @@ window.exitChat=async function(){
 </div>
 <button type="button" onclick="closeSettings()">بستن</button>
 </div></div>
+<div id="privateChatModal" style="display:none;position:fixed;inset:0;z-index:100002;background:#090018e8;align-items:center;justify-content:center;padding:14px">
+ <div style="width:100%;max-width:440px;max-height:88dvh;display:flex;flex-direction:column;gap:10px;background:linear-gradient(145deg,#351364,#1c103b);border:2px solid #bb73ff;border-radius:20px;padding:14px;color:#fff">
+  <h3 id="privateChatTitle" style="margin:0;text-align:center">💌 پیام شخصی</h3>
+  <div id="privateMessages" style="min-height:180px;max-height:48dvh;overflow:auto;background:#1a1035;border-radius:12px;padding:10px"></div>
+  <textarea id="privateMessageInput" rows="2" placeholder="پیام شخصی خود را بنویس..." style="width:100%;padding:12px;border-radius:12px;border:0;background:white;color:#24133d;resize:vertical"></textarea>
+  <p id="privateChatStatus" style="margin:0;font-size:12px;color:#f3d7ff"></p>
+  <button type="button" onclick="sendPrivateMessage()" style="padding:11px;border:0;border-radius:14px;background:#7817c9;color:white">ارسال پیام</button>
+  <button type="button" onclick="closePrivateChat()" style="padding:10px;border:1px solid #d8a6ff;border-radius:14px;background:transparent;color:white">بستن</button>
+ </div>
+</div>
 </body>
 </html>
