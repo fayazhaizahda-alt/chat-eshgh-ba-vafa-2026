@@ -367,6 +367,16 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
  #users .user-profile-name{position:absolute!important;z-index:2!important;top:0!important;bottom:auto!important;left:1px!important;right:1px!important;width:auto!important;max-width:none!important;padding:2px 1px!important;background:transparent!important;color:#fff!important;font-size:9px!important;font-weight:700!important;line-height:1.3!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-align:center!important}
 }
 
+
+/* بازیابی قطعی نمایش پروفایل‌ها در ستون راست موبایل */
+@media(max-width:760px){
+ body:has(#chat[style*="display: block"]) #profileSidebar #users{display:block!important;visibility:visible!important;opacity:1!important;min-height:100px!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList{display:flex!important;flex-direction:column!important;visibility:visible!important;opacity:1!important;min-height:80px!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList .user{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;position:relative!important;width:100%!important;height:66px!important;min-height:66px!important;padding:2px 0!important;margin:0!important;gap:2px!important;visibility:visible!important;opacity:1!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList .user-profile-name{display:block!important;position:static!important;order:0!important;width:100%!important;height:16px!important;color:#fff!important;font-size:10px!important;font-weight:bold!important;line-height:14px!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList .avatar{display:block!important;position:static!important;order:1!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex:0 0 42px!important;transform:none!important;border-radius:50%!important;object-fit:cover!important;visibility:visible!important;opacity:1!important}
+}
+
 </style>
 </head>
 <body>
@@ -440,7 +450,16 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
 
 <div class="panel" id="users">
 <h3>👥 کاربران آنلاین</h3>
-<div id="userList"></div>
+<div id="userList">
+<button type="button" class="user" id="sidebarFallbackSelf" onclick="showUserPhotoZoom(document.getElementById('headerMyPhoto')?.src||document.getElementById('myPhoto')?.src||'',document.getElementById('welcome')?.textContent||'فیاض')">
+<span class="user-profile-name" id="sidebarFallbackSelfName">فیاض</span>
+<img class="avatar" id="sidebarFallbackSelfPhoto" alt="پروفایل فیاض" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%238b68ad'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='54' fill='white'%3E👤%3C/text%3E%3C/svg%3E">
+</button>
+<button type="button" class="user" onclick="showUserPhotoZoom(this.querySelector('img').src,'هیله')">
+<span class="user-profile-name">هیله</span>
+<img class="avatar" alt="پروفایل هیله" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%2370418c'/%3E%3Ctext x='50' y='70' text-anchor='middle' font-size='62'%3E🌸%3C/text%3E%3C/svg%3E">
+</button>
+</div>
 </div>
 
 <div class="panel" id="profileCard" style="display:none;text-align:center">
