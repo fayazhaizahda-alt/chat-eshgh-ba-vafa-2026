@@ -941,7 +941,11 @@ function renderUsers(){
  const now=Date.now();
  const profiles=[];
  if(me){
-  profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:myPhoto||"",role:myRole||"user",lastSeen:now,self:true});
+  // عکس پروفایل خود کاربر را مستقیماً از آخرین اطلاعات دریافتی فایربیس بگیر
+  const mySavedProfile=allUsers.find(u=>u.uid===me.uid);
+  const currentMyPhoto=(mySavedProfile&&typeof mySavedProfile.photo==="string"&&mySavedProfile.photo)?mySavedProfile.photo:myPhoto;
+  if(currentMyPhoto)myPhoto=currentMyPhoto;
+  profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:currentMyPhoto||"",role:myRole||"user",lastSeen:now,self:true});
  }
  profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",photo:botAvatarPhoto,bot:true,lastSeen:now});
  // همه حساب‌های ثبت‌شده نمایش داده می‌شوند؛ کاربران آنلاین در بالای فهرست هستند.
@@ -989,6 +993,10 @@ function renderUsers(){
   info.style.setProperty("color","#fff","important");
   const img=document.createElement("img");
   img.className="avatar";
+  img.loading="eager";
+  img.decoding="async";
+  img.style.setProperty("visibility","visible","important");
+  img.style.setProperty("opacity","1","important");
   img.style.setProperty("display","block","important");
   img.style.setProperty("position","static","important");
   img.style.setProperty("order","1","important");
@@ -997,6 +1005,8 @@ function renderUsers(){
   img.style.setProperty("height","42px","important");
   img.style.setProperty("flex","0 0 42px","important");
   img.alt="پروفایل "+(u.displayName||u.name||"کاربر");
+  img.style.setProperty("object-fit","cover","important");
+  img.style.setProperty("border-radius","50%","important");
   if(u.bot){
    img.src=botAvatarPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#70418c"/><text x="50" y="70" text-anchor="middle" font-size="62">👩‍🦰</text></svg>');
   }else{
