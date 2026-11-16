@@ -279,7 +279,7 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
  body:has(#chat[style*="display: block"]) #layout{
   direction:rtl!important;
   display:grid!important;
-  grid-template-columns:minmax(88px,26%) minmax(0,1fr)!important;
+  grid-template-columns:64px minmax(0,1fr)!important;
   grid-template-rows:minmax(0,1fr) auto!important;
   grid-template-areas:"sidebar chat" "nav nav"!important;
   gap:5px!important;
@@ -295,10 +295,11 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
   max-height:100%!important;
   height:100%!important;
   overflow-y:auto!important;
-  padding:4px!important;
-  gap:5px!important;
+  padding:0!important;
+  gap:3px!important;
   border:0!important;
-  border-radius:10px!important;
+  border-radius:0!important;
+  background:transparent!important;
   box-shadow:none!important;
  }
  #profileSidebar>button:first-child{display:none!important}
@@ -325,8 +326,11 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
   min-height:0!important;
   gap:4px!important;
   margin:0!important;
-  padding:5px 2px!important;
-  border-radius:9px!important;
+  padding:2px 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
   text-align:center!important;
  }
  #users .user-profile-name{
