@@ -358,6 +358,15 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
  }
  body:has(#chat[style*="display: block"]) #loveBottomNav{grid-area:nav!important}
 }
+
+/* فقط عکس و نام در ستون کاربران؛ بدون عنوان و قاب اضافی */
+@media(max-width:760px){
+ #users h3{display:none!important}
+ #users .user{position:relative!important;width:100%!important;min-height:48px!important;height:48px!important;padding:0!important;margin:0!important}
+ #users .user .avatar{width:42px!important;height:42px!important;flex:0 0 42px!important}
+ #users .user-profile-name{position:absolute!important;z-index:2!important;bottom:1px!important;left:1px!important;right:1px!important;width:auto!important;max-width:none!important;padding:1px 2px!important;border-radius:0 0 18px 18px!important;background:#160b3bd9!important;color:#fff!important;font-size:8px!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-align:center!important}
+}
+
 </style>
 </head>
 <body>
@@ -872,6 +881,25 @@ function startUsers(){
  },e=>console.error(e));
 }
 
+
+window.showUserPhotoZoom=function(photo,name){
+ const old=document.getElementById("userPhotoZoom");
+ if(old)old.remove();
+ const overlay=document.createElement("div");
+ overlay.id="userPhotoZoom";
+ overlay.style.cssText="position:fixed;inset:0;z-index:200000;background:rgba(8,0,20,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px";
+ const image=document.createElement("img");
+ image.src=photo;
+ image.alt=name;
+ image.style.cssText="width:min(76vw,320px);height:min(76vw,320px);object-fit:cover;border-radius:50%;border:2px solid #d9b5f6";
+ const caption=document.createElement("div");
+ caption.textContent=name;
+ caption.style.cssText="margin-top:12px;max-width:85vw;color:white;font: bold 16px Tahoma;text-align:center;overflow-wrap:anywhere";
+ overlay.append(image,caption);
+ overlay.addEventListener("click",()=>overlay.remove());
+ document.body.append(overlay);
+};
+
 function renderUsers(){
  const list=$("userList");
  const botSlot=$("botProfileSlot");
@@ -898,7 +926,7 @@ function renderUsers(){
   btn.className="user";
   const info=document.createElement("span");
   info.className="user-profile-name";
-  info.textContent=u.bot?"هیله":(u.self?"خودم · "+(u.displayName||u.name):((u.displayName||u.name||"کاربر")));
+  info.textContent=u.bot?"هیله":(u.displayName||u.name||"کاربر");
   const img=document.createElement("img");
   img.className="avatar";
   img.alt="پروفایل "+(u.displayName||u.name||"کاربر");
@@ -909,7 +937,7 @@ function renderUsers(){
   }
   img.onerror=()=>{img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
   btn.append(info,img);
-  btn.onclick=()=>u.bot?showBotProfile():showProfile(u);
+  btn.onclick=()=>showUserPhotoZoom(img.src,info.textContent);
   list.append(btn);
  });
  if(!me&&profiles.length===1)list.textContent="ابتدا وارد چت شوید";
