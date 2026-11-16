@@ -1198,11 +1198,18 @@ async function sendBotMessage(message){
 }
 
 function startBotModeration(){
- // برای جلوگیری از پاسخ‌های تکراری، فقط دستگاه مالک پاسخ‌گوی هیله است.
+ // فقط دستگاه مالک پاسخ می‌فرستد؛ پیام‌های همه کاربران، حتی مالک، بررسی می‌شوند.
  if(!me || me.uid!==OWNER_UID)return;
  if(moderationUnsub)moderationUnsub();
  const publicQuery=query(collection(db,"messages"),where("type","==","public"));
+ let botListenerReady=false;
  moderationUnsub=onSnapshot(publicQuery,snapshot=>{
+  // پیام‌های قدیمی هنگام شروع شنونده پاسخ تازه نمی‌گیرند.
+  if(!botListenerReady){
+   snapshot.docs.forEach(item=>botProcessed.add(item.id));
+   botListenerReady=true;
+   return;
+  }
   snapshot.docChanges().forEach(async change=>{
    if(change.type!=="added")return;
    const message={id:change.doc.id,...change.doc.data({serverTimestamps:"estimate"})};
@@ -1221,8 +1228,9 @@ function startBotModeration(){
     return;
    }
 
-   if(message.senderUid!==OWNER_UID && /سلام|درود|السلام علیکم|هیله/u.test(normalizeBotText(message.text))){
-    await sendBotMessage("وعلیکم‌السلام! خوش آمدی ❤️");
+   // هر بار که هر کاربری «سلام» یا عبارت خوش‌آمدگویی بفرستد، یک پاسخ تازه ثبت می‌شود.
+   if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(message.text))){
+    await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!");
    }
   });
  },error=>{
