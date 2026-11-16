@@ -273,6 +273,87 @@ body:has(#chat[style*="display: block"]) #loveBottomNav button{
     padding:10px !important;
   }
 }
+
+/* فهرست پروفایل‌ها همیشه در ستون راست چت، حتی در موبایل */
+@media(max-width:760px){
+ body:has(#chat[style*="display: block"]) #layout{
+  direction:rtl!important;
+  display:grid!important;
+  grid-template-columns:minmax(88px,26%) minmax(0,1fr)!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
+  grid-template-areas:"sidebar chat" "nav nav"!important;
+  gap:5px!important;
+ }
+ body:has(#chat[style*="display: block"]) #profileSidebar{
+  position:static!important;
+  grid-area:sidebar!important;
+  display:flex!important;
+  flex-direction:column!important;
+  width:auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-height:100%!important;
+  height:100%!important;
+  overflow-y:auto!important;
+  padding:4px!important;
+  gap:5px!important;
+  border:0!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+ }
+ #profileSidebar>button:first-child{display:none!important}
+ #myProfilePanel{display:none!important}
+ #botProfileSlot{display:none!important}
+ #profileSidebar #users{
+  display:block!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  width:100%!important;
+  padding:4px!important;
+  overflow:visible!important;
+ }
+ #users h3{font-size:10px!important;line-height:1.4!important;margin:2px 0 6px!important}
+ #userList{display:flex!important;flex-direction:column!important;gap:7px!important}
+ #users .user{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  gap:4px!important;
+  margin:0!important;
+  padding:5px 2px!important;
+  border-radius:9px!important;
+  text-align:center!important;
+ }
+ #users .user-profile-name{
+  display:block!important;
+  order:0!important;
+  width:100%!important;
+  font-size:10px!important;
+  line-height:1.35!important;
+  text-align:center!important;
+  overflow-wrap:anywhere!important;
+ }
+ #users .user .avatar{
+  display:block!important;
+  order:1!important;
+  width:42px!important;
+  height:42px!important;
+  flex:0 0 42px!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+ }
+ body:has(#chat[style*="display: block"]) #chatPanel{
+  grid-area:chat!important;
+  min-width:0!important;
+  width:100%!important;
+ }
+ body:has(#chat[style*="display: block"]) #loveBottomNav{grid-area:nav!important}
+}
 </style>
 </head>
 <body>
