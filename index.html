@@ -1010,9 +1010,11 @@ function renderUsers(){
   if(u.bot){
    img.src=botAvatarPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#70418c"/><text x="50" y="70" text-anchor="middle" font-size="62">👩‍🦰</text></svg>');
   }else{
-   img.src=u.photo||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');
+   // برای پروفایل خودم دقیقاً همان منبع عکسی را استفاده کن که در نمای بزرگ پروفایل دیده می‌شود.
+   const selfPhoto=u.self?(myPhoto||u.photo||$("myPhoto")?.getAttribute("src")||""):(u.photo||"");
+   img.src=selfPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');
   }
-  img.onerror=()=>{img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
+  img.onerror=()=>{img.onerror=null;img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
   const online=!!(u.self||u.bot||(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen)));
   const status=document.createElement("span");
   status.className="user-presence-status";
