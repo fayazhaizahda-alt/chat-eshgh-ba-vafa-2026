@@ -579,6 +579,7 @@ async function restoreSavedSession(user){
    return;
   }
   me=user;
+  await loadBotReplies();
   myName=profile.name||"کاربر";
   myDisplayName=profile.displayName||myName;
   myPhoto=profile.photo||"";
@@ -838,6 +839,7 @@ window.enterChat=async function(){
   }
 
   me=credential.user;
+  await loadBotReplies();
   myName=name;
   const profileSnap=await getDoc(doc(db,"users",me.uid));
   const profileData=profileSnap.exists()?profileSnap.data():{};
@@ -907,6 +909,9 @@ function startUsers(){
   // عکس هیله را از همان فهرست عمومی کاربران نیز بگیر؛ خواندن جداگانه سند مالک
   // ممکن است برای کاربران دیگر با قوانین Firestore محدود شده باشد.
   const ownerProfile=allUsers.find(u=>u.uid===OWNER_UID);
+  if(ownerProfile && Array.isArray(ownerProfile.botReplies)){
+   botCustomReplies=ownerProfile.botReplies.filter(x=>x&&typeof x.trigger==="string"&&typeof x.response==="string");
+  }
   if(ownerProfile && typeof ownerProfile.botAvatar==="string" && ownerProfile.botAvatar){
    botAvatarPhoto=ownerProfile.botAvatar;
   }
@@ -1286,9 +1291,20 @@ window.saveBotReplies=async function(){
   if(status)status.textContent="ذخیره نشد: "+(e.code||e.message||e);
  }
 };
+async function loadBotReplies(){
+ try{
+  const ownerSnap=await getDoc(doc(db,"users",OWNER_UID));
+  const replies=ownerSnap.exists()?ownerSnap.data().botReplies:[];
+  botCustomReplies=Array.isArray(replies)?replies.filter(x=>x&&typeof x.trigger==="string"&&typeof x.response==="string"):[];
+ }catch(e){
+  console.error("Bot replies load failed:",e);
+ }
+}
 function getBotReply(message){
  const normalized=normalizeBotText(message);
- const custom=botCustomReplies.find(item=>item.trigger&&normalized.includes(item.trigger));
+ const custom=botCustomReplies.find(item=>item.trigger&&(
+  item.trigger.includes(" ") ? normalized.includes(item.trigger) : normalizeBotText(message).split(/[^\\p{L}\\p{N}]+/u).includes(item.trigger)
+ ));
  if(custom)return custom.response;
  if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalized))return "وعلیکم‌السلام ❤️ خوش آمدی!";
  return "";
