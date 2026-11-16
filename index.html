@@ -52,7 +52,16 @@ main{width:100%;max-width:1600px;margin:0 auto;padding:10px}
 #messages:before{content:"♡   ♡   ♡";position:absolute;z-index:0;top:12%;right:7%;font-size:clamp(38px,6vw,76px);color:#ff72f5;text-shadow:0 0 12px #f0f,0 0 28px #f0f;opacity:.72;pointer-events:none}
 #messages:after{content:"🌹  🌹  🌹";position:absolute;z-index:0;bottom:4%;right:4%;font-size:clamp(28px,5vw,54px);pointer-events:none}
 #messages>*{position:relative;z-index:1}
-.msg{max-width:88%;padding:12px 15px;border-radius:18px;background:#f5eaff;color:#24133d;box-shadow:0 3px 12px #14052855;overflow-wrap:anywhere}
+.msg{display:flex;align-items:flex-end;gap:8px;width:100%;max-width:100%;padding:2px 3px;background:transparent;color:#24133d;box-shadow:none;overflow-wrap:anywhere}
+.msg.mine{flex-direction:row-reverse}
+.message-avatar{display:block;width:38px;height:38px;flex:0 0 38px;object-fit:cover;border-radius:50%;background:#d9c5ef;border:0}
+.message-content{display:flex;flex-direction:column;align-items:flex-start;gap:3px;max-width:min(82%,520px);min-width:0}
+.msg.mine .message-content{align-items:flex-end}
+.message-sender-link{display:block;max-width:100%;padding:0 5px;border:0!important;background:transparent!important;color:#fff!important;font-size:12px;font-weight:700;text-align:right;overflow-wrap:anywhere}
+.message-body{display:block;max-width:100%;padding:10px 13px;border:0;border-radius:17px;background:#f5eaff;color:#24133d;font-size:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.mine .message-body{background:#ead8ff}
+.message-content>img{max-width:100%}
+@media(max-width:760px){.message-avatar{width:36px;height:36px;flex-basis:36px}.message-content{max-width:84%}.message-body{font-size:14px;padding:9px 12px}.message-sender-link{font-size:11px}}
 .empty-public-chat{margin:auto;text-align:center;padding:22px 14px;color:#f0dcff;font-size:14px;line-height:2;opacity:.9}.empty-public-chat strong{display:block;font-size:18px;color:#fff;margin-bottom:5px}
 #sendArea{display:flex;align-items:center;gap:9px;flex:0 0 auto;width:100%;min-width:0;margin-top:10px;padding:9px;border-radius:32px;background:#f8f3ff;border:2px solid #d9b5f6}
 #sendArea textarea{flex:1 1 auto;min-width:0;width:auto;min-height:56px;max-height:130px;margin:0;padding:14px 16px;border:0;border-radius:26px;background:white;color:#28133e;font:15px Tahoma;resize:none;text-align:right}
@@ -1078,13 +1087,16 @@ function renderMessages(arr){
   if(!m.bot){
    const avatar=document.createElement("img");
    avatar.className="message-avatar";
-   avatar.alt="";
+   avatar.alt="عکس پروفایل "+(sender?.displayName||m.senderName||"کاربر");
    avatar.src=sender?.photo||"";
    avatar.onerror=()=>{avatar.style.display="none";};
    div.append(avatar);
   }
-  div.append(name,body);
-  if(m.image){const photo=document.createElement('img');photo.src=m.image;photo.alt='عکس فرستاده‌شده';photo.style.cssText='display:block;max-width:min(100%,360px);max-height:320px;object-fit:contain;border-radius:14px;margin-top:8px;cursor:zoom-in';photo.onclick=()=>window.open(photo.src,'_blank');div.append(photo);}
+  const content=document.createElement("div");
+  content.className="message-content";
+  content.append(name,body);
+  if(m.image){const photo=document.createElement('img');photo.src=m.image;photo.alt='عکس فرستاده‌شده';photo.style.cssText='display:block;max-width:min(100%,360px);max-height:320px;object-fit:contain;border-radius:14px;margin-top:8px;cursor:zoom-in';photo.onclick=()=>window.open(photo.src,'_blank');content.append(photo);}
+  div.append(content);
   if(me?.uid===OWNER_UID){
    const del=document.createElement("button");
    del.textContent="حذف پیام"; del.style.marginTop="6px";
