@@ -524,7 +524,7 @@ import {
 
 import {
  getFirestore,collection,doc,setDoc,updateDoc,
- addDoc,query,where,onSnapshot,serverTimestamp,
+ addDoc,query,where,onSnapshot,serverTimestamp,runTransaction,
  getDoc,deleteDoc,getDocs,writeBatch
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
@@ -1181,15 +1181,24 @@ function isOffensiveMessage(value){
  });
 }
 
-async function sendBotMessage(message){
+async function sendBotMessage(message, uniqueReplyId=null){
  try{
   if(!me)throw new Error("کاربر هنوز وارد حساب نشده است");
-  // ثبت پیام هیله با همان روش عادی پیام‌های چت
-  await addDoc(collection(db,"messages"),{
+  const payload={
    senderUid:me.uid,senderName:"هیله",
    text:message,type:"public",bot:true,
    createdAt:serverTimestamp()
-  });
+  };
+  if(uniqueReplyId){
+   const replyRef=doc(db,"messages","bot_reply_"+uniqueReplyId);
+   // همه دستگاه‌ها می‌توانند پاسخ دهند، اما برای هر پیام فقط یک پاسخ ساخته می‌شود.
+   await runTransaction(db,async transaction=>{
+    const existing=await transaction.get(replyRef);
+    if(!existing.exists())transaction.set(replyRef,payload);
+   });
+  }else{
+   await addDoc(collection(db,"messages"),payload);
+  }
  }catch(e){
   console.error("Bot message failed:",e);
   const title=$("roomTitle");
@@ -1198,13 +1207,11 @@ async function sendBotMessage(message){
 }
 
 function startBotModeration(){
- // فقط دستگاه مالک پاسخ می‌فرستد؛ پیام‌های همه کاربران، حتی مالک، بررسی می‌شوند.
- if(!me || me.uid!==OWNER_UID)return;
+ if(!me)return;
  if(moderationUnsub)moderationUnsub();
  const publicQuery=query(collection(db,"messages"),where("type","==","public"));
  let botListenerReady=false;
  moderationUnsub=onSnapshot(publicQuery,snapshot=>{
-  // پیام‌های قدیمی هنگام شروع شنونده پاسخ تازه نمی‌گیرند.
   if(!botListenerReady){
    snapshot.docs.forEach(item=>botProcessed.add(item.id));
    botListenerReady=true;
@@ -1228,9 +1235,8 @@ function startBotModeration(){
     return;
    }
 
-   // هر بار که هر کاربری «سلام» یا عبارت خوش‌آمدگویی بفرستد، یک پاسخ تازه ثبت می‌شود.
    if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(message.text))){
-    await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!");
+    await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!",message.id);
    }
   });
  },error=>{
