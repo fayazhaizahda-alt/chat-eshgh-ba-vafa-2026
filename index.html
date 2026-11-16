@@ -937,15 +937,19 @@ function renderUsers(){
   profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:myPhoto||"",role:myRole||"user",lastSeen:now,self:true});
  }
  profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",bot:true,lastSeen:now});
- const onlineUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.lastSeen&&now-u.lastSeen<65000);
+ // همه حساب‌های ثبت‌شده نمایش داده می‌شوند؛ کاربران آنلاین در بالای فهرست هستند.
+ const otherUsers=allUsers.filter(u=>u.uid!==me?.uid);
  const roleOrder={owner:0,admin:1,manager:2,moderator:3,user:4};
- onlineUsers.sort((a,b)=>{
+ const isOnline=u=>!!(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen));
+ otherUsers.sort((a,b)=>{
+  const onlineA=isOnline(a)?0:1, onlineB=isOnline(b)?0:1;
+  if(onlineA!==onlineB)return onlineA-onlineB;
   const roleA=a.uid===OWNER_UID?"owner":(a.role||"user");
   const roleB=b.uid===OWNER_UID?"owner":(b.role||"user");
   return (roleOrder[roleA]??4)-(roleOrder[roleB]??4)||
    String(a.displayName||a.name||"").localeCompare(String(b.displayName||b.name||""),"fa");
  });
- profiles.push(...onlineUsers);
+ profiles.push(...otherUsers);
  profiles.forEach(u=>{
   const btn=document.createElement("button");
   btn.type="button";
@@ -956,8 +960,8 @@ function renderUsers(){
   btn.style.setProperty("align-items","center","important");
   btn.style.setProperty("justify-content","flex-start","important");
   btn.style.setProperty("gap","2px","important");
-  btn.style.setProperty("height","66px","important");
-  btn.style.setProperty("min-height","66px","important");
+  btn.style.setProperty("height","80px","important");
+  btn.style.setProperty("min-height","80px","important");
   btn.style.setProperty("padding","2px 0","important");
   btn.style.setProperty("width","100%","important");
   const info=document.createElement("span");
@@ -992,7 +996,22 @@ function renderUsers(){
    img.src=u.photo||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');
   }
   img.onerror=()=>{img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
-  btn.append(info,img);
+  const online=!!(u.self||u.bot||(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen)));
+  const status=document.createElement("span");
+  status.className="user-presence-status";
+  status.textContent=online?"● آنلاین":"● آفلاین";
+  status.style.setProperty("display","block","important");
+  status.style.setProperty("order","2","important");
+  status.style.setProperty("width","100%","important");
+  status.style.setProperty("height","12px","important");
+  status.style.setProperty("line-height","12px","important");
+  status.style.setProperty("font-size","8px","important");
+  status.style.setProperty("font-weight","bold","important");
+  status.style.setProperty("text-align","center","important");
+  status.style.setProperty("color",online?"#35ef8b":"#c5c1ce","important");
+  status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
+  btn.append(info,img,status);
+  btn.setAttribute("aria-label",(u.displayName||u.name||"کاربر")+"، "+(online?"آنلاین":"آفلاین"));
   btn.onclick=()=>window.showProfile(u);
   list.append(btn);
  });
