@@ -53,6 +53,7 @@ main{width:100%;max-width:1600px;margin:0 auto;padding:10px}
 #messages:after{content:"🌹  🌹  🌹";position:absolute;z-index:0;bottom:4%;right:4%;font-size:clamp(28px,5vw,54px);pointer-events:none}
 #messages>*{position:relative;z-index:1}
 .msg{max-width:88%;padding:12px 15px;border-radius:18px;background:#f5eaff;color:#24133d;box-shadow:0 3px 12px #14052855;overflow-wrap:anywhere}
+.empty-public-chat{margin:auto;text-align:center;padding:22px 14px;color:#f0dcff;font-size:14px;line-height:2;opacity:.9}.empty-public-chat strong{display:block;font-size:18px;color:#fff;margin-bottom:5px}
 #sendArea{display:flex;align-items:center;gap:9px;flex:0 0 auto;width:100%;min-width:0;margin-top:10px;padding:9px;border-radius:32px;background:#f8f3ff;border:2px solid #d9b5f6}
 #sendArea textarea{flex:1 1 auto;min-width:0;width:auto;min-height:56px;max-height:130px;margin:0;padding:14px 16px;border:0;border-radius:26px;background:white;color:#28133e;font:15px Tahoma;resize:none;text-align:right}
 #sendArea button{flex:0 0 auto;min-width:60px;min-height:48px;padding:10px 13px;border:0;border-radius:28px;background:linear-gradient(135deg,#8e2bd2,#5913a2);color:white;font-size:14px}
@@ -971,6 +972,16 @@ function renderMessages(arr){
  const clearButton=$("clearAllChatsBtn");
  if(clearButton)clearButton.style.display=me?.uid===OWNER_UID?"inline-block":"none";
  box.innerHTML="";
+ if(!arr.length){
+  const empty=document.createElement("div");
+  empty.className="empty-public-chat";
+  const heading=document.createElement("strong");
+  heading.textContent="💬 گفت‌وگوی عمومی عشق با وفا";
+  const note=document.createElement("span");
+  note.textContent="هنوز پیامی در اتاق عمومی نیست؛ اولین پیام را بنویس و گفتگو را آغاز کن ❤️";
+  empty.append(heading,note);
+  box.append(empty);
+ }
  arr.forEach(m=>{
   const div=document.createElement("div");
   div.className="msg"+(m.senderUid===me.uid&&!m.bot?" mine":"");
