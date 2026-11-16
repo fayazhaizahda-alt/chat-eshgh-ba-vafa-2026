@@ -39,6 +39,9 @@ main{width:100%;max-width:1600px;margin:0 auto;padding:10px}
 #users{display:block!important;max-height:44vh;min-height:160px;overflow:auto}
 #users h3,#groupsPanel h3{font-size:16px;text-align:center;margin:2px 0 10px;padding-bottom:9px;border-bottom:1px solid #8851bd}
 #userList{display:flex;flex-direction:column;gap:6px}
+#users .user{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%;min-height:86px;padding:8px 5px;text-align:center}
+#users .user-profile-name{display:block;max-width:100%;font-size:12px;font-weight:700;line-height:1.5;color:#fff;overflow-wrap:anywhere}
+#users .avatar{width:52px;height:52px;flex:0 0 52px;border-radius:50%;object-fit:cover;border:2px solid #d9b5f6}
 #users .user{display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;background:#27174d;border:1px solid #7344a4;color:white;min-width:0;overflow-wrap:anywhere}
 #users .avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;object-fit:cover}
 #groupsPanel{display:block!important}
@@ -790,45 +793,41 @@ function renderUsers(){
  list.innerHTML="";
  if(botSlot)botSlot.innerHTML="";
  const now=Date.now();
- const roleOrder={owner:0,bot:1,admin:2,manager:3,moderator:4,user:5};
- const onlineUsers=allUsers.filter(u=>{
-  return u.lastSeen&&now-u.lastSeen<65000;
- });
- onlineUsers.push({uid:"CHAT_BOT",name:"هیله",bot:true,lastSeen:now});
+ const profiles=[];
+ if(me){
+  profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:myPhoto||"",role:myRole||"user",lastSeen:now,self:true});
+ }
+ profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",bot:true,lastSeen:now});
+ const onlineUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.lastSeen&&now-u.lastSeen<65000);
+ const roleOrder={owner:0,admin:1,manager:2,moderator:3,user:4};
  onlineUsers.sort((a,b)=>{
-  const roleA=a.uid===OWNER_UID?"owner":(a.bot?"bot":(a.role||"user"));
-  const roleB=b.uid===OWNER_UID?"owner":(b.bot?"bot":(b.role||"user"));
-  return (roleOrder[roleA]??5)-(roleOrder[roleB]??5)||
-   String(a.name||"").localeCompare(String(b.name||""),"fa");
+  const roleA=a.uid===OWNER_UID?"owner":(a.role||"user");
+  const roleB=b.uid===OWNER_UID?"owner":(b.role||"user");
+  return (roleOrder[roleA]??4)-(roleOrder[roleB]??4)||
+   String(a.displayName||a.name||"").localeCompare(String(b.displayName||b.name||""),"fa");
  });
-
- onlineUsers.forEach(u=>{
+ profiles.push(...onlineUsers);
+ profiles.forEach(u=>{
   const btn=document.createElement("button");
+  btn.type="button";
   btn.className="user";
+  const info=document.createElement("span");
+  info.className="user-profile-name";
+  info.textContent=u.bot?"هیله":(u.self?"خودم · "+(u.displayName||u.name):((u.displayName||u.name||"کاربر")));
   const img=document.createElement("img");
   img.className="avatar";
+  img.alt="پروفایل "+(u.displayName||u.name||"کاربر");
   if(u.bot){
-   btn.classList.add("hey-leh-user");
-   img.style.display="none";
-   const botIcon=document.createElement("span");   botIcon.textContent="🌸";
-   botIcon.style.cssText="width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#70418c;font-size:22px";
-   btn.append(botIcon);
+   img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#70418c"/><text x="50" y="70" text-anchor="middle" font-size="62">🌸</text></svg>');
   }else{
-   img.src=u.photo||"";
-   btn.append(img);
+   img.src=u.photo||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');
   }
-  const info=document.createElement("span");
-  info.textContent=u.bot?"🌸 هیله پاسخگو":countryFlag(u.countryCode||"")+" "+(u.displayName||u.name||"کاربر")+" · "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"))+" · آنلاین";
-  btn.append(info);
-  if(u.bot)btn.onclick=()=>showBotProfile();
-  else btn.onclick=()=>showProfile(u);
-  if(u.bot && botSlot)botSlot.append(btn);
-  else list.append(btn);
+  img.onerror=()=>{img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
+  btn.append(info,img);
+  btn.onclick=()=>u.bot?showBotProfile():showProfile(u);
+  list.append(btn);
  });
-
- if(!list.children.length){
-  list.textContent="فعلاً کاربر آنلاین دیگری نیست";
- }
+ if(!me&&profiles.length===1)list.textContent="ابتدا وارد چت شوید";
 }
 let selectedProfile=null;
 window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",role:"bot",bot:true,lastSeen:Date.now()});};
