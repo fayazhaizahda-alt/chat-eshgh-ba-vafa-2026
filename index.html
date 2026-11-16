@@ -232,7 +232,6 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 <div class="panel" id="chatPanel">
 
 <h3 id="roomTitle">💬 گفت‌وگوی عمومی</h3>
-<button id="clearAllChatsBtn" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:8px 12px;font-size:12px;margin:4px 0">🗑️ پاک کردن تمام چت‌ها</button>
 <div id="messages"><div class="empty-public-chat"><strong>💬 گفت‌وگوی عمومی عشق با وفا</strong><span>به اتاق عمومی خوش آمدی ❤️<br>پیام‌های دوستان اینجا نمایش داده می‌شود. اولین پیام را بنویس و گفتگو را آغاز کن.</span></div></div>
 
 <div id="chatEmojiPanel" style="display:none;flex-wrap:wrap;gap:5px;padding:6px">
@@ -289,6 +288,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 <p id="profileCardPhotoStatus" class="small"></p>
 <hr style="border-color:#8053a2;margin:12px 0">
 <button type="button" onclick="openSettings()">🎨 تنظیمات صفحه چت</button>
+<button id="clearAllChatsBtn" type="button" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:10px 12px;font-size:12px;margin:8px 0">🗑️ پاک کردن تمام پیام‌های عمومی</button>
 </div>
 <div id="ownerUserControls" style="display:none;text-align:center;margin:12px 0;padding:12px;border:1px solid #8053a2;border-radius:14px;background:#211b32">
  <p style="margin:3px 0 12px;font-weight:bold;color:#f1d7ff">🛡️ تعیین رتبه کاربر</p>
@@ -763,6 +763,8 @@ window.showProfile=function(u){
  onlineDot.setAttribute("aria-label",online?"آنلاین":"آفلاین");
  const isSelf=u.uid===me?.uid;
  $("selfProfileControls").style.display=isSelf?"block":"none";
+ const clearButton=$("clearAllChatsBtn");
+ if(clearButton)clearButton.style.display=isSelf && me?.uid===OWNER_UID?"block":"none";
  const ownerControls=$("ownerUserControls");
  const isOwner=me?.uid===OWNER_UID && u.uid!==OWNER_UID && !u.bot;
  ownerControls.style.display=isOwner?"block":"none";
@@ -970,8 +972,6 @@ async function openMessageSenderProfile(message){
 
 function renderMessages(arr){
  const box=$("messages");
- const clearButton=$("clearAllChatsBtn");
- if(clearButton)clearButton.style.display=me?.uid===OWNER_UID?"inline-block":"none";
  box.innerHTML="";
  if(!arr.length){
   const empty=document.createElement("div");
