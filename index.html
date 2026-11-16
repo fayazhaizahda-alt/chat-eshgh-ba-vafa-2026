@@ -1181,23 +1181,26 @@ function isOffensiveMessage(value){
  });
 }
 
-async function sendBotMessage(message){
+async function sendBotMessage(message,replyToId=""){
  try{
   if(!me)throw new Error("کاربر هنوز وارد حساب نشده است");
-  // برای سازگاری با قوانین Firestore، پیام ربات با حساب واردشده ثبت می‌شود
-  // اما فیلد bot باعث می‌شود در صفحه با نام و ظاهر هیله نمایش داده شود.
-  await addDoc(collection(db,"messages"),{
-   senderUid:me.uid,   senderName:"هیله",
-   text:message,
-   type:"public",
-   bot:true,
+  const botMessage={
+   senderUid:me.uid,senderName:"هیله",
+   text:message,type:"public",bot:true,
    createdAt:serverTimestamp()
-  });
+  };
+  // پاسخ به هر پیام شناسه ثابت دارد تا چند کاربر هم‌زمان پاسخ تکراری نسازند.
+  if(replyToId){
+   await setDoc(doc(db,"messages","bot_reply_"+replyToId),botMessage);
+  }else{
+   await addDoc(collection(db,"messages"),botMessage);
+  }
  }catch(e){console.error("Bot message failed:",e);$("roomTitle").textContent="خطای ارسال پیام هیله: "+(e.message||e);}
 }
 
 function startBotModeration(){
- if(me?.uid!==OWNER_UID)return;
+ // شنونده روی دستگاه هر کاربر فعال می‌شود؛ برای پاسخ به هیله لازم نیست مالک آنلاین باشد.
+ if(!me)return;
  if(moderationUnsub)moderationUnsub();
  const publicQuery=query(collection(db,"messages"),where("type","==","public"));
  let botListenerReady=false;
@@ -1214,22 +1217,22 @@ function startBotModeration(){
       message.bot || botProcessed.has(message.id))return;
    botProcessed.add(message.id);
 
-   // کاربران عادی برای توهین مسدود می‌شوند؛ مالک مستثنا است.
-   if(message.senderUid!==OWNER_UID && isOffensiveMessage(message.text)){
+   // فقط دستگاه مالک اجازه اجرای مجازات و مسدودسازی را دارد.
+   if(me?.uid===OWNER_UID && message.senderUid!==OWNER_UID && isOffensiveMessage(message.text)){
     try{
      await deleteDoc(doc(db,"messages",message.id));
      await updateDoc(doc(db,"users",message.senderUid),{
       banned:true,bannedBy:"CHAT_BOT",bannedAt:Date.now(),
       banReason:"توهین و استفاده از الفاظ نامناسب"
      });
-     await sendBotMessage("🛡️ ربات: پیام توهین‌آمیز حذف شد و حساب فرستنده مسدود گردید.");
+     await sendBotMessage("🛡️ هیله: پیام توهین‌آمیز حذف شد و حساب فرستنده مسدود گردید.",message.id);
     }catch(e){console.error("Bot moderation failed:",e);}
     return;
    }
 
-   // هیله به سلام همه کاربران، حتی مالک، پاسخ می‌دهد.
-   if(/سلام|درود|السلام علیکم|السلام‌علیکم/u.test(normalizeBotText(message.text))){
-    await sendBotMessage("وعلیکم‌السلام! خوش آمدی ❤️");
+   // هر دستگاهی که پیام را دریافت کند می‌تواند پاسخ را ثبت کند؛ شناسه ثابت مانع تکرار می‌شود.
+   if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(message.text))){
+    await sendBotMessage("وعلیکم‌السلام! خوش آمدی ❤️",message.id);
    }
   });
  },error=>console.error("Bot moderation listener failed:",error));
