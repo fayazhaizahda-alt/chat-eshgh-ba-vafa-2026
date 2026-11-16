@@ -238,6 +238,7 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
 <div id="chatEmojiPanel" style="display:none;flex-wrap:wrap;gap:5px;padding:6px">
 <button type="button" onclick="addEmoji('❤️')">❤️</button><button type="button" onclick="addEmoji('😍')">😍</button><button type="button" onclick="addEmoji('😘')">😘</button><button type="button" onclick="addEmoji('🌹')">🌹</button><button type="button" onclick="addEmoji('🥰')">🥰</button><button type="button" onclick="addEmoji('😂')">😂</button><button type="button" onclick="addEmoji('😭')">😭</button><button type="button" onclick="addEmoji('💔')">💔</button><button type="button" onclick="addEmoji('💕')">💕</button><button type="button" onclick="addEmoji('🌸')">🌸</button><button type="button" onclick="addEmoji('👍')">👍</button><button type="button" onclick="addEmoji('🙏')">🙏</button>
 </div>
+<p id="messageSendStatus" class="small" role="status" style="min-height:20px;margin:4px 8px;text-align:center"></p>
 <div id="sendArea">
 <button type="button" onclick="toggleChatEmoji()" aria-label="شکلک">☺️</button>
 <button type="button" onclick="document.getElementById('chatPhotoInput').click()" aria-label="فرستادن عکس">📎</button>
@@ -1027,23 +1028,36 @@ function renderMessages(arr){
 }
 
 window.sendMessage=async function(){
- const text=$("message").value.trim();
- if(!text||!me)return;
-
+ const input=$("message");
+ const textValue=input.value.trim();
+ const status=$("messageSendStatus");
+ if(!textValue){if(status)status.textContent="اول پیام خود را بنویس.";return;}
+ if(!me){if(status)status.textContent="حساب کاربری هنوز وارد نشده؛ دوباره وارد شو.";return;}
+ const sendButton=$("sendArea").querySelector('button:last-child');
+ if(sendButton){sendButton.disabled=true;sendButton.textContent="...";
+ }
+ if(status)status.textContent="در حال فرستادن پیام...";
  try{
-  const data={
-   senderUid:me.uid,
-   senderName:myDisplayName||myName,
-   text:text,
-   createdAt:serverTimestamp()
-  };
-   data.type="public";
- 
-
+  const data={senderUid:me.uid,senderName:myDisplayName||myName,text:textValue,createdAt:serverTimestamp(),type:"public"};
   await addDoc(collection(db,"messages"),data);
-  $("message").value="";
-  }catch(e){
-  alert("پیام ارسال نشد: "+e.message);
+  input.value="";
+  if(status)status.textContent="پیام ثبت شد؛ در حال تازه‌سازی اتاق عمومی...";
+  // دریافت مستقیم پیام‌ها برای اطمینان از نمایش فوری در صورت تأخیر شنونده زنده
+  try{
+   const q=query(collection(db,"messages"),where("type","==","public"));
+   const snap=await getDocs(q);
+   const arr=snap.docs.map(d=>({id:d.id,...d.data()}));
+   arr.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+   renderMessages(arr.slice(-100));
+   if(status)status.textContent="پیام ارسال و در اتاق عمومی بارگذاری شد ❤️";
+  }catch(readError){
+   if(status)status.textContent="پیام ثبت شد، اما خواندن پیام‌ها مشکل دارد: "+(readError.message||readError);
+  }
+ }catch(e){
+  if(status)status.textContent="ارسال انجام نشد: "+(e.message||e);
+  alert("پیام ارسال نشد: "+(e.message||e));
+ }finally{
+  if(sendButton){sendButton.disabled=false;sendButton.textContent="ارسال";}
  }
 };
 
