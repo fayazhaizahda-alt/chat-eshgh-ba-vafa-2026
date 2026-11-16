@@ -1199,15 +1199,21 @@ window.uploadBotAvatar=async function(event){
   if(dataUrl.length>700000)throw new Error("حجم عکس پس از فشرده‌سازی هنوز زیاد است؛ عکس دیگری انتخاب کن.");
   // نسخه عمومی عکس را نیز در مجموعه پیام‌های عمومی می‌گذاریم تا همه کاربران
   // بدون نیاز به دسترسی خواندن سند خصوصی مالک، عکس هیله را دریافت کنند.
+  // ذخیره اصلی عکس در پروفایل مالک
   await updateDoc(doc(db,"users",OWNER_UID),{botAvatar:dataUrl});
-  await addDoc(collection(db,"messages"),{
-   type:"public",botAvatarUpdate:true,botAvatar:dataUrl,
-   senderUid:OWNER_UID,senderName:"هیله",bot:true,
-   text:"",createdAt:serverTimestamp()
-  });
   botAvatarPhoto=dataUrl;
   renderUsers();if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
-  const statusText="عکس پروفایل هیله ذخیره شد و برای همه کاربران نمایش داده می‌شود ❤️";if(status)status.textContent=statusText;alert(statusText);
+  // پیام پخش عکس فقط قابلیت کمکی است؛ خطای مجوز آن نباید ذخیره اصلی را ناموفق نشان دهد.
+  try{
+   await addDoc(collection(db,"messages"),{
+    type:"public",botAvatarUpdate:true,botAvatar:dataUrl,
+    senderUid:OWNER_UID,senderName:"هیله",bot:true,
+    text:"",createdAt:serverTimestamp()
+   });
+  }catch(broadcastError){
+   console.warn("Bot avatar broadcast unavailable; profile photo was saved:",broadcastError);
+  }
+  const statusText="عکس پروفایل هیله ذخیره شد ❤️";if(status)status.textContent=statusText;alert(statusText);
  }catch(e){if(status)status.textContent="ذخیره عکس انجام نشد: "+(e.code||e.message||e);}
  finally{event.target.value="";}
 };
