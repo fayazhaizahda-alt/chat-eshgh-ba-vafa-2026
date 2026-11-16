@@ -772,6 +772,7 @@ function startUsers(){
    return;
   }
   renderUsers();
+  if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
   renderAdminPanel();
  },e=>console.error(e));
 }
@@ -1048,6 +1049,7 @@ async function openMessageSenderProfile(message){
 }
 
 function renderMessages(arr){
+ window.__loveLastMessages=arr;
  const box=$("messages");
  box.innerHTML="";
  if(!arr.length){
