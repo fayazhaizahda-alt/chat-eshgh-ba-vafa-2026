@@ -896,6 +896,12 @@ function startUsers(){
  if(usersUnsub)usersUnsub();
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
   allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
+  // عکس هیله را از همان فهرست عمومی کاربران نیز بگیر؛ خواندن جداگانه سند مالک
+  // ممکن است برای کاربران دیگر با قوانین Firestore محدود شده باشد.
+  const ownerProfile=allUsers.find(u=>u.uid===OWNER_UID);
+  if(ownerProfile && typeof ownerProfile.botAvatar==="string" && ownerProfile.botAvatar){
+   botAvatarPhoto=ownerProfile.botAvatar;
+  }
   if(me && allUsers.some(u=>u.uid===me.uid && u.banned===true)){
    alert("🤖 حساب شما به دلیل تخلف مسدود شده است.");
    exitChat();
