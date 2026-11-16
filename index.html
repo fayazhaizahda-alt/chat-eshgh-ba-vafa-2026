@@ -205,6 +205,62 @@ body:has(#chat[style*="display: block"]) #profileSidebar{
   box-shadow:none !important;
 }
 .love-header{border-bottom:0 !important;}
+
+/* چیدمان یک‌دست و تمام‌صفحه؛ بدون قاب و خط جداکننده */
+body:has(#chat[style*="display: block"]){
+  background:#171027 !important;
+}
+body:has(#chat[style*="display: block"]) main{
+  width:100% !important;max-width:none !important;
+  margin:0 !important;padding:0 !important;
+}
+body:has(#chat[style*="display: block"]) .love-header{
+  min-height:64px !important;padding:4px 10px !important;
+  border:0 !important;border-radius:0 !important;
+  box-shadow:none !important;
+}
+body:has(#chat[style*="display: block"]) #layout{
+  gap:0 !important;
+}
+body:has(#chat[style*="display: block"]) #chatPanel{
+  border:0 !important;border-radius:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  padding:6px 0 0 !important;
+}
+body:has(#chat[style*="display: block"]) #messages{
+  border:0 !important;border-radius:0 !important;
+  outline:0 !important;box-shadow:none !important;
+  width:100% !important;
+}
+body:has(#chat[style*="display: block"]) #sendArea{
+  border:0 !important;border-radius:0 !important;
+  outline:0 !important;box-shadow:none !important;
+  margin:0 !important;padding:8px !important;
+  background:rgba(235,230,240,.88) !important;
+}
+body:has(#chat[style*="display: block"]) #sendArea textarea{
+  border:0 !important;box-shadow:none !important;
+  border-radius:28px !important;
+}
+body:has(#chat[style*="display: block"]) #loveBottomNav{
+  border:0 !important;border-radius:0 !important;
+  box-shadow:none !important;
+}
+body:has(#chat[style*="display: block"]) #loveBottomNav button{
+  border:0 !important;
+}
+@media(max-width:760px){
+  body:has(#chat[style*="display: block"]) main{
+    padding:0 !important;
+  }
+  body:has(#chat[style*="display: block"]) #chatPanel{
+    padding:0 !important;
+  }
+  body:has(#chat[style*="display: block"]) #messages{
+    padding:10px !important;
+  }
+}
 </style>
 </head>
 <body>
