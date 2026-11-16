@@ -1193,6 +1193,7 @@ function normalizeBotText(value){
 }
 
 let moderationCustomTerms=[];
+let botCustomReplies=[];
 let botAvatarPhoto="";
 async function loadBotAvatar(){
  if(!me)return;
@@ -1258,10 +1259,41 @@ async function loadModerationTerms(){
  try{
   const ownerDoc=await getDoc(doc(db,"users",OWNER_UID));
   moderationCustomTerms=Array.isArray(ownerDoc.data()?.moderationWords)?ownerDoc.data().moderationWords:[];
+  botCustomReplies=Array.isArray(ownerDoc.data()?.botReplies)?ownerDoc.data().botReplies:[];
   const field=$("moderationWordsInput");
   if(field)field.value=moderationCustomTerms.join("\n");
+  const repliesField=$("botRepliesInput");
+  if(repliesField)repliesField.value=botCustomReplies.map(x=>x.trigger+" | "+x.response).join("\n");
  }catch(e){console.error("Moderation settings load failed:",e);}
 }
+window.saveBotReplies=async function(){
+ if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پاسخ‌های هیله را دارد.");return;}
+ const field=$("botRepliesInput");
+ const rows=(field?.value||"").split("\n").map(line=>{
+  const cut=line.indexOf("|");
+  if(cut<0)return null;
+  const trigger=normalizeBotText(line.slice(0,cut));
+  const response=line.slice(cut+1).trim();
+  return trigger&&response?{trigger,response}:null;
+ }).filter(Boolean);
+ try{
+  await updateDoc(doc(db,"users",OWNER_UID),{botReplies:rows});
+  botCustomReplies=rows;
+  const status=$("botRepliesStatus");
+  if(status)status.textContent="ذخیره شد؛ "+rows.length+" پاسخ سفارشی فعال است.";
+ }catch(e){
+  const status=$("botRepliesStatus");
+  if(status)status.textContent="ذخیره نشد: "+(e.code||e.message||e);
+ }
+};
+function getBotReply(message){
+ const normalized=normalizeBotText(message);
+ const custom=botCustomReplies.find(item=>item.trigger&&normalized.includes(item.trigger));
+ if(custom)return custom.response;
+ if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalized))return "وعلیکم‌السلام ❤️ خوش آمدی!";
+ return "";
+}
+
 window.saveModerationTerms=async function(){
  if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر کلمات ممنوعه را دارد.");return;}
  const field=$("moderationWordsInput");
@@ -1509,10 +1541,9 @@ window.sendMessage=async function(){
   const data={senderUid:me.uid,senderName:myDisplayName||myName,senderPhoto:myPhoto||"",text:textValue,createdAt:serverTimestamp(),type:"public"};
   await addDoc(collection(db,"messages"),data);
   input.value="";
-  // پاسخ هیله مستقیماً پس از ثبت سلام همان کاربر فرستاده می‌شود؛ وابسته به شنوندهٔ زنده نیست.
-  if(/سلام|درود|السلام علیکم|السلام‌علیکم|هیله/u.test(normalizeBotText(textValue))){
-   await sendBotMessage("وعلیکم‌السلام ❤️ خوش آمدی!");
-  }
+  // پاسخ‌های سفارشی مالک و پاسخ پیش‌فرض سلام
+  const botReply=getBotReply(textValue);
+  if(botReply)await sendBotMessage(botReply);
   if(status)status.textContent="پیام ثبت شد؛ در حال تازه‌سازی اتاق عمومی...";
   // دریافت مستقیم پیام‌ها برای اطمینان از نمایش فوری در صورت تأخیر شنونده زنده
   try{
@@ -1707,6 +1738,12 @@ window.exitChat=async function(){
  <p class="small">واکنش هیله: پیام دارای کلمه ممنوعه حذف می‌شود و اخطار اول داده می‌شود؛ اگر همان کاربر دوباره تکرار کند، حسابش مسدود می‌شود.</p>
  <button type="button" onclick="saveModerationTerms()">💾 ذخیره کلمات و عبارت‌های ممنوعه</button>
  <p id="moderationWordsStatus" class="small">کلمات دلخواهت را بنویس و ذخیره کن.</p>
+ <hr style="border-color:#8053a2;margin:14px 0">
+ <h4 style="margin:0 0 8px;text-align:center">💬 افزودن پاسخ‌های دلخواه هیله</h4>
+ <p class="small">هر خط را به این شکل بنویس: کلمه یا عبارت محرک | پاسخ هیله. وقتی کاربر آن عبارت را در پیامش بنویسد، هیله پاسخ ثبت‌شده را می‌فرستد.</p>
+ <textarea id="botRepliesInput" rows="7" placeholder="صبح بخیر | صبح تو هم بخیر عزیزم 🌹\nحالت چطور است | من خوبم، ممنون که پرسیدی ❤️\nتشکر | خواهش می‌کنم 🌸" style="width:100%;min-height:130px;padding:10px;border-radius:10px;background:#fff;color:#24133d;resize:vertical"></textarea>
+ <button type="button" onclick="saveBotReplies()">💾 ذخیره پاسخ‌های هیله</button>
+ <p id="botRepliesStatus" class="small">هر پاسخ در یک خط جداگانه نوشته شود.</p>
 </div>
 <div id="ownerBackgroundControls">
 <hr style="border-color:#8053a2;margin:14px 0">
