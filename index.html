@@ -1197,9 +1197,16 @@ window.uploadBotAvatar=async function(event){
  try{
   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,420/img.width,420/img.height);const canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.68));};img.onerror=reject;img.src=reader.result;};reader.onerror=reject;reader.readAsDataURL(file);});
   if(dataUrl.length>700000)throw new Error("حجم عکس پس از فشرده‌سازی هنوز زیاد است؛ عکس دیگری انتخاب کن.");
+  // نسخه عمومی عکس را نیز در مجموعه پیام‌های عمومی می‌گذاریم تا همه کاربران
+  // بدون نیاز به دسترسی خواندن سند خصوصی مالک، عکس هیله را دریافت کنند.
   await updateDoc(doc(db,"users",OWNER_UID),{botAvatar:dataUrl});
+  await addDoc(collection(db,"messages"),{
+   type:"public",botAvatarUpdate:true,botAvatar:dataUrl,
+   senderUid:OWNER_UID,senderName:"هیله",bot:true,
+   text:"",createdAt:serverTimestamp()
+  });
   botAvatarPhoto=dataUrl;
-  renderUsers();if(window.__loveLastMessages)renderMessages(window.__loveLastMessages);
+  renderUsers();if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
   const statusText="عکس پروفایل هیله ذخیره شد و برای همه کاربران نمایش داده می‌شود ❤️";if(status)status.textContent=statusText;alert(statusText);
  }catch(e){if(status)status.textContent="ذخیره عکس انجام نشد: "+(e.code||e.message||e);}
  finally{event.target.value="";}
@@ -1277,7 +1284,7 @@ function startBotModeration(){
   for(const change of snapshot.docChanges()){
    if(change.type!=="added")continue;
    const message={id:change.doc.id,...change.doc.data({serverTimestamps:"estimate"})};
-   if(!message.senderUid || message.bot || botProcessed.has(message.id))continue;
+   if(!message.senderUid || message.bot || message.botAvatarUpdate===true || botProcessed.has(message.id))continue;
    botProcessed.add(message.id);
    if(message.senderUid===OWNER_UID || !isOffensiveMessage(message.text))continue;
    try{
@@ -1387,6 +1394,12 @@ async function openMessageSenderProfile(message){
 }
 
 function renderMessages(arr){
+ // آخرین نسخه عمومی عکس هیله را از پیام‌های عمومی دریافت کن.
+ const avatarUpdates=arr.filter(m=>m.botAvatarUpdate===true && typeof m.botAvatar==="string" && m.botAvatar.length>0);
+ if(avatarUpdates.length){
+  avatarUpdates.sort((a,b)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0));
+  botAvatarPhoto=avatarUpdates[avatarUpdates.length-1].botAvatar;
+ }
  window.__loveLastMessages=arr;
  const box=$("messages");
  box.innerHTML="";
@@ -1401,6 +1414,7 @@ function renderMessages(arr){
   box.append(empty);
  }
  arr.forEach(m=>{
+  if(m.botAvatarUpdate===true)return;
   const div=document.createElement("div");
   div.className="msg"+(m.senderUid===me.uid&&!m.bot?" mine":"");
 
