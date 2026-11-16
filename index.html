@@ -468,6 +468,7 @@ body:has(#chat[style*="display: block"]) #layout{
 <span class="user-profile-name" id="sidebarFallbackSelfName">فیاض</span>
 <img class="avatar" id="sidebarFallbackSelfPhoto" alt="پروفایل فیاض" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%238b68ad'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='54' fill='white'%3E👤%3C/text%3E%3C/svg%3E">
 </button>
+<p id="userListStatus" role="status" style="display:none;margin:4px 2px;text-align:center;font-size:9px;line-height:1.7;color:#ffd6ee"></p>
 <button type="button" class="user" onclick="showBotProfile()">
 <span class="user-profile-name">هیله</span>
 <img class="avatar" alt="پروفایل هیله" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%2370418c'/%3E%3Ctext x='50' y='70' text-anchor='middle' font-size='62'%3E👩‍🦰%3C/text%3E%3C/svg%3E">
@@ -908,6 +909,11 @@ function startUsers(){
  renderUsers();
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
   allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
+  const status=$("userListStatus");
+  if(status && allUsers.filter(u=>u.uid!==me?.uid && u.uid!==OWNER_UID).length===0){
+   status.textContent="هنوز کاربر دیگری وارد اتاق نشده است.";
+   status.style.display="block";
+  }
   // عکس هیله را از همان فهرست عمومی کاربران نیز بگیر؛ خواندن جداگانه سند مالک
   // ممکن است برای کاربران دیگر با قوانین Firestore محدود شده باشد.
   const ownerProfile=allUsers.find(u=>u.uid===OWNER_UID);
@@ -941,6 +947,11 @@ function startUsers(){
    }
   }catch(profileError){console.error("Own profile load failed:",profileError);}
   renderUsers();
+  const listStatus=$("userListStatus");
+  if(listStatus){
+   listStatus.textContent="بارگذاری کاربران دیگر ناموفق بود: "+(e.code==="permission-denied"?"دسترسی فایربیس اجازه دیدن فهرست کاربران را نمی‌دهد.":"اتصال به فهرست کاربران برقرار نشد.");
+   listStatus.style.display="block";
+  }
   const status=$("messageSendStatus");
   if(status)status.textContent="فهرست همه کاربران بارگذاری نشد؛ پروفایل خودت جداگانه نمایش داده می‌شود.";
  });
@@ -968,7 +979,9 @@ window.showUserPhotoZoom=function(photo,name){
 function renderUsers(){
  const list=$("userList");
  const botSlot=$("botProfileSlot");
+ const status=$("userListStatus");
  list.innerHTML="";
+ if(status){status.textContent="";status.style.display="none";}
  if(botSlot)botSlot.innerHTML="";
  const now=Date.now();
  const profiles=[];
