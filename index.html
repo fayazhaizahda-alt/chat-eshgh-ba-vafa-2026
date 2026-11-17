@@ -1546,7 +1546,9 @@ window.openPublic=function(){
  // هنگام ورود و بازگشت، همیشه خود اتاق عمومی را مستقیم نمایش بده.
 
  const sidebar=$("profileSidebar");
- if(sidebar)sidebar.style.display="none";
+ // فهرست پروفایل‌ها هنگام ورود به اتاق عمومی نباید مخفی شود.
+ if(sidebar)sidebar.style.setProperty("display","flex","important");
+ if(typeof refreshUserSidebar==="function" && me)refreshUserSidebar();
  const card=$("profileCard");
  if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
  if(typeof selectedProfile!=="undefined")selectedProfile=null;
