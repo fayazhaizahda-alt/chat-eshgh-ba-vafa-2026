@@ -480,8 +480,16 @@ body:has(#chat[style*="display: block"]) #layout{
 <button id="enterBtn" onclick="enterChat()">ورود به چت</button>
 <p class="small">کشور کنار پروفایل به‌صورت تقریبی از نشانی اینترنتی (IP) تشخیص داده می‌شود؛ VPN ممکن است کشور را تغییر دهد.</p>
 <p id="error" class="small"></p>
+</div>
 
-
+<div id="guestNameModal" style="display:none;position:fixed;inset:0;z-index:100010;background:#090018ed;align-items:center;justify-content:center;padding:18px">
+ <div style="width:100%;max-width:420px;padding:22px;border:2px solid #bb73ff;border-radius:22px;background:linear-gradient(145deg,#351364,#1c103b);color:#fff;text-align:center">
+  <h3 style="margin:0 0 10px">🌹 به چت عشق با وفا خوش آمدی</h3>
+  <p style="font-size:13px;line-height:1.8">برای ورود به گفت‌وگوی عمومی، نام دلخواهت را انتخاب کن.</p>
+  <input id="guestNameInput" maxlength="25" autocomplete="nickname" placeholder="نام دلخواه شما" style="width:100%;padding:14px;border:1px solid #bb73ff;border-radius:12px;background:#fff;color:#24133d;font:16px Tahoma;text-align:center">
+  <p id="guestNameError" style="min-height:20px;color:#ffd0e5;font-size:12px"></p>
+  <button type="button" onclick="confirmGuestName()" style="width:100%;padding:13px;border:0;border-radius:14px;background:linear-gradient(100deg,#922bd5,#5510a4);color:white;font-weight:bold">ورود به صفحه چت ❤️</button>
+ </div>
 </div>
 
 <div id="chat">
@@ -546,6 +554,12 @@ body:has(#chat[style*="display: block"]) #layout{
 <p id="profileCardUsername" style="font-size:16px;font-weight:bold;color:#1769c2"></p>
 <p id="profileCardRole" style="font-weight:bold;color:#8b3fa5"></p>
 <p id="profileCardStatus" class="small"></p>
+<div id="guestProfileControls" style="display:none;margin:12px 0;padding:12px;border:1px solid #9b65c6;border-radius:14px;background:#241044">
+ <h4 style="margin:4px 0 10px">👤 حساب مهمان</h4>
+ <button type="button" onclick="changeGuestName()">✏️ تغییر نام</button>
+ <button type="button" onclick="openGuestRegistration()">📝 ثبت‌نام و حفظ حساب مهمان</button>
+ <button type="button" onclick="openAccountLogin()">🔐 ورود به حساب قبلی</button>
+</div>
 <div id="selfProfileControls" style="display:none;margin:12px 0;padding:12px;border:1px solid #9b65c6;border-radius:14px;background:#241044">
 <h4 style="margin:4px 0 10px">👤 تنظیمات پروفایل من</h4>
 <button id="clearAllChatsBtn" type="button" onclick="clearAllChats()" style="display:none;background:linear-gradient(135deg,#c62855,#8e163b);border:1px solid #ff9ab5;border-radius:18px;padding:10px 12px;font-size:12px;margin:8px 0;width:100%">🗑️ پاک کردن تمام پیام‌های عمومی</button>
@@ -587,7 +601,7 @@ import {initializeApp}
 from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
 import {
- getAuth,createUserWithEmailAndPassword,
+ getAuth,createUserWithEmailAndPassword,linkWithCredential,
  signInWithEmailAndPassword,signInAnonymously,signOut,onAuthStateChanged,
  EmailAuthProvider,reauthenticateWithCredential,updateEmail,updatePassword,
  setPersistence,browserLocalPersistence
@@ -631,27 +645,70 @@ const botProcessed=new Set();
 // تنها اتاق فعال برنامه، گفت‌وگوی عمومی است.
 let loginInProgress=false;
 let anonymousSignInInProgress=false;
+let allowLoginFlow=false;
 
-// ورود مهمان بدون ثبت‌نام؛ این حساب فقط برای مجوز امن Firebase استفاده می‌شود.
-function enterGuestChat(user){
+// ورود مهمان: ابتدا نام دلخواه را می‌گیرد و سپس همان حساب ناشناس را وارد اتاق می‌کند.
+async function enterGuestChat(user){
  if(!user || !user.isAnonymous || me)return;
  me=user;
  myRole="user";
- myName="مهمان";
- myDisplayName="مهمان-"+user.uid.slice(-4);
  myPhoto="";
+ try{
+  const saved=await getDoc(doc(db,"users",user.uid));
+  if(saved.exists()){
+   const profile=saved.data();
+   if(profile.banned===true){await signOut(auth);me=null;return;}
+   if(profile.name||profile.displayName){
+    myName=profile.name||profile.displayName;
+    myDisplayName=profile.displayName||myName;
+    activateGuestChat();
+    return;
+   }
+  }
+ }catch(e){console.warn("Guest profile lookup failed:",e);}
+ $("login").style.display="none";
+ $("chat").style.display="none";
+ $("poetryQuickSections").style.display="none";
+ $("guestNameInput").value="";
+ $("guestNameError").textContent="";
+ $("guestNameModal").style.display="flex";
+ setTimeout(()=>$("guestNameInput").focus(),100);
+}
+
+async function activateGuestChat(){
+ if(!me?.isAnonymous)return;
+ $("guestNameModal").style.display="none";
  $("login").style.display="none";
  $("chat").style.display="block";
  $("poetryQuickSections").style.display="none";
- $("welcome").textContent="خوش آمدی مهمان عزیز ❤️";
+ $("welcome").textContent="خوش آمدی "+myDisplayName+" عزیز ❤️";
  $("myRoleBadge").textContent="مهمان بدون ثبت‌نام";
- $("myPhoto").src="";
- $("myUid").textContent="مهمان";
+ $("myPhoto").src=myPhoto||"";
+ $("myUid").textContent="حساب مهمان";
  $("myProfilePanel").classList.remove("owner-profile");
+ try{
+  await setDoc(doc(db,"users",me.uid),{
+   name:myName,displayName:myDisplayName,photo:myPhoto||"",
+   role:"user",lastSeen:Date.now(),isGuest:true
+  },{merge:true});
+ }catch(e){console.error("Guest profile save failed:",e);}
+ startUsers();
  applySavedChatBackground();
  renderAdminPanel();
  openPublic();
+ if(heartbeat)clearInterval(heartbeat);
+ heartbeat=setInterval(async()=>{if(me)try{await updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()});}catch(e){}},20000);
+ startBotModeration();
 }
+
+window.confirmGuestName=async function(){
+ if(!me?.isAnonymous)return;
+ const name=$("guestNameInput").value.trim();
+ if(name.length<2||name.length>25){$("guestNameError").textContent="نام باید بین ۲ تا ۲۵ حرف باشد.";return;}
+ myName=name;myDisplayName=name;
+ $("guestNameError").textContent="در حال ورود...";
+ await activateGuestChat();
+};
 
 // با باز شدن دوباره صفحه، حساب کاربر از حافظه محلی Firebase بازیابی می‌شود.
 async function restoreSavedSession(user){
@@ -725,7 +782,7 @@ onAuthStateChanged(auth,user=>{
   restoreSavedSession(user);
   return;
  }
- if(!user&&!loginInProgress&&!anonymousSignInInProgress){
+ if(!user&&!loginInProgress&&!anonymousSignInInProgress&&!allowLoginFlow){
   anonymousSignInInProgress=true;
   signInAnonymously(auth).catch(error=>{
    console.error("Anonymous sign-in failed:",error);
@@ -931,15 +988,17 @@ window.enterChat=async function(){
   const identity=await usernameEmail(name);
 
   if(mode==="register"){
-   // Firebase Authentication keeps the generated username email unique.
-   // This avoids unauthenticated reads/writes to a public username index.
-   credential=await createUserWithEmailAndPassword(
-    auth,identity.email,password
-   );
-
-   const file=$("photo").files[0];
-   myPhoto=file?await compressPhoto(file):"";
-
+   if(me?.isAnonymous){
+    // تبدیل همان حساب مهمان به حساب دائمی؛ UID و پیام‌های قبلی حفظ می‌شوند.
+    const linked=await linkWithCredential(me,EmailAuthProvider.credential(identity.email,password));
+    credential={user:linked.user};
+    const file=$("photo").files[0];
+    if(file)myPhoto=await compressPhoto(file);
+   }else{
+    credential=await createUserWithEmailAndPassword(auth,identity.email,password);
+    const file=$("photo").files[0];
+    myPhoto=file?await compressPhoto(file):"";
+   }
   }else{
    credential=await signInWithEmailAndPassword(
     auth,identity.email,password
@@ -950,6 +1009,7 @@ window.enterChat=async function(){
   }
 
   me=credential.user;
+  allowLoginFlow=false;
   await loadBotReplies();
   myName=name;
   const profileSnap=await getDoc(doc(db,"users",me.uid));
@@ -1251,7 +1311,9 @@ window.showProfile=function(u){
   onlineDot.setAttribute("aria-label",online?"آنلاین":"آفلاین");
  }
  const isSelf=u.uid===me?.uid;
- $("selfProfileControls").style.display=isSelf?"block":"none";
+ $("selfProfileControls").style.display=isSelf&&!me?.isAnonymous?"block":"none";
+ const guestControls=$("guestProfileControls");
+ if(guestControls)guestControls.style.display=isSelf&&!!me?.isAnonymous?"block":"none";
  const otherControls=$("otherProfileControls");
  if(otherControls)otherControls.style.display=(!isSelf&&!u.bot&&!!u.uid)?"block":"none";
  const clearButton=$("clearAllChatsBtn");
@@ -1301,6 +1363,47 @@ window.toggleUserBan=async function(){
  }catch(e){alert("عملیات انجام نشد: "+e.message);}
 };
 window.openMyProfile=function(){if(!me)return;$("profileSidebar").style.display="flex";const headerPhoto=$("headerMyPhoto");if(headerPhoto)headerPhoto.src=myPhoto||$("myPhoto")?.src||"";window.showProfile({uid:me.uid,name:myName,displayName:myDisplayName,photo:myPhoto,role:myRole,lastSeen:Date.now()});};
+
+window.changeGuestName=async function(){
+ if(!me?.isAnonymous)return;
+ const name=(prompt("نام جدید خود را وارد کنید (۲ تا ۲۵ حرف):",myDisplayName)||"").trim();
+ if(!name)return;
+ if(name.length<2||name.length>25)return alert("نام باید بین ۲ تا ۲۵ حرف باشد.");
+ try{
+  await updateDoc(doc(db,"users",me.uid),{name,displayName:name,lastSeen:Date.now()});
+  myName=name;myDisplayName=name;
+  $("welcome").textContent="خوش آمدی "+name+" عزیز ❤️";
+  $("profileCardName").textContent=name;
+  $("profileCardUsername").textContent="نام مهمان";
+  renderUsers();
+  alert("نام شما تغییر کرد.");
+ }catch(e){alert("تغییر نام انجام نشد: "+(e.message||e));}
+};
+
+window.openGuestRegistration=function(){
+ if(!me?.isAnonymous)return;
+ $("chat").style.display="none";
+ $("login").style.display="block";
+ $("username").value=myName||myDisplayName;
+ $("password").value="";
+ 
+ window.setMode("register");
+ $("error").textContent="با ثبت‌نام، همین حساب مهمان و پیام‌های قبلی‌ات حفظ می‌شود.";
+ closeProfile();
+};
+
+window.openAccountLogin=async function(){
+ allowLoginFlow=true;
+ if(me?.isAnonymous){try{await signOut(auth);}catch(e){}}
+ me=null;
+ $("chat").style.display="none";
+ $("login").style.display="block";
+ $("username").value="";
+ $("password").value="";
+ window.setMode("login");
+ $("error").textContent="نام کاربری و رمز عبور حساب قبلی خود را وارد کنید.";
+ closeProfile();
+};
 
 let privateTarget=null;
 let privateMessagesUnsub=null;
