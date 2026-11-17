@@ -1118,7 +1118,7 @@ function renderUsers(){
   status.style.setProperty("text-align","center","important");
   status.style.setProperty("color",online?"#35ef8b":"#c5c1ce","important");
   status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
-  if(u.self){
+  if(u.uid===OWNER_UID){
    const avatarRow=document.createElement("span");
    avatarRow.style.cssText="display:flex;align-items:center;justify-content:center;gap:3px;order:1;width:100%;height:44px";
    img.style.setProperty("order","0","important");
@@ -1126,7 +1126,7 @@ function renderUsers(){
    crown.textContent="👑";
    crown.title="مدیر اصلی";
    crown.setAttribute("aria-label","تاج مدیر اصلی");
-   crown.style.cssText="display:inline-block;font-size:19px;line-height:1";
+   crown.style.cssText="display:inline-block;font-size:14px;line-height:1";
    avatarRow.append(img,crown);
    btn.append(info,avatarRow,status);
   }else{
