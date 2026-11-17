@@ -1882,7 +1882,9 @@ window.sendMessage=async function(){
    data.replyToText=String(selectedReplyMessage.text||(selectedReplyMessage.image?"📷 عکس":"پیام")).slice(0,180);
    data.replyToSenderUid=selectedReplyMessage.senderUid||"";
   }
-  await addDoc(collection(db,"messages"),data);
+  // شناسه یکتا برای جلوگیری از برخورد شناسه پیام در مرورگرهای موبایل
+  const messageId=(globalThis.crypto&&typeof globalThis.crypto.randomUUID==="function")?globalThis.crypto.randomUUID():doc(collection(db,"messages")).id;
+  await setDoc(doc(db,"messages",messageId),data);
   input.value="";
   window.cancelReply();
   // پاسخ‌های سفارشی مالک و پاسخ پیش‌فرض سلام
