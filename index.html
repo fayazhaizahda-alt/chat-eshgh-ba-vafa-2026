@@ -397,8 +397,7 @@ body:has(#chat[style*="display: block"]) #layout{
 }
 
 #replyPreview{display:none;align-items:center;gap:8px;margin:8px 8px 0;padding:9px 12px;border-right:4px solid #d58aff;border-radius:10px;background:#2b174b;color:#fff;min-width:0}
-#replyPreview .reply-preview-copy{flex:1;min-width:0;overflow:hidden}
-#replyPreview strong{display:block;font-size:12px;color:#e8c5ff}
+#replyPreview .reply-preview-copy{flex:1;min-width:0;overflow:hidden}#replyPreview strong{display:block;font-size:12px;color:#e8c5ff}
 #replyPreview span{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}
 #replyPreview button{border:0;background:transparent;color:#fff;font-size:20px;padding:2px 7px}
 .message-reply-quote{display:block;max-width:100%;padding:6px 9px;margin-bottom:3px;border-right:3px solid #a65cff;border-radius:8px;background:#e6d4f6;color:#42215e;font-size:11px;line-height:1.6;overflow:hidden}
@@ -454,6 +453,9 @@ body:has(#chat[style*="display: block"]) #layout{
   pointer-events:none!important;
  }
 }
+
+/* حذف صفحه خوش‌آمدگویی خالی؛ نمایش مستقیم پیام‌های اتاق */
+#messages .empty-public-chat{display:none!important}
 </style>
 </head>
 <body>
@@ -797,8 +799,7 @@ window.changeDisplayName=async function(){
   await updateDoc(doc(db,"users",me.uid),{displayName:nextName});
   myDisplayName=nextName;
   $("welcome").textContent="خوش آمدی "+myDisplayName+" عزیز ❤️";
-  renderUsers();
-  alert("نام نمایشی با موفقیت ذخیره شد. نام ورود و رمز عبور شما هیچ تغییری نکرد.");
+  renderUsers();  alert("نام نمایشی با موفقیت ذخیره شد. نام ورود و رمز عبور شما هیچ تغییری نکرد.");
  }catch(e){alert("تغییر نام نمایشی انجام نشد: "+(e.message||"خطای نامشخص"));}
 };
 
@@ -1197,8 +1198,7 @@ window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیل
 window.showProfile=function(u){
  selectedProfile=u;
  const profilePhoto=$("profileCardPhoto");
- const fallbackPhoto="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100" fill="white">👤</text></svg>');
- const botPhoto=botAvatarPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100">👩‍🦰</text></svg>');
+ const fallbackPhoto="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100" fill="white">👤</text></svg>'); const botPhoto=botAvatarPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100">👩‍🦰</text></svg>');
  const savedPhoto=u.bot?botPhoto:(u.photo||(u.uid===me?.uid?(myPhoto||$("myPhoto")?.src||$("headerMyPhoto")?.src):"")||fallbackPhoto);
  profilePhoto.style.cssText="display:block!important;visibility:visible!important;opacity:1!important;width:110px!important;height:110px!important;min-width:110px;min-height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff;background:#70418c";
  profilePhoto.onerror=()=>{profilePhoto.onerror=null;profilePhoto.src=fallbackPhoto;};
@@ -1597,7 +1597,6 @@ function listenMessages(){
    $("messages").textContent="خطا در دریافت پیام‌ها: "+e.message;
   });
 }
-
 async function openMessageSenderProfile(message){
  const uid=message.senderUid||"";
  const senderName=String(message.senderName||"").replace(/^@+/,"").trim();
