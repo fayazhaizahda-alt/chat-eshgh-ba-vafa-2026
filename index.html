@@ -1109,15 +1109,31 @@ function renderUsers(){
   const status=document.createElement("span");
   status.className="user-presence-status";
   status.textContent=isOwner?"👑":(online?"● آنلاین":"● آفلاین");
-  status.style.setProperty("display","block","important");
-  status.style.setProperty("order","2","important");
-  status.style.setProperty("width","100%","important");
-  status.style.setProperty("height","12px","important");
-  status.style.setProperty("line-height","12px","important");
-  status.style.setProperty("font-size",isOwner?"12px":"8px","important");
-  status.style.setProperty("font-weight","bold","important");
-  status.style.setProperty("text-align","center","important");
-  status.style.setProperty("color",isOwner?(online?"#FFD700":"#111111"):(online?"#35ef8b":"#c5c1ce"),"important");
+  if(isOwner){
+   status.style.setProperty("display","block","important");
+   status.style.setProperty("position","absolute","important");
+   status.style.setProperty("left","calc(50% + 19px)","important");
+   status.style.setProperty("top","29px","important");
+   status.style.setProperty("width","15px","important");
+   status.style.setProperty("height","15px","important");
+   status.style.setProperty("line-height","15px","important");
+   status.style.setProperty("font-size","13px","important");
+   status.style.setProperty("font-weight","bold","important");
+   status.style.setProperty("text-align","center","important");
+   status.style.setProperty("z-index","5","important");
+   status.style.setProperty("color",online?"#FFD700":"#111111","important");
+   btn.style.setProperty("position","relative","important");
+  }else{
+   status.style.setProperty("display","block","important");
+   status.style.setProperty("order","2","important");
+   status.style.setProperty("width","100%","important");
+   status.style.setProperty("height","12px","important");
+   status.style.setProperty("line-height","12px","important");
+   status.style.setProperty("font-size","8px","important");
+   status.style.setProperty("font-weight","bold","important");
+   status.style.setProperty("text-align","center","important");
+   status.style.setProperty("color",online?"#35ef8b":"#c5c1ce","important");
+  }
   status.setAttribute("aria-label",isOwner?(online?"مدیر اصلی آنلاین":"مدیر اصلی آفلاین"):(online?"آنلاین":"آفلاین"));
   if(isOwner){
    status.title=online?"مدیر اصلی آنلاین":"مدیر اصلی آفلاین";
