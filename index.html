@@ -658,9 +658,11 @@ async function enterGuestChat(user){
   if(saved.exists()){
    const profile=saved.data();
    if(profile.banned===true){await signOut(auth);me=null;return;}
-   if(profile.name||profile.displayName){
-    myName=profile.name||profile.displayName;
-    myDisplayName=profile.displayName||myName;
+   if(profile.name||profile.displayName||profile.username){
+    // نام و عکس مهمان را از پروفایل ذخیره‌شده خودش بازیابی کن.
+    myName=String(profile.name||profile.displayName||profile.username||"مهمان").trim();
+    myDisplayName=String(profile.displayName||profile.name||profile.username||myName).trim();
+    myPhoto=profile.photo||"";
     activateGuestChat();
     return;
    }
@@ -681,6 +683,9 @@ async function activateGuestChat(){
  $("login").style.display="none";
  $("chat").style.display="block";
  $("poetryQuickSections").style.display="none";
+ // همیشه نام خود مهمان را بالای پروفایل و در فهرست کاربران نشان بده.
+ myName=String(myName||myDisplayName||"مهمان").trim();
+ myDisplayName=String(myDisplayName||myName||"مهمان").trim();
  $("welcome").textContent="خوش آمدی "+myDisplayName+" عزیز ❤️";
  $("myRoleBadge").textContent="مهمان بدون ثبت‌نام";
  $("myPhoto").src=myPhoto||"";
@@ -1171,7 +1176,8 @@ function renderUsers(){
   const mySavedProfile=allUsers.find(u=>u.uid===me.uid);
   const currentMyPhoto=(mySavedProfile&&typeof mySavedProfile.photo==="string"&&mySavedProfile.photo)?mySavedProfile.photo:myPhoto;
   if(currentMyPhoto)myPhoto=currentMyPhoto;
-  profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:currentMyPhoto||"",role:myRole||"user",lastSeen:now,self:true});
+  const ownDisplayName=String(myDisplayName||myName||"مهمان").trim()||"مهمان";
+  profiles.push({uid:me.uid,name:myName||ownDisplayName,displayName:ownDisplayName,photo:currentMyPhoto||"",role:myRole||"user",lastSeen:now,self:true});
  }
  profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",photo:botAvatarPhoto,bot:true,lastSeen:now});
  // تا ۳۰ ثانیه پس از آخرین ضربان آنلاین؛ ۲۰ ثانیه بعد از آفلاین شدن هم نشان بده و سپس پنهان کن.
