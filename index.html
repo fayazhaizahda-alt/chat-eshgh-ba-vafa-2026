@@ -397,8 +397,7 @@ body:has(#chat[style*="display: block"]) #layout{
 }
 
 #replyPreview{display:none;align-items:center;gap:8px;margin:8px 8px 0;padding:9px 12px;border-right:4px solid #d58aff;border-radius:10px;background:#2b174b;color:#fff;min-width:0}
-#replyPreview .reply-preview-copy{flex:1;min-width:0;overflow:hidden}#replyPreview strong{display:block;font-size:12px;color:#e8c5ff}#replyPreview span{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}#replyPreview button{border:0;background:transparent;color:#fff;font-size:20px;padding:2px 7px}
-.message-reply-quote{display:block;max-width:100%;padding:6px 9px;margin-bottom:3px;border-right:3px solid #a65cff;border-radius:8px;background:#e6d4f6;color:#42215e;font-size:11px;line-height:1.6;overflow:hidden}
+#replyPreview .reply-preview-copy{flex:1;min-width:0;overflow:hidden}#replyPreview strong{display:block;font-size:12px;color:#e8c5ff}#replyPreview span{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}#replyPreview button{border:0;background:transparent;color:#fff;font-size:20px;padding:2px 7px}.message-reply-quote{display:block;max-width:100%;padding:6px 9px;margin-bottom:3px;border-right:3px solid #a65cff;border-radius:8px;background:#e6d4f6;color:#42215e;font-size:11px;line-height:1.6;overflow:hidden}
 .message-reply-quote strong{display:block;color:#6e2aa1}
 .message-reply-button{align-self:flex-start;border:0!important;background:transparent!important;color:#f0d7ff!important;padding:2px 6px!important;font-size:11px!important}
 .msg.mine .message-reply-button{align-self:flex-end}
@@ -452,9 +451,13 @@ body:has(#chat[style*="display: block"]) #layout{
  }
 }
 
-/* فقط نوشته خوش‌آمدگویی حذف شود؛ جای پیام‌ها باقی بماند تا کادر تایپ پایین صفحه بماند */
-#messages{display:flex!important}
+/* حذف صفحه خالی آغاز چت؛ پیام‌ها هنگام وجود پیام دیده می‌شوند و کادر تایپ پایین می‌ماند */
+#chatPanel{display:flex!important;flex-direction:column!important}
+#chatPanel #roomTitle{display:none!important}
+#messages:not(:has(.msg)){display:none!important}
+#messages:has(.msg){display:flex!important;flex:1 1 auto!important}
 #messages .empty-public-chat{display:none!important}
+#chatPanel #sendArea{margin-top:auto!important;flex:0 0 auto!important}
 </style>
 </head>
 <body>
@@ -797,8 +800,7 @@ window.changeDisplayName=async function(){
  try{
   await updateDoc(doc(db,"users",me.uid),{displayName:nextName});
   myDisplayName=nextName;  $("welcome").textContent="خوش آمدی "+myDisplayName+" عزیز ❤️";  renderUsers();  alert("نام نمایشی با موفقیت ذخیره شد. نام ورود و رمز عبور شما هیچ تغییری نکرد.");
- }catch(e){alert("تغییر نام نمایشی انجام نشد: "+(e.message||"خطای نامشخص"));}
-};
+ }catch(e){alert("تغییر نام نمایشی انجام نشد: "+(e.message||"خطای نامشخص"));}};
 
 window.changePassword=function(){
  if(!me){alert("ابتدا وارد چت شوید.");return;}
@@ -1197,8 +1199,7 @@ window.showProfile=function(u){
  const profilePhoto=$("profileCardPhoto"); const fallbackPhoto="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100" fill="white">👤</text></svg>'); const botPhoto=botAvatarPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><circle cx="80" cy="80" r="80" fill="#70418c"/><text x="80" y="112" text-anchor="middle" font-size="100">👩‍🦰</text></svg>');
  const savedPhoto=u.bot?botPhoto:(u.photo||(u.uid===me?.uid?(myPhoto||$("myPhoto")?.src||$("headerMyPhoto")?.src):"")||fallbackPhoto); profilePhoto.style.cssText="display:block!important;visibility:visible!important;opacity:1!important;width:110px!important;height:110px!important;min-width:110px;min-height:110px;border-radius:50%;object-fit:cover;border:2px solid #b7d5ff;background:#70418c";
  profilePhoto.onerror=()=>{profilePhoto.onerror=null;profilePhoto.src=fallbackPhoto;};
- profilePhoto.src=savedPhoto;
- $("profileCardName").textContent=u.bot?"👩‍🦰 هیله":(u.displayName||u.name||"کاربر");
+ profilePhoto.src=savedPhoto; $("profileCardName").textContent=u.bot?"👩‍🦰 هیله":(u.displayName||u.name||"کاربر");
  $("profileCardUsername").textContent=u.bot?"نام کاربری: @HEYLE":"نام ثبت‌نامی: "+(u.name||"user");
  $("profileCardRole").textContent=u.bot?"رتبه حساب: ربات رسمی":"رتبه این حساب: "+roleLabel(u.uid===OWNER_UID?"owner":(u.role||"user"));
  const online=!!u.bot||(u.lastSeen&&Date.now()-u.lastSeen<65000);
@@ -1597,8 +1598,7 @@ async function openMessageSenderProfile(message){ const uid=message.senderUid||"
  let account=(allUsers||[]).find(u=>uid&&u.uid===uid)||null; try{
   if(!account&&uid){
    const snap=await getDoc(doc(db,"users",uid));
-   if(snap.exists())account={uid:snap.id,...snap.data()};
-  }
+   if(snap.exists())account={uid:snap.id,...snap.data()};  }
   if(!account&&senderName){
    let snap=await getDocs(query(collection(db,"users"),where("displayName","==",senderName)));
    if(snap.empty)snap=await getDocs(query(collection(db,"users"),where("name","==",senderName)));
