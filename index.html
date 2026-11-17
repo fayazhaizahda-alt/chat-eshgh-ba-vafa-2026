@@ -395,6 +395,16 @@ body:has(#chat[style*="display: block"]) #chat{
 body:has(#chat[style*="display: block"]) #layout{
  width:100%!important;height:100%!important;min-height:0!important;
 }
+
+#replyPreview{display:none;align-items:center;gap:8px;margin:8px 8px 0;padding:9px 12px;border-right:4px solid #d58aff;border-radius:10px;background:#2b174b;color:#fff;min-width:0}
+#replyPreview .reply-preview-copy{flex:1;min-width:0;overflow:hidden}
+#replyPreview strong{display:block;font-size:12px;color:#e8c5ff}
+#replyPreview span{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}
+#replyPreview button{border:0;background:transparent;color:#fff;font-size:20px;padding:2px 7px}
+.message-reply-quote{display:block;max-width:100%;padding:6px 9px;margin-bottom:3px;border-right:3px solid #a65cff;border-radius:8px;background:#e6d4f6;color:#42215e;font-size:11px;line-height:1.6;overflow:hidden}
+.message-reply-quote strong{display:block;color:#6e2aa1}
+.message-reply-button{align-self:flex-start;border:0!important;background:transparent!important;color:#f0d7ff!important;padding:2px 6px!important;font-size:11px!important}
+.msg.mine .message-reply-button{align-self:flex-end}
 </style>
 </head>
 <body>
@@ -434,6 +444,7 @@ body:has(#chat[style*="display: block"]) #layout{
 <button type="button" onclick="addEmoji('❤️')">❤️</button><button type="button" onclick="addEmoji('😍')">😍</button><button type="button" onclick="addEmoji('😘')">😘</button><button type="button" onclick="addEmoji('🌹')">🌹</button><button type="button" onclick="addEmoji('🥰')">🥰</button><button type="button" onclick="addEmoji('😂')">😂</button><button type="button" onclick="addEmoji('😭')">😭</button><button type="button" onclick="addEmoji('💔')">💔</button><button type="button" onclick="addEmoji('💕')">💕</button><button type="button" onclick="addEmoji('🌸')">🌸</button><button type="button" onclick="addEmoji('👍')">👍</button><button type="button" onclick="addEmoji('🙏')">🙏</button>
 </div>
 <p id="messageSendStatus" class="small" role="status" style="min-height:20px;margin:4px 8px;text-align:center"></p>
+<div id="replyPreview" aria-live="polite"><div class="reply-preview-copy"><strong id="replyPreviewName"></strong><span id="replyPreviewText"></span></div><button type="button" onclick="cancelReply()" aria-label="لغو پاسخ">×</button></div>
 <div id="sendArea">
 <button type="button" onclick="toggleChatEmoji()" aria-label="شکلک">☺️</button>
 <button type="button" onclick="document.getElementById('chatPhotoInput').click()" aria-label="فرستادن عکس">📎</button>
@@ -1514,6 +1525,18 @@ async function openMessageSenderProfile(message){
  window.showProfile(account);
 }
 
+let selectedReplyMessage=null;
+window.cancelReply=function(){selectedReplyMessage=null;const p=$("replyPreview");if(p)p.style.display="none";};
+window.startReply=function(message){
+ if(!message||!message.id)return;
+ selectedReplyMessage=message;
+ const preview=$("replyPreview");
+ $("replyPreviewName").textContent="پاسخ به "+(message.senderName||"کاربر");
+ $("replyPreviewText").textContent=String(message.text|| (message.image?"📷 عکس":"پیام")).slice(0,180);
+ preview.style.display="flex";
+ $("message").focus();
+};
+
 function renderMessages(arr){
  // آخرین نسخه عمومی عکس هیله را از پیام‌های عمومی دریافت کن.
  const avatarUpdates=arr.filter(m=>m.botAvatarUpdate===true && typeof m.botAvatar==="string" && m.botAvatar.length>0);
@@ -1555,6 +1578,16 @@ function renderMessages(arr){
    name.onclick=()=>openMessageSenderProfile(m);
   }
 
+  if(m.replyToMessageId){
+   const quote=document.createElement("div");
+   quote.className="message-reply-quote";
+   const quoteName=document.createElement("strong");
+   quoteName.textContent="↪ "+(m.replyToName||"پاسخ به پیام");
+   const quoteText=document.createElement("span");
+   quoteText.textContent=String(m.replyToText||"پیام").slice(0,180);
+   quote.append(quoteName,quoteText);
+   content.append(quote);
+  }
   const body=document.createElement("span");
   body.className="message-body";
   body.textContent=m.text;
@@ -1579,6 +1612,12 @@ function renderMessages(arr){
   content.className="message-content";
   content.append(name,body);
   if(m.image){const photo=document.createElement('img');photo.src=m.image;photo.alt='عکس فرستاده‌شده';photo.style.cssText='display:block;max-width:min(100%,360px);max-height:320px;object-fit:contain;border-radius:14px;margin-top:8px;cursor:zoom-in';photo.onclick=()=>window.open(photo.src,'_blank');content.append(photo);}
+  const replyButton=document.createElement("button");
+  replyButton.type="button";
+  replyButton.className="message-reply-button";
+  replyButton.textContent="↩ پاسخ";
+  replyButton.onclick=()=>window.startReply(m);
+  content.append(replyButton);
   div.append(content);
   if(me?.uid===OWNER_UID){
    const del=document.createElement("button");
@@ -1602,8 +1641,15 @@ window.sendMessage=async function(){
  if(status)status.textContent="در حال فرستادن پیام...";
  try{
   const data={senderUid:me.uid,senderName:myDisplayName||myName,senderPhoto:myPhoto||"",text:textValue,createdAt:serverTimestamp(),type:"public"};
+  if(selectedReplyMessage){
+   data.replyToMessageId=selectedReplyMessage.id;
+   data.replyToName=String(selectedReplyMessage.senderName||"کاربر");
+   data.replyToText=String(selectedReplyMessage.text||(selectedReplyMessage.image?"📷 عکس":"پیام")).slice(0,180);
+   data.replyToSenderUid=selectedReplyMessage.senderUid||"";
+  }
   await addDoc(collection(db,"messages"),data);
   input.value="";
+  window.cancelReply();
   // پاسخ‌های سفارشی مالک و پاسخ پیش‌فرض سلام
   const botReply=getBotReply(textValue);
   if(botReply)await sendBotMessage(botReply);
