@@ -438,6 +438,22 @@ body:has(#chat[style*="display: block"]) #layout{
  #sendArea textarea{font-size:17px!important}
 }
 
+/* تاج مالک: چسبیده به گوشه راست و بالای عکس پروفایل */
+@media(max-width:760px){
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList .user .owner-crown{
+  position:absolute!important;
+  right:calc(50% - 30px)!important;
+  left:auto!important;
+  top:25px!important;
+  z-index:20!important;
+  display:block!important;
+  width:15px!important;
+  height:15px!important;
+  line-height:15px!important;
+  font-size:13px!important;
+  pointer-events:none!important;
+ }
+}
 </style>
 </head>
 <body>
@@ -1110,10 +1126,12 @@ function renderUsers(){
   status.className="user-presence-status";
   status.textContent=isOwner?"👑":(online?"● آنلاین":"● آفلاین");
   if(isOwner){
+   status.classList.add("owner-crown");
    status.style.setProperty("display","block","important");
    status.style.setProperty("position","absolute","important");
-   status.style.setProperty("left","calc(50% + 19px)","important");
-   status.style.setProperty("top","29px","important");
+   status.style.setProperty("right","calc(50% - 30px)","important");
+   status.style.setProperty("left","auto","important");
+   status.style.setProperty("top","25px","important");
    status.style.setProperty("width","15px","important");
    status.style.setProperty("height","15px","important");
    status.style.setProperty("line-height","15px","important");
@@ -1123,6 +1141,7 @@ function renderUsers(){
    status.style.setProperty("z-index","5","important");
    status.style.setProperty("color",online?"#FFD700":"#111111","important");
    btn.style.setProperty("position","relative","important");
+   btn.style.setProperty("overflow","visible","important");
   }else{
    status.style.setProperty("display","block","important");
    status.style.setProperty("order","2","important");
