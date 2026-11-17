@@ -1105,33 +1105,24 @@ function renderUsers(){
   }
   img.onerror=()=>{img.onerror=null;img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
   const online=!!(u.self||u.bot||(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen)));
+  const isOwner=u.uid===OWNER_UID;
   const status=document.createElement("span");
   status.className="user-presence-status";
-  status.textContent=online?"● آنلاین":"● آفلاین";
+  status.textContent=isOwner?"👑":(online?"● آنلاین":"● آفلاین");
   status.style.setProperty("display","block","important");
   status.style.setProperty("order","2","important");
   status.style.setProperty("width","100%","important");
   status.style.setProperty("height","12px","important");
   status.style.setProperty("line-height","12px","important");
-  status.style.setProperty("font-size","8px","important");
+  status.style.setProperty("font-size",isOwner?"12px":"8px","important");
   status.style.setProperty("font-weight","bold","important");
   status.style.setProperty("text-align","center","important");
-  status.style.setProperty("color",online?"#35ef8b":"#c5c1ce","important");
-  status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
-  if(u.uid===OWNER_UID){
-   const avatarRow=document.createElement("span");
-   avatarRow.style.cssText="display:flex;align-items:center;justify-content:center;gap:3px;order:1;width:100%;height:44px";
-   img.style.setProperty("order","0","important");
-   const crown=document.createElement("span");
-   crown.textContent="👑";
-   crown.title="مدیر اصلی";
-   crown.setAttribute("aria-label","تاج مدیر اصلی");
-   crown.style.cssText="display:inline-block;font-size:14px;line-height:1";
-   avatarRow.append(img,crown);
-   btn.append(info,avatarRow,status);
-  }else{
-   btn.append(info,img,status);
+  status.style.setProperty("color",isOwner?(online?"#FFD700":"#111111"):(online?"#35ef8b":"#c5c1ce"),"important");
+  status.setAttribute("aria-label",isOwner?(online?"مدیر اصلی آنلاین":"مدیر اصلی آفلاین"):(online?"آنلاین":"آفلاین"));
+  if(isOwner){
+   status.title=online?"مدیر اصلی آنلاین":"مدیر اصلی آفلاین";
   }
+  btn.append(info,img,status);
   btn.setAttribute("aria-label",(u.displayName||u.name||"کاربر")+"، "+(online?"آنلاین":"آفلاین"));
   btn.onclick=()=>window.showProfile(u);
   list.append(btn);
