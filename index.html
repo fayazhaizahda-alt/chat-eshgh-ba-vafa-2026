@@ -1209,9 +1209,18 @@ window.showProfile=function(u){
  const online=!!u.bot||(u.lastSeen&&Date.now()-u.lastSeen<65000);
  $("profileCardStatus").textContent=u.bot?"🟢 هیله همیشه آنلاین است":(online?"🟢 این حساب موجود است — آنلاین":"🟠 این حساب موجود است — آفلاین")+(u.banned?" · 🚫 مسدود":"");
  const onlineDot=$("profileOnlineDot");
- onlineDot.style.background=online?"#22c55e":"#f59e0b";
- onlineDot.title=online?"آنلاین":"آفلاین";
- onlineDot.setAttribute("aria-label",online?"آنلاین":"آفلاین");
+ if(u.uid===OWNER_UID){
+  // نشان زرد وضعیت در پروفایل مالک با تاج مدیر اصلی جایگزین می‌شود.
+  onlineDot.textContent="👑";
+  onlineDot.style.cssText="position:absolute;right:-7px;bottom:-7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:25px;line-height:1;background:transparent;border:0;box-sizing:border-box";
+  onlineDot.title="مدیر اصلی";
+  onlineDot.setAttribute("aria-label","مدیر اصلی");
+ }else{
+  onlineDot.textContent="";
+  onlineDot.style.cssText="position:absolute;right:5px;bottom:5px;width:19px;height:19px;border-radius:50%;border:3px solid #211b32;background:"+(online?"#22c55e":"#f59e0b")+";box-sizing:border-box";
+  onlineDot.title=online?"آنلاین":"آفلاین";
+  onlineDot.setAttribute("aria-label",online?"آنلاین":"آفلاین");
+ }
  const isSelf=u.uid===me?.uid;
  $("selfProfileControls").style.display=isSelf?"block":"none";
  const otherControls=$("otherProfileControls");
