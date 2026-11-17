@@ -619,6 +619,7 @@ let myRole="user";
 let myName="";let myDisplayName="";
 let myPhoto="";
 let usersUnsub=null;
+let presenceUiTimer=null;
 let messagesUnsub=null;
 let heartbeat=null;
 let allUsers=[];
@@ -678,6 +679,19 @@ async function restoreSavedSession(user){
   console.error("Session restore failed:",e);
  }
 }
+// هنگام پنهان شدن یا بسته شدن صفحه، حضور را فوراً آفلاین ثبت کن؛ هنگام برگشت دوباره آنلاین شو.
+document.addEventListener("visibilitychange",()=>{
+ if(!me)return;
+ const stamp=document.visibilityState==="hidden"?0:Date.now();
+ updateDoc(doc(db,"users",me.uid),{lastSeen:stamp}).catch(()=>{});
+});
+window.addEventListener("pagehide",()=>{
+ if(me)updateDoc(doc(db,"users",me.uid),{lastSeen:0}).catch(()=>{});
+});
+window.addEventListener("pageshow",()=>{
+ if(me)updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()}).catch(()=>{});
+});
+
 onAuthStateChanged(auth,user=>{
  if(user&&!loginInProgress&&!me)restoreSavedSession(user);
 });
@@ -967,6 +981,8 @@ window.enterChat=async function(){
 
 function startUsers(){
  if(usersUnsub)usersUnsub();
+ if(presenceUiTimer)clearInterval(presenceUiTimer);
+ presenceUiTimer=setInterval(()=>{if(me)renderUsers();},1000);
  // فهرست را پیش از رسیدن پاسخ Firebase نیز با پروفایل خود کاربر و هیله نمایش بده.
  renderUsers();
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
@@ -1055,17 +1071,16 @@ function renderUsers(){
   profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:currentMyPhoto||"",role:myRole||"user",lastSeen:now,self:true});
  }
  profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",photo:botAvatarPhoto,bot:true,lastSeen:now});
- // فقط کسانی را نشان بده که اکنون در اتاق حضور دارند؛ ترتیب ورود جدیدترها بالاتر است.
- const isOnline=u=>!!(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen));
- const otherUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.uid!=="CHAT_BOT"&&isOnline(u));
+ // تا ۳۰ ثانیه پس از آخرین ضربان آنلاین؛ ۲۰ ثانیه بعد از آفلاین شدن هم نشان بده و سپس پنهان کن.
+ const ageOf=u=>now-Number(u.lastSeen||0);
+ const isOnline=u=>!!(u.lastSeen&&ageOf(u)>=0&&ageOf(u)<30000);
+ const otherUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.uid!=="CHAT_BOT"&&u.lastSeen&&ageOf(u)>=0&&ageOf(u)<=50000);
  otherUsers.sort((a,b)=>{
-  const timeA=Number(a.lastSeen)||0,timeB=Number(b.lastSeen)||0;
-  if(timeA!==timeB)return timeB-timeA;
-  const roleA=a.uid===OWNER_UID?0:1;
-  const roleB=b.uid===OWNER_UID?0:1;
-  return roleA-roleB||String(a.displayName||a.name||"").localeCompare(String(b.displayName||b.name||""),"fa");
+  const onlineA=isOnline(a)?0:1,onlineB=isOnline(b)?0:1;
+  if(onlineA!==onlineB)return onlineA-onlineB;
+  return (Number(b.lastSeen)||0)-(Number(a.lastSeen)||0);
  });
- // جایگاه ثابت: پروفایل خود کاربر، سپس هیله، بعد همه کاربران حاضر در اتاق.
+ // جایگاه ثابت: پروفایل خود کاربر، سپس هیله، بعد آنلاین‌ها و در پایان آفلاین‌های تازه.
  profiles.push(...otherUsers);
  profiles.forEach(u=>{
   const btn=document.createElement("button");
@@ -1121,7 +1136,7 @@ function renderUsers(){
    img.src=selfPhoto||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');
   }
   img.onerror=()=>{img.onerror=null;img.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#8b68ad"/><text x="50" y="68" text-anchor="middle" font-size="54" fill="white">👤</text></svg>');};
-  const online=!!(u.self||u.bot||(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen)));
+  const online=!!(u.self||u.bot||(u.lastSeen&&now-Number(u.lastSeen)<30000&&now>=Number(u.lastSeen)));
   const isOwner=u.uid===OWNER_UID;
   const status=document.createElement("span");
   status.className="user-presence-status";
@@ -1134,7 +1149,7 @@ function renderUsers(){
   status.style.setProperty("font-size","8px","important");
   status.style.setProperty("font-weight","bold","important");
   status.style.setProperty("text-align","center","important");
-  status.style.setProperty("color",online?"#35ef8b":"#c5c1ce","important");
+  status.style.setProperty("color",online?"#35ef8b":"#111111","important");
   status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
   if(isOwner){
    const crown=document.createElement("span");
@@ -1847,6 +1862,8 @@ window.addEmoji=function(emoji){
 };
 
 window.exitChat=async function(){
+ if(presenceUiTimer)clearInterval(presenceUiTimer);
+ presenceUiTimer=null;
  if(heartbeat)clearInterval(heartbeat);
  heartbeat=null;
  stopMessages();
