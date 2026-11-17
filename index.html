@@ -1578,16 +1578,6 @@ function renderMessages(arr){
    name.onclick=()=>openMessageSenderProfile(m);
   }
 
-  if(m.replyToMessageId){
-   const quote=document.createElement("div");
-   quote.className="message-reply-quote";
-   const quoteName=document.createElement("strong");
-   quoteName.textContent="↪ "+(m.replyToName||"پاسخ به پیام");
-   const quoteText=document.createElement("span");
-   quoteText.textContent=String(m.replyToText||"پیام").slice(0,180);
-   quote.append(quoteName,quoteText);
-   content.append(quote);
-  }
   const body=document.createElement("span");
   body.className="message-body";
   body.textContent=m.text;
@@ -1610,7 +1600,18 @@ function renderMessages(arr){
   div.append(avatar);
   const content=document.createElement("div");
   content.className="message-content";
-  content.append(name,body);
+  content.append(name);
+  if(m.replyToMessageId){
+   const quote=document.createElement("div");
+   quote.className="message-reply-quote";
+   const quoteName=document.createElement("strong");
+   quoteName.textContent="↪ "+(m.replyToName||"پاسخ به پیام");
+   const quoteText=document.createElement("span");
+   quoteText.textContent=String(m.replyToText||"پیام").slice(0,180);
+   quote.append(quoteName,quoteText);
+   content.append(quote);
+  }
+  content.append(body);
   if(m.image){const photo=document.createElement('img');photo.src=m.image;photo.alt='عکس فرستاده‌شده';photo.style.cssText='display:block;max-width:min(100%,360px);max-height:320px;object-fit:contain;border-radius:14px;margin-top:8px;cursor:zoom-in';photo.onclick=()=>window.open(photo.src,'_blank');content.append(photo);}
   const replyButton=document.createElement("button");
   replyButton.type="button";
