@@ -588,7 +588,7 @@ from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
 import {
  getAuth,createUserWithEmailAndPassword,
- signInWithEmailAndPassword,signOut,onAuthStateChanged,
+ signInWithEmailAndPassword,signInAnonymously,signOut,onAuthStateChanged,
  EmailAuthProvider,reauthenticateWithCredential,updateEmail,updatePassword,
  setPersistence,browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
@@ -630,6 +630,28 @@ let moderationUnsub=null;
 const botProcessed=new Set();
 // تنها اتاق فعال برنامه، گفت‌وگوی عمومی است.
 let loginInProgress=false;
+let anonymousSignInInProgress=false;
+
+// ورود مهمان بدون ثبت‌نام؛ این حساب فقط برای مجوز امن Firebase استفاده می‌شود.
+function enterGuestChat(user){
+ if(!user || !user.isAnonymous || me)return;
+ me=user;
+ myRole="user";
+ myName="مهمان";
+ myDisplayName="مهمان-"+user.uid.slice(-4);
+ myPhoto="";
+ $("login").style.display="none";
+ $("chat").style.display="block";
+ $("poetryQuickSections").style.display="none";
+ $("welcome").textContent="خوش آمدی مهمان عزیز ❤️";
+ $("myRoleBadge").textContent="مهمان بدون ثبت‌نام";
+ $("myPhoto").src="";
+ $("myUid").textContent="مهمان";
+ $("myProfilePanel").classList.remove("owner-profile");
+ applySavedChatBackground();
+ renderAdminPanel();
+ openPublic();
+}
 
 // با باز شدن دوباره صفحه، حساب کاربر از حافظه محلی Firebase بازیابی می‌شود.
 async function restoreSavedSession(user){
@@ -695,7 +717,22 @@ window.addEventListener("pageshow",()=>{
 });
 
 onAuthStateChanged(auth,user=>{
- if(user&&!loginInProgress&&!me)restoreSavedSession(user);
+ if(user?.isAnonymous){
+  if(!me)enterGuestChat(user);
+  return;
+ }
+ if(user&&!loginInProgress&&!me){
+  restoreSavedSession(user);
+  return;
+ }
+ if(!user&&!loginInProgress&&!anonymousSignInInProgress){
+  anonymousSignInInProgress=true;
+  signInAnonymously(auth).catch(error=>{
+   console.error("Anonymous sign-in failed:",error);
+   $("login").style.display="block";
+   $("error").textContent="ورود بدون ثبت‌نام فعال نیست. مدیر باید ورود Anonymous را در Firebase فعال کند. ("+(error.code||error.message)+")";
+  }).finally(()=>{anonymousSignInInProgress=false;});
+ }
 });
 
 // اگر صفحه از حافظهٔ مرورگر یا وب‌ویو بازگردانده شد، اتاق عمومی را دوباره فعال کن.
@@ -1645,7 +1682,7 @@ function renderMessages(arr){
  arr.forEach(m=>{
   if(m.botAvatarUpdate===true)return;
   const div=document.createElement("div");
-  div.className="msg"+(m.senderUid===me.uid&&!m.bot?" mine":"");
+  div.className="msg"+(m.senderUid===me?.uid&&!m.bot?" mine":"");
 
   const name=document.createElement("button");
   name.type="button";
@@ -1720,7 +1757,7 @@ window.sendMessage=async function(){
  const textValue=input.value.trim();
  const status=$("messageSendStatus");
  if(!textValue){if(status)status.textContent="اول پیام خود را بنویس.";return;}
- if(!me){if(status)status.textContent="حساب کاربری هنوز وارد نشده؛ دوباره وارد شو.";return;}
+ if(!me){if(status)status.textContent="اتصال مهمان هنوز آماده نیست؛ چند لحظه صبر کن.";return;}
  const sendButton=$("sendArea").querySelector('button:last-child');
  if(sendButton){sendButton.disabled=true;sendButton.textContent="...";
  }
