@@ -1184,26 +1184,13 @@ function renderUsers(){
 // پس از ورود، نمایش فهرست کاربران را بعد از تکمیل چیدمان صفحه نیز تازه‌سازی کن.
 function refreshUserSidebar(){
  const sidebar=$("profileSidebar"),users=$("users"),list=$("userList");
- // فهرست پروفایل‌ها در کنار راست چت، مستقل از تنظیمات و اندازه صفحه
- if(sidebar){
-  sidebar.style.setProperty("display","flex","important");
-  sidebar.style.setProperty("position","fixed","important");
-  sidebar.style.setProperty("z-index","9000","important");
-  sidebar.style.setProperty("top","90px","important");
-  sidebar.style.setProperty("right","8px","important");
-  sidebar.style.setProperty("bottom","8px","important");
-  sidebar.style.setProperty("left","auto","important");
-  sidebar.style.setProperty("width","104px","important");
-  sidebar.style.setProperty("max-width","30vw","important");
-  sidebar.style.setProperty("overflow-y","auto","important");
-  sidebar.style.setProperty("flex-direction","column","important");
- }
- if(users){users.style.setProperty("display","block","important");users.style.setProperty("visibility","visible","important");users.style.setProperty("opacity","1","important");}
- if(list){list.style.setProperty("display","flex","important");list.style.setProperty("flex-direction","column","important");list.style.setProperty("visibility","visible","important");list.style.setProperty("opacity","1","important");}
- try{renderUsers();}catch(e){console.error("نمایش فهرست کاربران:",e);}
- requestAnimationFrame(()=>{if(me)try{renderUsers();}catch(e){}});
- setTimeout(()=>{if(me)try{renderUsers();}catch(e){}},180);
- setTimeout(()=>{if(me)try{renderUsers();}catch(e){}},650);
+ if(sidebar)sidebar.style.setProperty("display","flex","important");
+ if(users){users.style.setProperty("display","block","important");users.style.setProperty("visibility","visible","important");}
+ if(list){list.style.setProperty("display","flex","important");list.style.setProperty("visibility","visible","important");}
+ renderUsers();
+ requestAnimationFrame(()=>{if(me)renderUsers();});
+ setTimeout(()=>{if(me)renderUsers();},180);
+ setTimeout(()=>{if(me)renderUsers();},650);
 }
 let selectedProfile=null;
 window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",role:"bot",bot:true,lastSeen:Date.now()});};
@@ -1559,11 +1546,9 @@ window.openPublic=function(){
  // هنگام ورود و بازگشت، همیشه خود اتاق عمومی را مستقیم نمایش بده.
 
  const sidebar=$("profileSidebar");
- const chat=$("chat");
- if(chat)chat.style.display="block";
- // ابتدا اتاق را آشکار کن، سپس فهرست پروفایل‌ها را با چیدمان قطعی نشان بده.
+ // فهرست پروفایل‌ها هنگام ورود به اتاق عمومی نباید مخفی شود.
+ if(sidebar)sidebar.style.setProperty("display","flex","important");
  if(typeof refreshUserSidebar==="function" && me)refreshUserSidebar();
- else if(sidebar)sidebar.style.setProperty("display","flex","important");
  const card=$("profileCard");
  if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
  if(typeof selectedProfile!=="undefined")selectedProfile=null;
