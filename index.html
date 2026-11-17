@@ -406,6 +406,26 @@ body:has(#chat[style*="display: block"]) #layout{
 .message-reply-button{align-self:flex-start;border:0!important;background:transparent!important;color:#f0d7ff!important;padding:2px 6px!important;font-size:11px!important}
 .msg.mine .message-reply-button{align-self:flex-end}
 
+/* فضای بزرگ‌تر برای تایپ پیام */
+#sendArea textarea{
+ min-height:82px!important;
+ height:82px;
+ max-height:190px!important;
+ padding:16px 18px!important;
+ font-size:18px!important;
+ line-height:1.8!important;
+}
+#sendArea button{min-height:64px!important}
+@media(max-width:760px){
+ #sendArea textarea{
+  min-height:78px!important;
+  height:78px;
+  max-height:180px!important;
+  padding:15px 14px!important;
+  font-size:18px!important;
+ }
+ #sendArea button{min-height:60px!important}
+}
 /* خوانایی بهتر نوشته‌های چت */
 #messages .message-body{font-size:18px!important;line-height:1.9!important}
 #messages .message-sender-link{font-size:14px!important}
