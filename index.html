@@ -790,7 +790,13 @@ onAuthStateChanged(auth,user=>{
   signInAnonymously(auth).catch(error=>{
    console.error("Anonymous sign-in failed:",error);
    $("guestNameModal").style.display="flex";
-   $("guestNameError").textContent="ورود مهمان برقرار نشد. اتصال اینترنت یا فعال بودن Anonymous در Firebase را بررسی کنید.";
+   const code=error?.code||"unknown";
+   let message="خطای ورود مهمان: "+code;
+   if(code==="auth/operation-not-allowed") message="ورود مهمان در Firebase فعال نیست. در Firebase > Authentication > Sign-in method، گزینه Anonymous را فعال کن.";
+   else if(code==="auth/unauthorized-domain") message="دامنه سایت در Firebase مجاز نیست. دامنه GitHub Pages را در Authentication > Settings > Authorized domains اضافه کن.";
+   else if(code==="auth/network-request-failed") message="اتصال اینترنت برقرار نیست یا دسترسی به سرور Firebase مسدود شده است.";
+   else if(code==="auth/invalid-api-key") message="کلید Firebase نادرست است؛ تنظیمات پروژه را بررسی می‌کنیم.";
+   $("guestNameError").textContent=message;
   }).finally(()=>{anonymousSignInInProgress=false;});
  }
 });
