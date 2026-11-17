@@ -645,6 +645,8 @@ async function restoreSavedSession(user){
   myDisplayName=profile.displayName||myName;
   myPhoto=profile.photo||"";
   myRole=user.uid===OWNER_UID?"owner":(profile.role||"user");
+  // هنگام بازیابی نشست نیز حضور کاربر را فوراً تازه کن تا برای دیگران نمایش داده شود.
+  try{await updateDoc(doc(db,"users",user.uid),{lastSeen:Date.now()});}catch(presenceError){console.warn("Presence refresh failed:",presenceError);}
   $("login").style.display="none";
   $("chat").style.display="block";
   $("poetryQuickSections").style.display="none";
@@ -1053,18 +1055,17 @@ function renderUsers(){
   profiles.push({uid:me.uid,name:myName||"من",displayName:myDisplayName||myName||"من",photo:currentMyPhoto||"",role:myRole||"user",lastSeen:now,self:true});
  }
  profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",photo:botAvatarPhoto,bot:true,lastSeen:now});
- // همه حساب‌های ثبت‌شده نمایش داده می‌شوند؛ کاربران آنلاین در بالای فهرست هستند.
- const otherUsers=allUsers.filter(u=>u.uid!==me?.uid);
- const roleOrder={owner:0,admin:1,manager:2,moderator:3,user:4};
+ // فقط کسانی را نشان بده که اکنون در اتاق حضور دارند؛ ترتیب ورود جدیدترها بالاتر است.
  const isOnline=u=>!!(u.lastSeen&&now-Number(u.lastSeen)<65000&&now>=Number(u.lastSeen));
+ const otherUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.uid!=="CHAT_BOT"&&isOnline(u));
  otherUsers.sort((a,b)=>{
-  const onlineA=isOnline(a)?0:1, onlineB=isOnline(b)?0:1;
-  if(onlineA!==onlineB)return onlineA-onlineB;
-  const roleA=a.uid===OWNER_UID?"owner":(a.role||"user");
-  const roleB=b.uid===OWNER_UID?"owner":(b.role||"user");
-  return (roleOrder[roleA]??4)-(roleOrder[roleB]??4)||
-   String(a.displayName||a.name||"").localeCompare(String(b.displayName||b.name||""),"fa");
+  const timeA=Number(a.lastSeen)||0,timeB=Number(b.lastSeen)||0;
+  if(timeA!==timeB)return timeB-timeA;
+  const roleA=a.uid===OWNER_UID?0:1;
+  const roleB=b.uid===OWNER_UID?0:1;
+  return roleA-roleB||String(a.displayName||a.name||"").localeCompare(String(b.displayName||b.name||""),"fa");
  });
+ // جایگاه ثابت: پروفایل خود کاربر، سپس هیله، بعد همه کاربران حاضر در اتاق.
  profiles.push(...otherUsers);
  profiles.forEach(u=>{
   const btn=document.createElement("button");
