@@ -463,7 +463,7 @@ body:has(#chat[style*="display: block"]) #layout{
 
 <main>
 
-<div class="panel" id="login">
+<div class="panel" id="login" style="display:none">
 <h3>خوش آمدید ❤️</h3>
 
 <button class="mode active" id="loginMode" onclick="setMode('login')">ورود</button>
@@ -482,7 +482,7 @@ body:has(#chat[style*="display: block"]) #layout{
 <p id="error" class="small"></p>
 </div>
 
-<div id="guestNameModal" style="display:none;position:fixed;inset:0;z-index:100010;background:#090018ed;align-items:center;justify-content:center;padding:18px">
+<div id="guestNameModal" style="display:flex;position:fixed;inset:0;z-index:100010;background:#090018ed;align-items:center;justify-content:center;padding:18px">
  <div style="width:100%;max-width:420px;padding:22px;border:2px solid #bb73ff;border-radius:22px;background:linear-gradient(145deg,#351364,#1c103b);color:#fff;text-align:center">
   <h3 style="margin:0 0 10px">🌹 به چت عشق با وفا خوش آمدی</h3>
   <p style="font-size:13px;line-height:1.8">برای ورود به گفت‌وگوی عمومی، نام دلخواهت را انتخاب کن.</p>
@@ -774,6 +774,9 @@ window.addEventListener("pageshow",()=>{
 });
 
 onAuthStateChanged(auth,user=>{
+ if(user && !user.isAnonymous){
+  $("guestNameModal").style.display="none";
+ }
  if(user?.isAnonymous){
   if(!me)enterGuestChat(user);
   return;
@@ -786,8 +789,8 @@ onAuthStateChanged(auth,user=>{
   anonymousSignInInProgress=true;
   signInAnonymously(auth).catch(error=>{
    console.error("Anonymous sign-in failed:",error);
-   $("login").style.display="block";
-   $("error").textContent="ورود بدون ثبت‌نام فعال نیست. مدیر باید ورود Anonymous را در Firebase فعال کند. ("+(error.code||error.message)+")";
+   $("guestNameModal").style.display="flex";
+   $("guestNameError").textContent="ورود مهمان برقرار نشد. اتصال اینترنت یا فعال بودن Anonymous در Firebase را بررسی کنید.";
   }).finally(()=>{anonymousSignInInProgress=false;});
  }
 });
