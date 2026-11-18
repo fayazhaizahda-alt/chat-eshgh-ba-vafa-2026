@@ -1166,43 +1166,48 @@ window.enterChat=async function(){
  $("enterBtn").disabled=false;
 };
 
-// ورود اولیه: عکس‌های پروفایل خود کاربر و هیله را مستقیماً از اسناد Firestore بارگذاری کن؛
- // برای نمایش عکس‌ها لازم نباشد کاربر صفحه تنظیمات را باز کند.
- async function loadInitialProfilePhotos(){
-  if(!me)return;
-  try{
-   const ownRef=doc(db,"users",me.uid);
-   const ownerRef=doc(db,"users",OWNER_UID);
-   const [ownSnap,ownerSnap]=await Promise.all([
-    getDoc(ownRef),
-    me.uid===OWNER_UID?getDoc(ownRef):getDoc(ownerRef)
-   ]);
-   if(ownSnap.exists()){
-    const own={uid:me.uid,...ownSnap.data()};
-    allUsers=[...allUsers.filter(u=>u.uid!==me.uid),{...allUsers.find(u=>u.uid===me.uid),...own}];
-    if(typeof own.photo==="string")myPhoto=own.photo;
-    if(own.displayName)myDisplayName=own.displayName;
-    if(own.name)myName=own.name;
-    const ownPhoto=$("myPhoto");
-    if(ownPhoto&&myPhoto)ownPhoto.src=myPhoto;
-    const headerPhoto=$("headerMyPhoto");
-    if(headerPhoto&&myPhoto)headerPhoto.src=myPhoto;
-   }
-   if(ownerSnap.exists()){
-    const owner=ownerSnap.data();
-    if(typeof owner.botAvatar==="string"&&owner.botAvatar)botAvatarPhoto=owner.botAvatar;
-    if(typeof owner.showOwnerProfileInList==="boolean")showOwnerProfileInList=owner.showOwnerProfileInList;
-   }
-   renderUsers();
-   if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
-  }catch(e){
-   console.warn("Initial profile photos load failed:",e);
+// عکس پروفایل را مستقل از بازشدن تنظیمات و پس از آماده‌شدن فهرست کاربران بازیابی کن.
+let initialProfilePhotosLoadedForUid="";
+async function loadInitialProfilePhotos(){
+ if(!me)return;
+ const uid=me.uid;
+ try{
+  const ownSnap=await getDoc(doc(db,"users",uid));
+  if(!me||me.uid!==uid)return;
+  if(ownSnap.exists()){
+   const ownData=ownSnap.data();
+   const own={uid,...ownData};
+   const index=allUsers.findIndex(u=>u.uid===uid);
+   if(index>=0)allUsers[index]={...allUsers[index],...own};
+   else allUsers.push(own);
+   if(typeof ownData.photo==="string")myPhoto=ownData.photo;
+   if(ownData.displayName)myDisplayName=ownData.displayName;
+   if(ownData.name)myName=ownData.name;
+   const ownPhoto=$("myPhoto");
+   if(ownPhoto&&myPhoto)ownPhoto.src=myPhoto;
+   const headerPhoto=$("headerMyPhoto");
+   if(headerPhoto&&myPhoto)headerPhoto.src=myPhoto;
   }
+ }catch(e){console.warn("Own profile photo load failed:",e);}
+ let ownerProfile=allUsers.find(u=>u.uid===OWNER_UID);
+ if(ownerProfile&&typeof ownerProfile.botAvatar==="string"&&ownerProfile.botAvatar){
+  botAvatarPhoto=ownerProfile.botAvatar;
+ }else{
+  try{
+   const ownerSnap=uid===OWNER_UID?await getDoc(doc(db,"users",uid)):await getDoc(doc(db,"users",OWNER_UID));
+   if(ownerSnap.exists()){
+    ownerProfile=ownerSnap.data();
+    if(typeof ownerProfile.botAvatar==="string"&&ownerProfile.botAvatar)botAvatarPhoto=ownerProfile.botAvatar;
+    if(typeof ownerProfile.showOwnerProfileInList==="boolean")showOwnerProfileInList=ownerProfile.showOwnerProfileInList;
+   }
+  }catch(e){console.warn("Bot profile photo load failed:",e);}
  }
+ if(!me||me.uid!==uid)return;
+ renderUsers();
+ if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
+}
 
 function startUsers(){
-  // عکس‌های ذخیره‌شده را همان ابتدای ورود دریافت کن، نه هنگام بازشدن تنظیمات.
-  loadInitialProfilePhotos();
  if(usersUnsub)usersUnsub();
  if(presenceUiTimer)clearInterval(presenceUiTimer);
  presenceUiTimer=setInterval(()=>{if(me)renderUsers();},1000);
@@ -1210,6 +1215,10 @@ function startUsers(){
  refreshUserSidebar();
  usersUnsub=onSnapshot(collection(db,"users"),snap=>{
   allUsers=snap.docs.map(d=>({uid:d.id,...d.data()}));
+  if(me&&initialProfilePhotosLoadedForUid!==me.uid){
+   initialProfilePhotosLoadedForUid=me.uid;
+   loadInitialProfilePhotos();
+  }
   const status=$("userListStatus");
   if(status && allUsers.filter(u=>u.uid!==me?.uid && u.uid!==OWNER_UID).length===0){
    status.textContent="هنوز کاربر دیگری وارد اتاق نشده است.";
