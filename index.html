@@ -1035,6 +1035,8 @@ window.enterChat=async function(){
   myName=name;
   const profileSnap=await getDoc(doc(db,"users",me.uid));
   const profileData=profileSnap.exists()?profileSnap.data():{};
+  // عکس را از خواندن نهایی پروفایل بگیر تا هنگام ورود، فهرست کاربران با عکس خالی ساخته نشود.
+  if(typeof profileData.photo==="string")myPhoto=profileData.photo;
   if(profileData.banned===true){
    await signOut(auth); me=null;
    throw new Error("این حساب به دلیل تخلف مسدود شده است. برای پیگیری با مالک برنامه تماس بگیرید.");
