@@ -512,6 +512,20 @@ body:has(#chat[style*="display: block"]) #layout{
 /* فقط حذف کادر دور فهرست پروفایل‌ها؛ خود فهرست و پس‌زمینه دست‌نخورده می‌ماند */
 #profileSidebar{border:0!important;outline:0!important;box-shadow:none!important;}
 </style>
+
+<style id="profile-sidebar-no-frame-final">
+/* حذف کامل قاب بیرونی پنل پروفایل؛ محتوا و چیدمان تغییر نکند */
+html body #profileSidebar,
+html body:has(#chat[style*="display: block"]) #profileSidebar{
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+html body #profileSidebar::before,
+html body #profileSidebar::after{content:none!important;display:none!important;border:0!important;outline:0!important;box-shadow:none!important;}
+</style>
 </head>
 <body>
 
