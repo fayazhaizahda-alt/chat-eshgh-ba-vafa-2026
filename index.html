@@ -462,11 +462,11 @@ body:has(#chat[style*="display: block"]) #layout{
 /* نمایش همیشگی فهرست پروفایل‌ها در اتاق چت موبایل؛ ستون پروفایل در سمت راست */
 @media(max-width:760px){
  body:has(#chat[style*="display: block"]) #layout{
-  direction:rtl!important;
+  direction:ltr!important;
   display:grid!important;
-  grid-template-columns:minmax(82px,26vw) minmax(0,1fr)!important;
+  grid-template-columns:minmax(0,1fr) minmax(82px,26vw)!important;
   grid-template-rows:minmax(0,1fr)!important;
-  grid-template-areas:"sidebar chat"!important;
+  grid-template-areas:"chat sidebar"!important;
   gap:4px!important;
  }
  body:has(#chat[style*="display: block"]) #profileSidebar{
