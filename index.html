@@ -1166,7 +1166,43 @@ window.enterChat=async function(){
  $("enterBtn").disabled=false;
 };
 
+// ورود اولیه: عکس‌های پروفایل خود کاربر و هیله را مستقیماً از اسناد Firestore بارگذاری کن؛
+ // برای نمایش عکس‌ها لازم نباشد کاربر صفحه تنظیمات را باز کند.
+ async function loadInitialProfilePhotos(){
+  if(!me)return;
+  try{
+   const ownRef=doc(db,"users",me.uid);
+   const ownerRef=doc(db,"users",OWNER_UID);
+   const [ownSnap,ownerSnap]=await Promise.all([
+    getDoc(ownRef),
+    me.uid===OWNER_UID?getDoc(ownRef):getDoc(ownerRef)
+   ]);
+   if(ownSnap.exists()){
+    const own={uid:me.uid,...ownSnap.data()};
+    allUsers=[...allUsers.filter(u=>u.uid!==me.uid),{...allUsers.find(u=>u.uid===me.uid),...own}];
+    if(typeof own.photo==="string")myPhoto=own.photo;
+    if(own.displayName)myDisplayName=own.displayName;
+    if(own.name)myName=own.name;
+    const ownPhoto=$("myPhoto");
+    if(ownPhoto&&myPhoto)ownPhoto.src=myPhoto;
+    const headerPhoto=$("headerMyPhoto");
+    if(headerPhoto&&myPhoto)headerPhoto.src=myPhoto;
+   }
+   if(ownerSnap.exists()){
+    const owner=ownerSnap.data();
+    if(typeof owner.botAvatar==="string"&&owner.botAvatar)botAvatarPhoto=owner.botAvatar;
+    if(typeof owner.showOwnerProfileInList==="boolean")showOwnerProfileInList=owner.showOwnerProfileInList;
+   }
+   renderUsers();
+   if(Array.isArray(window.__loveLastMessages))renderMessages(window.__loveLastMessages);
+  }catch(e){
+   console.warn("Initial profile photos load failed:",e);
+  }
+ }
+
 function startUsers(){
+  // عکس‌های ذخیره‌شده را همان ابتدای ورود دریافت کن، نه هنگام بازشدن تنظیمات.
+  loadInitialProfilePhotos();
  if(usersUnsub)usersUnsub();
  if(presenceUiTimer)clearInterval(presenceUiTimer);
  presenceUiTimer=setInterval(()=>{if(me)renderUsers();},1000);
