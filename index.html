@@ -697,10 +697,11 @@ async function activateGuestChat(){
    role:"user",lastSeen:Date.now(),isGuest:true
   },{merge:true});
  }catch(e){console.error("Guest profile save failed:",e);}
- startUsers();
  applySavedChatBackground();
  renderAdminPanel();
  openPublic();
+ // شنونده کاربران را پس از نمایش کامل اتاق آغاز کن تا اولین رندر پروفایل‌ها مخفی نماند.
+ startUsers();
  if(heartbeat)clearInterval(heartbeat);
  heartbeat=setInterval(async()=>{if(me)try{await updateDoc(doc(db,"users",me.uid),{lastSeen:Date.now()});}catch(e){}},20000);
  startBotModeration();
@@ -742,10 +743,11 @@ async function restoreSavedSession(user){
    $("myRoleBadge").textContent="رتبه حساب: "+roleLabel(myRole);
   $("myPhoto").src=myPhoto;
   $("myUid").textContent=me.uid;
-  startUsers();
    applySavedChatBackground();
   renderAdminPanel();
   openPublic();
+  // شنونده کاربران را پس از نمایش کامل اتاق آغاز کن تا اولین رندر پروفایل‌ها مخفی نماند.
+  startUsers();
   setTimeout(()=>{if(me)openPublic();},900);
   startBotModeration();
   try{
