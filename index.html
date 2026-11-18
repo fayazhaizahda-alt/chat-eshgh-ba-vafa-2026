@@ -1740,18 +1740,20 @@ function stopMessages(){
 }
 
 window.openPublic=function(){
- // هنگام ورود و بازگشت، همیشه خود اتاق عمومی را مستقیم نمایش بده.
+ // ابتدا صفحه چت را آشکار کن تا قواعد چیدمان موبایل فعال شوند.
+ $("chat").style.display="block";
+ $("login").style.display="none";
 
  const sidebar=$("profileSidebar");
- // فهرست پروفایل‌ها هنگام ورود به اتاق عمومی نباید مخفی شود.
+ // بعد از آشکار شدن چت، فهرست کاربران را نمایش و تازه‌سازی کن.
  if(sidebar)sidebar.style.setProperty("display","flex","important");
- if(typeof refreshUserSidebar==="function" && me)refreshUserSidebar();
  const card=$("profileCard");
  if(card){card.style.display="none";card.classList.remove("profile-self-modal");}
  if(typeof selectedProfile!=="undefined")selectedProfile=null;
  $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
- $("chat").style.display="block";
- $("login").style.display="none";
+ if(typeof refreshUserSidebar==="function" && me)refreshUserSidebar();
+ // یک تازه‌سازی دیگر پس از اعمال کامل چیدمان موبایل.
+ requestAnimationFrame(()=>{if(me && $("chat").style.display==="block")refreshUserSidebar();});
  listenMessages("public");
  // مقصد عمومی را پس از بارگذاری اولیه نیز تثبیت کن.
  setTimeout(()=>{
