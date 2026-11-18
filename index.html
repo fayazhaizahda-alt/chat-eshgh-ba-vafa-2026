@@ -1312,10 +1312,19 @@ function refreshUserSidebar(){
  if(sidebar)sidebar.style.setProperty("display","flex","important");
  if(users){users.style.setProperty("display","block","important");users.style.setProperty("visibility","visible","important");}
  if(list){list.style.setProperty("display","flex","important");list.style.setProperty("visibility","visible","important");}
+ // عکس ذخیره‌شده خود کاربر را پیش از ساخت فهرست، در هر دو جایگاه پروفایل همگام کن.
+ const ownProfile=me&&allUsers.find(u=>u.uid===me.uid);
+ const savedPhoto=(ownProfile&&typeof ownProfile.photo==="string"&&ownProfile.photo)?ownProfile.photo:myPhoto;
+ if(savedPhoto){
+  myPhoto=savedPhoto;
+  const ownPhoto=$("myPhoto");
+  if(ownPhoto&&ownPhoto.getAttribute("src")!==savedPhoto)ownPhoto.src=savedPhoto;
+  const headerPhoto=$("headerMyPhoto");
+  if(headerPhoto&&headerPhoto.getAttribute("src")!==savedPhoto)headerPhoto.src=savedPhoto;
+ }
  renderUsers();
- requestAnimationFrame(()=>{if(me)renderUsers();});
- setTimeout(()=>{if(me)renderUsers();},180);
- setTimeout(()=>{if(me)renderUsers();},650);
+ requestAnimationFrame(()=>{if(me){if(savedPhoto){const p=$("myPhoto");if(p&&p.getAttribute("src")!==savedPhoto)p.src=savedPhoto;}renderUsers();}});
+ [180,650,1200].forEach(delay=>setTimeout(()=>{if(me){if(savedPhoto){const p=$("myPhoto");if(p&&p.getAttribute("src")!==savedPhoto)p.src=savedPhoto;}renderUsers();}},delay));
 }
 let selectedProfile=null;
 window.showBotProfile=function(){window.showProfile({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",role:"bot",bot:true,lastSeen:Date.now()});};
