@@ -462,6 +462,7 @@ body:has(#chat[style*="display: block"]) #layout{
 /* نمایش همیشگی فهرست پروفایل‌ها در اتاق چت موبایل؛ ستون پروفایل در سمت راست */
 @media(max-width:760px){
  body:has(#chat[style*="display: block"]) #layout{
+  direction:rtl!important;
   display:grid!important;
   grid-template-columns:minmax(82px,26vw) minmax(0,1fr)!important;
   grid-template-rows:minmax(0,1fr)!important;
