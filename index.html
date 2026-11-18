@@ -457,6 +457,55 @@ body:has(#chat[style*="display: block"]) #layout{
 #messages .empty-public-chat{display:none!important}
 #chatPanel #sendArea{margin-top:10px!important;flex:0 0 auto!important}
 </style>
+
+<style id="profile-sidebar-first-load-fix">
+/* نمایش همیشگی فهرست پروفایل‌ها در اتاق چت موبایل؛ ستون پروفایل در سمت راست */
+@media(max-width:760px){
+ body:has(#chat[style*="display: block"]) #layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(82px,26vw)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  grid-template-areas:"chat sidebar"!important;
+  gap:4px!important;
+ }
+ body:has(#chat[style*="display: block"]) #profileSidebar{
+  display:flex!important;
+  position:static!important;
+  grid-area:sidebar!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:100%!important;
+  max-height:100%!important;
+  margin:0!important;
+  padding:3px!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  visibility:visible!important;
+  opacity:1!important;
+ }
+ body:has(#chat[style*="display: block"]) #profileSidebar #users,
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList{
+  display:flex!important;
+  flex-direction:column!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:100%!important;
+  min-width:0!important;
+ }
+ body:has(#chat[style*="display: block"]) #profileSidebar #users{display:block!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList{display:flex!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar #userList .user{
+  width:100%!important;
+  min-width:0!important;
+  height:80px!important;
+  min-height:80px!important;
+  padding:2px 0!important;
+ }
+ body:has(#chat[style*="display: block"]) #chatPanel{grid-area:chat!important;min-width:0!important}
+}
+</style>
+
 </head>
 <body>
 
