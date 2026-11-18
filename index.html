@@ -1061,10 +1061,11 @@ window.enterChat=async function(){
   $("myPhoto").src=myPhoto||"";
   $("myUid").textContent=me.uid;
 
-  startUsers();
    applySavedChatBackground();
   renderAdminPanel();
   openPublic();
+  // شنونده کاربران را بعد از آشکارشدن اتاق آغاز کن تا رندر اولیه پروفایل‌ها از دست نرود.
+  startUsers();
   startBotModeration();
   await sendBotMessage("سلام "+myDisplayName+" عزیز! به چت عشق با وفا خوش آمدی ❤️");
   // پس از پیام خوش‌آمدگویی، مقصد چت را روی عمومی تثبیت می‌کنیم.
