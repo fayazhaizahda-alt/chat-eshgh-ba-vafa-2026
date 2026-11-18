@@ -1761,11 +1761,16 @@ window.openPublic=function(){
  // مقصد عمومی را پس از بارگذاری اولیه نیز تثبیت کن.
  setTimeout(()=>{
   if(me && $("chat").style.display!=="none"){
-
    $("roomTitle").textContent="💬 گفت‌وگوی عمومی";
    listenMessages("public");
   }
  },500);
+ // تازه‌سازی نهایی پس از کامل‌شدن نمایش صفحه در ورود تازه؛ عکس ذخیره‌شده و وضعیت حضور را اعمال کن.
+ [1200,2200].forEach(delay=>setTimeout(()=>{
+  if(me && $("chat").style.display!=="none"){
+   if(typeof renderUsers==="function")renderUsers();
+  }
+ },delay));
 };
 function listenMessages(){
   stopMessages();
