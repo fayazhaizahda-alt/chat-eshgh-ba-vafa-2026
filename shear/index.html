@@ -22,7 +22,7 @@ main{max-width:560px;margin:0 auto;padding:12px 18px 38px}
 .choice h2{font-size:18px;margin:0 0 7px}.choice p{font-size:12px;color:#8b7180;margin:0;line-height:1.8}
 .arrow{margin-right:auto;color:#a45c7d;font-size:23px}
 .panel{display:none;margin-top:22px;padding:20px;background:#fffafc;border:1px solid #f0d5e1;border-radius:22px;box-shadow:0 8px 24px #7c345010}
-.panel.show{display:block}.panel h2{margin:0 0 10px;font-size:20px}
+.panel.show{display:block}.panel h2{margin:0 0 10px;font-size:20px}.panel-back{display:inline-flex;align-items:center;gap:7px;margin:0 0 14px;padding:10px 15px;border:1px solid #efcbdc;border-radius:999px;background:#fff;color:#8b315c;font:inherit;font-size:13px;cursor:pointer}
 .category-tabs{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 14px;margin:4px 0 10px;scrollbar-width:thin}.category{flex:0 0 auto;border:1px solid #efcbdc;border-radius:999px;background:#fff;color:#80506a;padding:9px 13px;font:inherit;font-size:12px;cursor:pointer}.category.active{background:#a83d70;color:#fff;border-color:#a83d70}.poem{background:#fff;border:1px solid #f1dce6;border-radius:17px;padding:17px;margin:13px 0;box-shadow:0 5px 16px #7c34500b}.poem h3{font-size:16px;margin:0 0 12px;color:#8b315c}.poem p{white-space:pre-line;line-height:2.15;font-size:15px;margin:0 0 13px}.like{border:1px solid #efcbdc;border-radius:999px;background:#fff6fa;color:#963e69;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.like.liked{background:#a83d70;color:white;border-color:#a83d70}.note{font-size:11px;color:#947d89;text-align:center;line-height:1.8;margin-top:14px}
 footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
 
@@ -79,6 +79,7 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
     <span class="arrow">‹</span>
   </button>
   <section class="panel" id="poetryPanel">
+    <button class="panel-back" type="button" data-panel-back>→ بازگشت به صفحهٔ اصلی</button>
     <h2>🌷 گنجینه شعر</h2>
     <div class="category-tabs" id="categoryTabs" aria-label="دسته‌بندی شعرها">
       <button type="button" class="category active" data-category="romantic">❤️ عاشقانه</button>
@@ -106,6 +107,7 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
   </section>
 
   <section class="panel" id="molanaPanel">
+    <button class="panel-back" type="button" data-panel-back>→ بازگشت به صفحهٔ اصلی</button>
     <h2>📜 مثنوی معنوی مولانا</h2>
     <p class="note">شش دفتر مثنوی؛ دفتر دلخواه را انتخاب کنید و متن کامل را بخوانید.</p>
     <div class="molana-reading">
@@ -130,6 +132,7 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
   </section>
 
   <section class="panel" id="saadiPanel">
+    <button class="panel-back" type="button" data-panel-back>→ بازگشت به صفحهٔ اصلی</button>
     <h2>🌿 بوستان سعدی — کتاب کامل</h2>
     <p class="note">متن بوستان در ۱۱ بخش در گنجور فهرست شده است. هر بخش را برای خواندن شعرها و حکایت‌ها باز کنید.</p>
     <div class="book-grid">
@@ -318,17 +321,27 @@ function renderPoems(){
 document.querySelectorAll('.category').forEach(btn=>btn.addEventListener('click',()=>{
  activeCategory=btn.dataset.category;renderPoems();
 }));
-function openPoetSection(category){
- activeCategory=category;
- panel.classList.add('show');
- document.getElementById('categoryTabs').style.display='none';
- button.setAttribute('aria-expanded','true');
- renderPoems();
- panel.scrollIntoView({behavior:'smooth',block:'start'});
+function closePanels(){
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+ button.setAttribute('aria-expanded','false');
+ document.getElementById('categoryTabs').style.display='flex';
+ window.scrollTo({top:0,behavior:'smooth'});
 }
-document.getElementById('molanaButton').addEventListener('click',()=>{const p=document.getElementById('molanaPanel');p.classList.toggle('show');document.getElementById('poetryPanel').classList.remove('show');p.scrollIntoView({behavior:'smooth',block:'start'});});
-document.getElementById('saadiButton').addEventListener('click',()=>{const p=document.getElementById('saadiPanel');p.classList.toggle('show');document.getElementById('poetryPanel').classList.remove('show');document.getElementById('molanaPanel').classList.remove('show');p.scrollIntoView({behavior:'smooth',block:'start'});});
+function showPanel(panelId){
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+ const p=document.getElementById(panelId);p.classList.add('show');
+ if(!history.state||history.state.shearPanel!==panelId)history.pushState({shearPanel:panelId},'','#'+panelId);
+ p.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function openPoetSection(category){
+ activeCategory=category;document.getElementById('categoryTabs').style.display='none';
+ button.setAttribute('aria-expanded','true');renderPoems();showPanel('poetryPanel');
+}
+document.getElementById('molanaButton').addEventListener('click',()=>showPanel('molanaPanel'));
+document.getElementById('saadiButton').addEventListener('click',()=>showPanel('saadiPanel'));
 document.getElementById('wisdomButton').addEventListener('click',()=>openPoetSection('wisdom'));
+document.querySelectorAll('[data-panel-back]').forEach(btn=>btn.addEventListener('click',()=>{if(history.state&&history.state.shearPanel)history.back();else closePanels();}));
+window.addEventListener('popstate',()=>{const id=history.state&&history.state.shearPanel;if(id){document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('show',p.id===id));document.getElementById('categoryTabs').style.display=id==='poetryPanel'&&activeCategory!=='wisdom'?'flex':'none';document.getElementById('poetryButton').setAttribute('aria-expanded',String(id==='poetryPanel'));document.getElementById(id).scrollIntoView({block:'start'});}else closePanels();});
 renderPoems();
 
 document.getElementById("showPoemForm").addEventListener("click",()=>{document.getElementById("poemForm").style.display="block";});
@@ -351,14 +364,9 @@ document.getElementById("poemForm").addEventListener("submit",async event=>{
 watchSharedPoems();
 
 button.addEventListener('click',()=>{
-  const opened=panel.classList.toggle('show');
-  button.setAttribute('aria-expanded',String(opened));
-  document.getElementById('categoryTabs').style.display=opened?'flex':'none';
-  if(opened){
-    activeCategory='romantic';
-    renderPoems();
-    panel.scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  if(panel.classList.contains('show')){if(history.state&&history.state.shearPanel)history.back();else closePanels();return;}
+  activeCategory='romantic';document.getElementById('categoryTabs').style.display='flex';
+  button.setAttribute('aria-expanded','true');renderPoems();showPanel('poetryPanel');
 });
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 </script>
