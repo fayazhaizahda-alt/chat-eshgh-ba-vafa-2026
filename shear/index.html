@@ -35,6 +35,15 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
 #molanaPanel .molana-actions a{display:inline-block;padding:10px 14px;border-radius:999px;background:#a83d70;color:#fff;text-decoration:none;font-size:13px}
 @media(max-width:360px){#molanaPanel .book-grid{grid-template-columns:1fr}}
 
+
+#saadiPanel .book-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+#saadiPanel .book-card{display:block;padding:14px 10px;border:1px solid #d9e8d7;border-radius:15px;background:linear-gradient(145deg,#fff,#f2faf0);color:#365b3d;text-align:center;text-decoration:none;box-shadow:0 4px 14px #345d3510}
+#saadiPanel .book-card strong{display:block;font-size:14px;margin-bottom:5px}
+#saadiPanel .book-card small{color:#718c75;font-size:11px}
+#saadiPanel .saadi-reading{padding:15px;border:1px solid #d9e8d7;border-radius:16px;background:#fff;margin:12px 0;line-height:2.1}
+#saadiPanel .saadi-actions a{display:inline-block;padding:10px 14px;border-radius:999px;background:#527d58;color:#fff;text-decoration:none;font-size:13px;margin:4px}
+@media(max-width:360px){#saadiPanel .book-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -118,6 +127,31 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
       <a href="https://divansara.ir/poets/moulavi/masnavi" target="_blank" rel="noopener">فهرست شعرهای شش دفتر</a>
     </div>
     <p class="note">متن کامل در منبع آزاد آنلاین باز می‌شود؛ در حال حاضر متن کامل شش دفتر هنوز داخل فایل برنامه ذخیره نشده است.</p>
+  </section>
+
+  <section class="panel" id="saadiPanel">
+    <h2>🌿 بوستان سعدی</h2>
+    <p class="note">کتاب منظوم سعدی در ده باب؛ هر باب درباره یکی از فضیلت‌های اخلاقی و انسانی است.</p>
+    <div class="saadi-reading">
+      <h3 style="margin:0 0 8px;color:#527d58">ده باب بوستان</h3>
+      <div class="book-grid">
+        <div class="book-card"><strong>۱. عدل و تدبیر</strong><small>دادگری و شیوه فرمانروایی</small></div>
+        <div class="book-card"><strong>۲. احسان</strong><small>نیکی و بخشندگی</small></div>
+        <div class="book-card"><strong>۳. عشق و مستی</strong><small>عشق و شوریدگی</small></div>
+        <div class="book-card"><strong>۴. تواضع</strong><small>فروتنی</small></div>
+        <div class="book-card"><strong>۵. رضا</strong><small>خشنودی و پذیرش</small></div>
+        <div class="book-card"><strong>۶. قناعت</strong><small>بسنده‌کردن و خرسندی</small></div>
+        <div class="book-card"><strong>۷. تربیت</strong><small>آموزش و پرورش</small></div>
+        <div class="book-card"><strong>۸. شکر</strong><small>سپاسگزاری</small></div>
+        <div class="book-card"><strong>۹. توبه</strong><small>بازگشت و پشیمانی</small></div>
+        <div class="book-card"><strong>۱۰. مناجات</strong><small>نیایش و راز و نیاز</small></div>
+      </div>
+    </div>
+    <div class="saadi-actions">
+      <a href="https://poetrycodex.com/work/bustan-fa/" target="_blank" rel="noopener">خواندن متن فارسی بوستان</a>
+      <a href="https://www.loc.gov/item/2017406026/" target="_blank" rel="noopener">دیدن نسخه خطی بوستان</a>
+    </div>
+    <p class="note">برای خواندن متن کامل، پیوند متن فارسی را باز کنید. متن کامل هنوز داخل فایل برنامه ذخیره نشده است.</p>
   </section>
 </main>
 <footer>با مهر و عشق 🌹</footer>
@@ -296,7 +330,7 @@ function openPoetSection(category){
  panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
 document.getElementById('molanaButton').addEventListener('click',()=>{const p=document.getElementById('molanaPanel');p.classList.toggle('show');document.getElementById('poetryPanel').classList.remove('show');p.scrollIntoView({behavior:'smooth',block:'start'});});
-document.getElementById('saadiButton').addEventListener('click',()=>openPoetSection('saadi'));
+document.getElementById('saadiButton').addEventListener('click',()=>{const p=document.getElementById('saadiPanel');p.classList.toggle('show');document.getElementById('poetryPanel').classList.remove('show');document.getElementById('molanaPanel').classList.remove('show');p.scrollIntoView({behavior:'smooth',block:'start'});});
 document.getElementById('wisdomButton').addEventListener('click',()=>openPoetSection('wisdom'));
 renderPoems();
 
