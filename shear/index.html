@@ -340,13 +340,15 @@ function saadiVerses(poem){
  const sections=poem.Sections||poem.sections||[];
  let verses=[];
  for(const section of sections){
+  const plain=section.PlainText||section.plainText;
+  if(plain){verses.push(plain);continue;}
   const list=section.Verses||section.verses||[];
   for(const v of list){
    if(typeof v==='string') verses.push(v);
    else {
-    const a=v.Verse1??v.verse1??v.Misra1??v.misra1??v.Text??v.text??'';
-    const b=v.Verse2??v.verse2??v.Misra2??v.misra2??'';
-    const line=[a,b].filter(Boolean).join('  ');
+    const x=v.Verse1??v.verse1??v.Misra1??v.misra1??v.Text??v.text??'';
+    const y=v.Verse2??v.verse2??v.Misra2??v.misra2??'';
+    const line=[x,y].filter(Boolean).join('  ');
     if(line)verses.push(line);
    }
   }
@@ -364,15 +366,14 @@ async function saadiLoadCategory(cat,container){
  container.appendChild(wrap);
  const target=wrap.querySelector('.saadi-poems');
  if(!poems.length){target.textContent='در این بخش شعری ثبت نشده است.';return;}
- const poemHtml=[];
- for(const item of poems){
+ const poemHtml=await Promise.all(poems.map(async item=>{
   try{
    const data=await saadiGet(saadiPath(item.FullUrl));
    const lines=saadiVerses(data);
-   const poemTitle=data.FullTitle||data.Title||item.Title||'شعر سعدی';
-   poemHtml.push('<article style="padding:14px 0;border-bottom:1px solid #d8c9aa"><h4>'+saadiEsc(poemTitle)+'</h4><p style="white-space:pre-line;line-height:2.1">'+saadiEsc(lines.join('\n'))+'</p></article>');
-  }catch(e){poemHtml.push('<p class="note">بارگذاری یک شعر انجام نشد.</p>');}
- }
+   const poemTitle=data.Title||item.Title||'شعر سعدی';
+   return '<article style="padding:14px 0;border-bottom:1px solid #d8c9aa"><h4>'+saadiEsc(poemTitle)+'</h4><p style="white-space:pre-line;line-height:2.1">'+saadiEsc(lines.join('\\n'))+'</p></article>';
+  }catch(e){return '<p class="note">بارگذاری یک شعر انجام نشد.</p>';}
+ }));
  target.innerHTML=poemHtml.join('');
 }
 document.getElementById('loadSaadiBook').addEventListener('click',async()=>{
