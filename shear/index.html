@@ -133,43 +133,11 @@ footer{text-align:center;color:#987f8d;font-size:11px;padding:16px}
 
   <section class="panel" id="saadiPanel">
     <button class="panel-back" type="button" data-panel-back>→ بازگشت به صفحهٔ اصلی</button>
-    <h2>🌿 بوستان سعدی — کتاب کامل</h2>
-    <p class="note">متن بوستان در ۱۱ بخش در گنجور فهرست شده است. هر بخش را برای خواندن شعرها و حکایت‌ها باز کنید.</p>
-    <div class="saadi-reading">
-      <h3 style="margin:0 0 10px;color:#527d58">آغاز بوستان — در نیایش خداوند</h3>
-      <p style="white-space:pre-line;margin:0">به نام خداوندِ جان‌آفرین
-حکیمِ سخن‌ در زبان‌آفرین
-
-خداوند بخشندهٔ دستگیر
-کریم خطابخش پوزش‌پذیر
-
-عزیزی که هر کز درش سر بتافت
-به هر در که شد هیچ عزّت نیافت
-
-سر پادشاهان گردن‌فراز
-به درگاه او بر زمینِ نیاز
-
-نه گردن‌کشان را بگیرد به فور
-نه عذرآوران را براند به جور</p>
-      <small>سعدی — بوستان، در نیایش خداوند</small>
-    </div>
-    <div class="book-grid">
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/niyayesh" target="_blank" rel="noopener"><strong>📖 در نیایش خداوند</strong><small>آغاز بوستان</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab1" target="_blank" rel="noopener"><strong>📖 باب اول</strong><small>عدل و تدبیر و رای</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab2" target="_blank" rel="noopener"><strong>📖 باب دوم</strong><small>احسان</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab3" target="_blank" rel="noopener"><strong>📖 باب سوم</strong><small>عشق و مستی و شور</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab4" target="_blank" rel="noopener"><strong>📖 باب چهارم</strong><small>تواضع</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab5" target="_blank" rel="noopener"><strong>📖 باب پنجم</strong><small>رضا</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab6" target="_blank" rel="noopener"><strong>📖 باب ششم</strong><small>قناعت</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab7" target="_blank" rel="noopener"><strong>📖 باب هفتم</strong><small>عالم تربیت</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab8" target="_blank" rel="noopener"><strong>📖 باب هشتم</strong><small>شکر بر عافیت</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab9" target="_blank" rel="noopener"><strong>📖 باب نهم</strong><small>توبه و راه صواب</small></a>
-      <a class="book-card" href="https://ganjoor.net/saadi/boostan/bab10" target="_blank" rel="noopener"><strong>📖 باب دهم</strong><small>مناجات و ختم کتاب</small></a>
-    </div>
-    <div class="saadi-actions">
-      <a href="https://ganjoor.net/saadi/boostan" target="_blank" rel="noopener">باز کردن فهرست کامل بوستان</a>
-    </div>
-    <p class="note">متن کامل آنلاین از گنجور باز می‌شود؛ برای استفاده آفلاین باید متن را جداگانه به برنامه اضافه کنیم.</p>
+    <h2>🌿 بوستان سعدی</h2>
+    <p class="note">متن بوستان در همین برنامه نمایش داده می‌شود. برای دریافت متن کامل کتاب، دکمهٔ زیر را بزنید.</p>
+    <button class="book-card" id="loadSaadiBook" type="button" style="width:100%;cursor:pointer"><strong>📖 خواندن بوستان سعدی</strong><small>۱۱ بخش، متن شعرها و حکایت‌ها</small></button>
+    <p id="saadiLoadStatus" class="note" aria-live="polite"></p>
+    <div id="saadiBookContent"></div>
   </section>
 </main>
 <footer>با مهر و عشق 🌹</footer>
@@ -356,7 +324,71 @@ function openPoetSection(category){
  button.setAttribute('aria-expanded','true');renderPoems();showPanel('poetryPanel');
 }
 document.getElementById('molanaButton').addEventListener('click',()=>showPanel('molanaPanel'));
+
 document.getElementById('saadiButton').addEventListener('click',()=>showPanel('saadiPanel'));
+
+// متن بوستان از داده‌های عمومی گنجور دریافت و درون همین صفحه نمایش داده می‌شود.
+const saadiDataBase='https://cdn.jsdelivr.net/gh/ganjoor/ganjoor-data@main/';
+const saadiEsc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+function saadiPath(fullUrl){return 'poets/saadi'+fullUrl.replace(/^\/saadi/,'')+'.json';}
+async function saadiGet(path){
+ const response=await fetch(saadiDataBase+path);
+ if(!response.ok) throw new Error('بارگذاری متن ممکن نشد ('+response.status+')');
+ return response.json();
+}
+function saadiVerses(poem){
+ const sections=poem.Sections||poem.sections||[];
+ let verses=[];
+ for(const section of sections){
+  const list=section.Verses||section.verses||[];
+  for(const v of list){
+   if(typeof v==='string') verses.push(v);
+   else {
+    const a=v.Verse1??v.verse1??v.Misra1??v.misra1??v.Text??v.text??'';
+    const b=v.Verse2??v.verse2??v.Misra2??v.misra2??'';
+    const line=[a,b].filter(Boolean).join('  ');
+    if(line)verses.push(line);
+   }
+  }
+ }
+ if(!verses.length && Array.isArray(poem.Verses)) verses=poem.Verses.map(v=>typeof v==='string'?v:[v.Verse1,v.Verse2].filter(Boolean).join('  ')).filter(Boolean);
+ return verses;
+}
+async function saadiLoadCategory(cat,container){
+ const catData=await saadiGet(saadiPath(cat.FullUrl));
+ const title=cat.Title||catData.Title||'بخش بوستان';
+ const poems=catData.Poems||[];
+ const wrap=document.createElement('section');
+ wrap.className='saadi-reading';
+ wrap.innerHTML='<h3>'+saadiEsc(title)+'</h3><div class="saadi-poems">در حال دریافت شعرها...</div>';
+ container.appendChild(wrap);
+ const target=wrap.querySelector('.saadi-poems');
+ if(!poems.length){target.textContent='در این بخش شعری ثبت نشده است.';return;}
+ const poemHtml=[];
+ for(const item of poems){
+  try{
+   const data=await saadiGet(saadiPath(item.FullUrl));
+   const lines=saadiVerses(data);
+   const poemTitle=data.FullTitle||data.Title||item.Title||'شعر سعدی';
+   poemHtml.push('<article style="padding:14px 0;border-bottom:1px solid #d8c9aa"><h4>'+saadiEsc(poemTitle)+'</h4><p style="white-space:pre-line;line-height:2.1">'+saadiEsc(lines.join('\n'))+'</p></article>');
+  }catch(e){poemHtml.push('<p class="note">بارگذاری یک شعر انجام نشد.</p>');}
+ }
+ target.innerHTML=poemHtml.join('');
+}
+document.getElementById('loadSaadiBook').addEventListener('click',async()=>{
+ const status=document.getElementById('saadiLoadStatus'),content=document.getElementById('saadiBookContent'),btn=document.getElementById('loadSaadiBook');
+ if(btn.dataset.loaded==='yes'){content.hidden=!content.hidden;return;}
+ btn.disabled=true;status.textContent='در حال دریافت متن بوستان؛ لطفاً چند لحظه صبر کنید...';content.innerHTML='';
+ try{
+  const root=await saadiGet('poets/saadi/boostan/_cat.json');
+  const cats=root.ChildCats||[];
+  for(const cat of cats) await saadiLoadCategory(cat,content);
+  btn.dataset.loaded='yes';btn.textContent='📖 پنهان کردن متن بوستان';
+  status.textContent='متن بخش‌های بوستان بارگذاری شد و در همین برنامه نمایش داده می‌شود.';
+ }catch(error){console.error(error);status.textContent='متن کتاب دریافت نشد. لطفاً اینترنت را بررسی کنید و دوباره بزنید.';}
+ finally{btn.disabled=false;}
+});
+
 document.getElementById('wisdomButton').addEventListener('click',()=>openPoetSection('wisdom'));
 document.querySelectorAll('[data-panel-back]').forEach(btn=>btn.addEventListener('click',()=>{if(history.state&&history.state.shearPanel)history.back();else closePanels();}));
 window.addEventListener('popstate',()=>{const id=history.state&&history.state.shearPanel;if(id){document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('show',p.id===id));document.getElementById('categoryTabs').style.display=id==='poetryPanel'&&activeCategory!=='wisdom'?'flex':'none';document.getElementById('poetryButton').setAttribute('aria-expanded',String(id==='poetryPanel'));document.getElementById(id).scrollIntoView({block:'start'});}else closePanels();});
