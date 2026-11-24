@@ -578,6 +578,12 @@ body:has(#chat[style*="display: block"]) #layout{
  #messages:before,#messages:after{letter-spacing:3px!important}
 }
 
+
+#ownerBackgroundControls{display:block!important;padding:14px!important;margin:14px 0!important;border:2px solid #e8a4ce!important;border-radius:16px!important;background:linear-gradient(145deg,#fff2fa,#f8d8ed)!important;color:#4b1740!important}
+#ownerBackgroundControls h4,#ownerBackgroundControls p{color:#4b1740!important}
+#ownerBackgroundControls .preset-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+#ownerBackgroundControls button{display:block!important;width:100%!important;box-sizing:border-box!important;margin:7px 0!important;padding:12px!important;border:0!important;border-radius:12px!important;background:linear-gradient(100deg,#c52b88,#8d1a68)!important;color:#fff!important;text-align:center!important;font-weight:bold!important;cursor:pointer!important}
+#chatSettingsStatus{padding:8px!important;border-radius:10px!important;background:#fff!important;color:#6d2052!important;line-height:1.8!important}
 </style>
 
 <style id="profile-sidebar-first-load-fix">
@@ -2445,6 +2451,20 @@ window.closeRulesModal=function(){const m=document.getElementById("chatRulesModa
 <div class="settings-card">
 <h3>🎨 تنظیمات صفحه چت</h3>
 <p class="small">این بخش فقط برای مدیر اصلی است. تغییر نام و عکس در صفحه پروفایل شما قرار دارد.</p>
+<div id="ownerBackgroundControls">
+<hr style="border-color:#8053a2;margin:14px 0">
+<h4 style="margin:14px 0 8px;text-align:center">🖼️ عکس پس‌زمینه چت را انتخاب کن</h4>
+<div class="preset-grid">
+<button type="button" onclick="setChatBackground('night')">🌙 شب بنفش</button>
+<button type="button" onclick="setChatBackground('mountain')">🏔️ کوهستان</button>
+<button type="button" onclick="setChatBackground('rose')">🌹 گل سرخ</button>
+<button type="button" onclick="setChatBackground('stars')">✨ ستاره‌ها</button>
+</div>
+<p>عکس دلخواهت را از گالری گوشی انتخاب کن:</p>
+<input id="ownerBackgroundFile" type="file" accept="image/*" onchange="uploadChatBackground(event)" style="display:block;width:100%;margin:10px 0;padding:10px;background:#fff;color:#30132b;border-radius:12px">
+<button type="button" onclick="resetChatBackground()">بازنشانی پس‌زمینه</button>
+<p id="chatSettingsStatus">پس‌زمینه فعلی در همین دستگاه ذخیره می‌شود.</p>
+</div>
 <div style="padding:12px;margin:12px 0;border:1px solid #a65cff;border-radius:14px;background:#241044">
  <h4 style="margin:0 0 8px;text-align:center">👁️ نمایش پروفایل خودم در فهرست کاربران</h4>
  <p id="ownerProfileVisibilityStatus" class="small">فعال است: پروفایل شما در فهرست کاربران نمایش داده می‌شود.</p>
@@ -2476,20 +2496,7 @@ window.closeRulesModal=function(){const m=document.getElementById("chatRulesModa
  <button type="button" onclick="saveBotReplies()">💾 ذخیره پاسخ‌های هیله</button>
  <p id="botRepliesStatus" class="small">هر پاسخ در یک خط جداگانه نوشته شود.</p>
 </div>
-<div id="ownerBackgroundControls">
-<hr style="border-color:#8053a2;margin:14px 0">
-<h4 style="margin:14px 0 8px;text-align:center">🖼️ مدیریت پس‌زمینه اتاق چت</h4>
-<div class="preset-grid">
-<button type="button" onclick="setChatBackground('night')">🌙 شب بنفش</button>
-<button type="button" onclick="setChatBackground('mountain')">🏔️ کوهستان</button>
-<button type="button" onclick="setChatBackground('rose')">🌹 گل سرخ</button>
-<button type="button" onclick="setChatBackground('stars')">✨ ستاره‌ها</button>
-</div>
-<p>یا عکس دلخواه از گوشی:</p>
-<input id="ownerBackgroundFile" type="file" accept="image/*" onchange="uploadChatBackground(event)">
-<button type="button" onclick="resetChatBackground()">بازنشانی پس‌زمینه</button>
-<p id="chatSettingsStatus">پس‌زمینه فعلی در همین دستگاه ذخیره می‌شود.</p>
-</div>
+
 <button type="button" onclick="closeSettings()">بستن</button>
 </div></div>
 <div id="privateChatModal" style="display:none;position:fixed;inset:0;z-index:100002;background:#090018e8;align-items:center;justify-content:center;padding:14px">
