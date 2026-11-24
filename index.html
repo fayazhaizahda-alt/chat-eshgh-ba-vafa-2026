@@ -456,6 +456,31 @@ body:has(#chat[style*="display: block"]) #layout{
 #messages{display:flex!important;visibility:visible!important;flex:1 1 auto!important;width:100%!important;min-height:240px!important;max-height:none!important;overflow-y:auto!important}
 #messages .empty-public-chat{display:none!important}
 #chatPanel #sendArea{margin-top:10px!important;flex:0 0 auto!important}
+
+/* بازآرایی صفحه اصلی چت عشق با وفا؛ مدیریت و قوانین فقط در منوی پروفایل */
+#chatTopbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:linear-gradient(100deg,#7b145f,#b52b86,#77165f);border:0;box-shadow:0 4px 16px #3c073044}
+#chatTopbar button{color:#fff;background:transparent;border:0;border-radius:14px;min-width:42px;min-height:42px;font-size:22px}
+#chatTopbar button:nth-child(3){display:none!important}
+#chatTopbar .room-picker{flex:1;text-align:center;font-size:14px!important;font-weight:bold}
+#chatPanel{background:linear-gradient(160deg,#fff5fb,#f7e4f2)!important;color:#4b1740!important;border:0!important;border-radius:20px!important;padding:10px!important}
+#roomTitle{color:#8e236c!important}
+#messages{background:radial-gradient(circle at 15% 15%,#ffe5f5,transparent 34%),linear-gradient(160deg,#fff5fb,#f4dff0 58%,#fcecf6)!important;border:1px solid #ecc1df!important;border-radius:18px!important;padding:14px!important}
+#messages:before{content:"♡   ♡   ♡";display:block!important;color:#e58ac4!important;opacity:.22!important;text-shadow:none!important}
+#messages:after{content:"🌹";display:block!important;opacity:.18!important}
+.message-body{background:#fff!important;color:#421d39!important;border:1px solid #f0d4e7!important;border-radius:18px!important;box-shadow:0 3px 10px #8f3c7020!important}
+.msg.mine .message-body{background:#f9d9ed!important;border-color:#edb6d8!important}
+.message-sender-link{color:#8e236c!important}
+#sendArea{background:#fff0f8!important;border:1px solid #e9b9d8!important;border-radius:28px!important;padding:7px!important}
+#sendArea textarea{background:#fff!important;color:#421d39!important;border:1px solid #f0d4e7!important}
+#sendArea button{background:linear-gradient(135deg,#c43d91,#85206d)!important;color:#fff!important;border-radius:22px!important}
+#profileSidebar{background:#fff5fb!important;color:#4b1740!important;border:1px solid #e8bdd9!important;border-radius:18px!important}
+#profileSidebar .panel,#users{background:linear-gradient(160deg,#fff,#fbe9f4)!important;color:#4b1740!important;border:1px solid #efc9e1!important}
+#users .user{background:#fff!important;color:#4b1740!important;border:1px solid #f0d5e7!important}
+#users .user-profile-name{color:#64204f!important}
+#selfProfileControls button{background:linear-gradient(100deg,#b52b86,#76205f)!important;color:white!important;border:0!important;border-radius:14px!important;padding:11px!important;margin:5px 0!important}
+#profileCard{background:linear-gradient(160deg,#fff7fc,#f6e4f0)!important;color:#4b1740!important;border:1px solid #e8bdd9!important;border-radius:22px!important}
+@media(max-width:760px){#chatTopbar{min-height:56px;padding:4px 7px}#chatTopbar button{min-width:34px;min-height:38px;font-size:19px}#chatPanel{padding:6px!important}#messages{padding:9px!important}}
+
 </style>
 
 <style id="profile-sidebar-first-load-fix">
@@ -701,7 +726,9 @@ body:has(#chat[style*="display: block"]) #sendArea button:last-child{background:
 <input id="selfProfilePhotoInput" type="file" accept="image/*" hidden onchange="changeProfilePhoto(event)">
 <p id="profileCardPhotoStatus" class="small"></p>
 <hr style="border-color:#8053a2;margin:12px 0">
-<button type="button" onclick="openSettings()">🎨 تنظیمات صفحه چت</button>
+<button type="button" onclick="openMainMenu();closeProfile()">👥 مدیریت کاربران</button>
+<button type="button" onclick="openRulesModal()">📜 قوانین و مقررات</button>
+<button type="button" onclick="openSettings()">⚙️ تنظیمات و مدیریت هیله</button>
 
 </div>
 <div id="otherProfileControls" style="display:none;margin:12px 0;padding:12px;border:1px solid #9b65c6;border-radius:14px;background:#241044">
@@ -2312,6 +2339,10 @@ window.exitChat=async function(){
  $("password").value="";
 };
 
+
+window.openRulesModal=function(){const m=document.getElementById("chatRulesModal");if(m)m.style.display="flex";};
+window.closeRulesModal=function(){const m=document.getElementById("chatRulesModal");if(m)m.style.display="none";};
+
 </script>
 
 <div id="passwordChangeModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:18px">
@@ -2388,6 +2419,14 @@ window.exitChat=async function(){
   <p id="privateChatStatus" style="margin:0;font-size:12px;color:#f3d7ff"></p>
   <button type="button" onclick="sendPrivateMessage()" style="padding:11px;border:0;border-radius:14px;background:#7817c9;color:white">ارسال پیام</button>
   <button type="button" onclick="closePrivateChat()" style="padding:10px;border:1px solid #d8a6ff;border-radius:14px;background:transparent;color:white">بستن</button>
+ </div>
+</div>
+
+<div id="chatRulesModal" style="display:none;position:fixed;inset:0;z-index:100003;background:#090018e8;align-items:center;justify-content:center;padding:16px">
+ <div style="width:100%;max-width:430px;max-height:85dvh;overflow:auto;background:linear-gradient(145deg,#351364,#1c103b);border:2px solid #bb73ff;border-radius:20px;padding:20px;color:#fff">
+  <h3 style="margin:0 0 12px;text-align:center">📜 قوانین چت عشق با وفا</h3>
+  <p style="line-height:2;font-size:14px">۱. با همه کاربران با احترام رفتار کنید.<br>۲. توهین، تهدید و آزار دیگران ممنوع است.<br>۳. فرستادن پیام‌های تبلیغاتی و مزاحمت‌آمیز ممنوع است.<br>۴. اطلاعات خصوصی خود و دیگران را بدون اجازه منتشر نکنید.<br>۵. دستورهای مدیران و مدیر اصلی را رعایت کنید.<br>۶. در صورت نقض قوانین، پیام یا حساب کاربر ممکن است محدود شود.</p>
+  <button type="button" onclick="closeRulesModal()" style="width:100%;padding:11px;border:0;border-radius:12px;background:#7817c9;color:white">بستن</button>
  </div>
 </div>
 </body>
