@@ -584,6 +584,37 @@ body:has(#chat[style*="display: block"]) #layout{
 #ownerBackgroundControls .preset-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
 #ownerBackgroundControls button{display:block!important;width:100%!important;box-sizing:border-box!important;margin:7px 0!important;padding:12px!important;border:0!important;border-radius:12px!important;background:linear-gradient(100deg,#c52b88,#8d1a68)!important;color:#fff!important;text-align:center!important;font-weight:bold!important;cursor:pointer!important}
 #chatSettingsStatus{padding:8px!important;border-radius:10px!important;background:#fff!important;color:#6d2052!important;line-height:1.8!important}
+
+/* FIX: visible user profiles and real uploaded chat background */
+@media(max-width:760px){
+ body:has(#chat[style*="display: block"]) #layout,
+ body:has(#chat[style*="display: flex"]) #layout{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(112px,24vw)!important;
+  grid-template-rows:minmax(0,1fr)!important;grid-template-areas:"chat sidebar"!important;
+  gap:5px!important;width:100%!important;min-width:0!important;
+ }
+ body:has(#chat[style*="display: block"]) #chatPanel,
+ body:has(#chat[style*="display: flex"]) #chatPanel{grid-area:chat!important;width:100%!important;min-width:0!important}
+ body:has(#chat[style*="display: block"]) #profileSidebar,
+ body:has(#chat[style*="display: flex"]) #profileSidebar{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  position:static!important;grid-area:sidebar!important;width:100%!important;
+  min-width:0!important;max-width:none!important;height:100%!important;
+  padding:4px!important;overflow-y:auto!important;overflow-x:hidden!important;
+  background:linear-gradient(180deg,#fff0fa,#f7d5ed)!important;border:1px solid #e9a5d0!important;
+ }
+ #profileSidebar #myProfilePanel,#profileSidebar #botProfileSlot{display:none!important}
+ #profileSidebar #users{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-width:0!important;max-height:none!important;min-height:0!important;padding:3px!important;background:transparent!important}
+ #profileSidebar #users h3{display:block!important;color:#702052!important;font-size:10px!important}
+ #profileSidebar #userList{display:flex!important;visibility:visible!important;flex-direction:column!important;width:100%!important;gap:7px!important}
+ #profileSidebar #userList .user{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;width:100%!important;height:auto!important;min-height:64px!important;padding:5px 2px!important;border:1px solid #e8b5d7!important;border-radius:12px!important;background:#fff!important;color:#4b1740!important}
+ #profileSidebar #userList .user-profile-name{display:block!important;width:100%!important;color:#4b1740!important;font-size:10px!important;text-align:center!important;white-space:normal!important}
+ #profileSidebar #userList .avatar{display:block!important;width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:50%!important;object-fit:cover!important}
+ .user-country-flag{display:inline-flex!important}
+}
+#messages{background-color:transparent!important;background-image:none!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+#messages:before,#messages:after{content:none!important;display:none!important}
+
 </style>
 
 <style id="profile-sidebar-first-load-fix">
@@ -2288,9 +2319,9 @@ window.openMainMenu=function(){const side=$("profileSidebar");if(side.style.disp
 window.openSettings=function(){if(!me||me.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر تنظیمات چت را دارد.");return;}const ownerControls=$("ownerBackgroundControls");if(ownerControls)ownerControls.style.display="block";refreshOwnerProfileVisibilityUI();refreshGuestProfilePermissionUI();$("chatSettingsModal").style.display="flex";loadModerationTerms();loadBotAvatar();};window.closeSettings=function(){$("chatSettingsModal").style.display="none";if(me)refreshUserSidebar();};
 const chatBackgrounds={night:"radial-gradient(circle at 80% 15%,#fff 0 2px,transparent 3px),linear-gradient(145deg,#17113e,#442080 55%,#170c36)",mountain:"radial-gradient(circle at 82% 15%,#fff0a8 0 6%,transparent 6.5%),linear-gradient(165deg,transparent 48%,#39206c 48.5% 55%,transparent 55.5%),linear-gradient(180deg,#4e2a9a,#d34cae 58%,#20104b)",rose:"radial-gradient(circle at 85% 20%,#ff426c 0 5%,transparent 5.5%),linear-gradient(145deg,#35123e,#70204d 55%,#1e123e)",stars:"radial-gradient(circle at 12% 18%,#fff 0 1px,transparent 2px),radial-gradient(circle at 70% 22%,#fff 0 1px,transparent 2px),linear-gradient(145deg,#080d35,#30106e 60%,#100d36)"};
 window.setChatBackground=function(k){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");return;}if(!chatBackgrounds[k])return;$("messages").style.backgroundImage=chatBackgrounds[k];try{localStorage.setItem("loveChatBackground",k);localStorage.removeItem("loveChatCustomBackground");$("chatSettingsStatus").textContent="پس‌زمینه ذخیره شد.";}catch(e){}};
-window.uploadChatBackground=function(ev){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");if(ev.target)ev.target.value="";return;}const f=ev.target.files?.[0];if(!f)return;if(!f.type.startsWith("image/")||f.size>6*1024*1024)return alert("یک عکس کمتر از ۶ مگابایت انتخاب کن.");const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const scale=Math.min(1,1400/im.width,1000/im.height),c=document.createElement("canvas");c.width=im.width*scale;c.height=im.height*scale;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const data=c.toDataURL("image/jpeg",.7);try{localStorage.setItem("loveChatCustomBackground",data);localStorage.removeItem("loveChatBackground");$("messages").style.backgroundImage="url('"+data+"')";$("chatSettingsStatus").textContent="عکس در همین گوشی ذخیره شد.";}catch(e){$("chatSettingsStatus").textContent="حجم عکس زیاد است؛ عکس کوچک‌تری انتخاب کن."}};im.src=r.result;};r.readAsDataURL(f);ev.target.value="";};
-function applySavedChatBackground(){try{const custom=localStorage.getItem("loveChatCustomBackground"),key=localStorage.getItem("loveChatBackground");if(custom)$("messages").style.backgroundImage="url('"+custom+"')";else if(chatBackgrounds[key])$("messages").style.backgroundImage=chatBackgrounds[key];}catch(e){}}
-window.resetChatBackground=function(){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");return;}try{localStorage.removeItem("loveChatBackground");localStorage.removeItem("loveChatCustomBackground");}catch(e){}$("messages").style.backgroundImage="";$("chatSettingsStatus").textContent="پس‌زمینه پیش‌فرض فعال شد.";};
+window.uploadChatBackground=function(ev){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");if(ev.target)ev.target.value="";return;}const f=ev.target.files?.[0];if(!f)return;if(!f.type.startsWith("image/")||f.size>6*1024*1024)return alert("یک عکس کمتر از ۶ مگابایت انتخاب کن.");const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const scale=Math.min(1,1400/im.width,1000/im.height),c=document.createElement("canvas");c.width=im.width*scale;c.height=im.height*scale;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const data=c.toDataURL("image/jpeg",.7);try{localStorage.setItem("loveChatCustomBackground",data);localStorage.removeItem("loveChatBackground");$("messages").style.setProperty("background-image","url('"+data+"')","important");$("messages").style.setProperty("background-size","cover","important");$("messages").style.setProperty("background-position","center","important");$("chatSettingsStatus").textContent="عکس در همین گوشی ذخیره شد.";}catch(e){$("chatSettingsStatus").textContent="حجم عکس زیاد است؛ عکس کوچک‌تری انتخاب کن."}};im.src=r.result;};r.readAsDataURL(f);ev.target.value="";};
+function applySavedChatBackground(){try{const custom=localStorage.getItem("loveChatCustomBackground"),key=localStorage.getItem("loveChatBackground");if(custom){$("messages").style.setProperty("background-image","url('"+custom+"')","important");$("messages").style.setProperty("background-size","cover","important");$("messages").style.setProperty("background-position","center","important");}else if(chatBackgrounds[key])$("messages").style.setProperty("background-image",chatBackgrounds[key],"important");}catch(e){}}
+window.resetChatBackground=function(){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");return;}try{localStorage.removeItem("loveChatBackground");localStorage.removeItem("loveChatCustomBackground");}catch(e){}$("messages").style.removeProperty("background-image");$("chatSettingsStatus").textContent="پس‌زمینه پیش‌فرض فعال شد.";};
 window.toggleChatEmoji=function(){const p=$("chatEmojiPanel");p.style.display=p.style.display==="flex"?"none":"flex";};
 window.addEmoji=function(emoji){$("message").value+=emoji;$("message").focus();};
 window.sendPhotoMessage=async function(event){
