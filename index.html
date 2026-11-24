@@ -1515,10 +1515,10 @@ function renderUsers(){
   profiles.push({uid:me.uid,name:myName||ownDisplayName,displayName:ownDisplayName,photo:currentMyPhoto||"",role:myRole||"user",lastSeen:now,self:true});
  }
  profiles.push({uid:"CHAT_BOT",name:"هیله",displayName:"هیله",photo:botAvatarPhoto,bot:true,lastSeen:now});
- // تا ۳۰ ثانیه پس از آخرین ضربان آنلاین؛ ۲۰ ثانیه بعد از آفلاین شدن هم نشان بده و سپس پنهان کن.
+ // همه پروفایل‌های ثبت‌شده نمایش داده می‌شوند؛ کاربران آفلاین هم از فهرست حذف نمی‌شوند.
  const ageOf=u=>now-Number(u.lastSeen||0);
  const isOnline=u=>!!(u.lastSeen&&ageOf(u)>=0&&ageOf(u)<30000);
- const otherUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.uid!=="CHAT_BOT"&&u.lastSeen&&ageOf(u)>=0&&ageOf(u)<=50000);
+ const otherUsers=allUsers.filter(u=>u.uid!==me?.uid&&u.uid!==OWNER_UID&&u.uid!=="CHAT_BOT"&&u.banned!==true&&(u.displayName||u.name||u.username));
  otherUsers.sort((a,b)=>{
   const onlineA=isOnline(a)?0:1,onlineB=isOnline(b)?0:1;
   if(onlineA!==onlineB)return onlineA-onlineB;
