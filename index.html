@@ -553,6 +553,31 @@ body:has(#chat[style*="display: block"]) #layout{
  #users .avatar{width:28px!important;height:28px!important;flex-basis:28px!important}
 }
 
+
+/* جزئیات بصری: گل‌های رز، کارت‌های افقی، بیرق و حباب‌های عاشقانه */
+#layout{grid-template-columns:minmax(190px,34%) minmax(0,1fr)!important}
+#profileSidebar{background:linear-gradient(160deg,#fff0faee,#f7d8efee),radial-gradient(circle at 15% 10%,#ff9bd533,transparent 35%)!important}
+#users .user{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;min-height:66px!important;height:auto!important;padding:7px 8px!important;border:1px solid #efc3df!important;border-radius:15px!important;background:linear-gradient(100deg,#fff,#ffe8f5)!important;box-shadow:0 2px 8px #a32c7020!important;position:relative!important}
+#users .user-profile-name{order:1!important;flex:1!important;width:auto!important;height:auto!important;text-align:right!important;color:#552044!important;font-size:13px!important;white-space:normal!important}
+#users .avatar{order:0!important;width:46px!important;height:46px!important;flex:0 0 46px!important;border:2px solid #e8a4ce!important;box-shadow:0 0 0 3px #ffe2f2!important}
+#users .user-presence-status{order:3!important;width:auto!important;height:auto!important;font-size:9px!important;line-height:1.2!important;text-align:right!important}
+.user-country-flag{order:2!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:27px!important;font-size:21px!important;filter:drop-shadow(0 1px 1px #0002)}
+#messages{background-color:#f8d7ed!important;background-image:radial-gradient(ellipse at 10% 90%,#ff5ca844,transparent 34%),radial-gradient(ellipse at 88% 15%,#fff8 0 8%,transparent 32%),radial-gradient(circle at 78% 72%,#ff9bd455 0 2px,transparent 3px),radial-gradient(circle at 25% 35%,#fff9 0 2px,transparent 3px),linear-gradient(145deg,#ffe8f6,#f7bfe1 50%,#ffeaf7)!important;position:relative!important}
+#messages:before{content:"🌸  🌹  💗  🌺  🌸"!important;position:sticky!important;top:0!important;align-self:flex-end!important;display:block!important;width:100%!important;text-align:right!important;font-size:clamp(18px,3vw,30px)!important;letter-spacing:9px!important;opacity:.30!important;pointer-events:none!important;z-index:0!important;text-shadow:0 2px 8px #fff!important}
+#messages:after{content:"🌹   🌸   💐   🌷"!important;position:sticky!important;bottom:0!important;display:block!important;width:100%!important;text-align:left!important;font-size:clamp(20px,3vw,34px)!important;letter-spacing:7px!important;opacity:.34!important;pointer-events:none!important;z-index:0!important}
+.message-body{border:1px solid #efc0df!important;box-shadow:0 5px 15px #9b2c7025!important}
+.msg.mine .message-body{background:linear-gradient(135deg,#ffd8ef,#f7bfe1)!important}
+#roomTitle{background:linear-gradient(90deg,#fff0f8,#f9d5eb,#fff0f8)!important;border:1px solid #efc0df!important;border-radius:16px!important;padding:9px!important}
+#sendArea{box-shadow:0 4px 16px #9b2c7020!important}
+@media(max-width:760px){
+ #users .user{min-height:56px!important;padding:5px!important;gap:5px!important}
+ #users .avatar{width:34px!important;height:34px!important;flex-basis:34px!important}
+ #users .user-profile-name{font-size:10px!important}
+ .user-country-flag{min-width:18px!important;font-size:16px!important}
+ #users .user-presence-status{font-size:8px!important}
+ #messages:before,#messages:after{letter-spacing:3px!important}
+}
+
 </style>
 
 <style id="profile-sidebar-first-load-fix">
@@ -1499,32 +1524,14 @@ function renderUsers(){
   const btn=document.createElement("button");
   btn.type="button";
   btn.className="user";
-  /* چیدمان قطعی: نام در ردیف بالا و عکس در ردیف پایین */
-  btn.style.setProperty("display","flex","important");
-  btn.style.setProperty("flex-direction","column","important");
-  btn.style.setProperty("align-items","center","important");
-  btn.style.setProperty("justify-content","flex-start","important");
-  btn.style.setProperty("gap","2px","important");
-  btn.style.setProperty("height","80px","important");
-  btn.style.setProperty("min-height","80px","important");
-  btn.style.setProperty("padding","2px 0","important");
-  btn.style.setProperty("width","100%","important");
-  const info=document.createElement("span");
+  /* کارت افقی کاربر: عکس، نام، وضعیت و بیرق */
+  btn.style.removeProperty("flex-direction");
+  btn.style.removeProperty("height");
+  btn.style.removeProperty("min-height");
+    const info=document.createElement("span");
   info.className="user-profile-name";
   info.textContent=u.bot?"هیله":(u.displayName||u.name||"کاربر");
-  info.style.setProperty("display","block","important");
-  info.style.setProperty("order","0","important");
-  info.style.setProperty("position","static","important");
-  info.style.setProperty("width","100%","important");
-  info.style.setProperty("height","20px","important");
-  info.style.setProperty("line-height","19px","important");
-  info.style.setProperty("font-size","12px","important");
-  info.style.setProperty("font-weight","bold","important");
-  info.style.setProperty("text-align","center","important");
-  info.style.setProperty("white-space","nowrap","important");
-  info.style.setProperty("overflow","hidden","important");
-  info.style.setProperty("text-overflow","ellipsis","important");
-  info.style.setProperty("color","#fff","important");
+  info.style.cssText="display:block;order:1;flex:1;min-width:0;font-size:14px;font-weight:800;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#552044";
   const img=document.createElement("img");
   img.className="avatar";
   img.loading="eager";
@@ -1532,12 +1539,7 @@ function renderUsers(){
   img.style.setProperty("visibility","visible","important");
   img.style.setProperty("opacity","1","important");
   img.style.setProperty("display","block","important");
-  img.style.setProperty("position","static","important");
-  img.style.setProperty("order","1","important");
-  img.style.setProperty("transform","none","important");
-  img.style.setProperty("width","42px","important");
-  img.style.setProperty("height","42px","important");
-  img.style.setProperty("flex","0 0 42px","important");
+  img.style.cssText="display:block;order:0;width:48px;height:48px;flex:0 0 48px;object-fit:cover;border-radius:50%;border:2px solid #e8a4ce";
   img.alt="پروفایل "+(u.displayName||u.name||"کاربر");
   img.style.setProperty("object-fit","cover","important");
   img.style.setProperty("border-radius","50%","important");
@@ -1555,16 +1557,13 @@ function renderUsers(){
   const status=document.createElement("span");
   status.className="user-presence-status";
   status.textContent=online?"● آنلاین":"● آفلاین";
-  status.style.setProperty("display","block","important");
-  status.style.setProperty("order","2","important");
-  status.style.setProperty("width","100%","important");
-  status.style.setProperty("height","12px","important");
-  status.style.setProperty("line-height","12px","important");
-  status.style.setProperty("font-size","8px","important");
-  status.style.setProperty("font-weight","bold","important");
-  status.style.setProperty("text-align","center","important");
-  status.style.setProperty("color",online?"#35ef8b":"#111111","important");
+  status.style.cssText="display:block;order:3;font-size:10px;font-weight:bold;white-space:nowrap;color:"+(online?"#16884c":"#888");
+  status.textContent=online?"● آنلاین":"● آفلاین";
   status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
+  const flag=document.createElement("span");
+  flag.className="user-country-flag";
+  flag.textContent=countryFlag(String(u.countryCode||u.country_code||(u.self?profile?.countryCode:"")||"").toUpperCase());
+  flag.title=u.countryName||u.country_name||"کشور ثبت‌شده کاربر";
   if(isOwner){
    const crown=document.createElement("span");
    crown.className="owner-crown";
@@ -1585,9 +1584,9 @@ function renderUsers(){
    crown.style.setProperty("color",online?"#FFD700":"#111111","important");
    btn.style.setProperty("position","relative","important");
    btn.style.setProperty("overflow","visible","important");
-   btn.append(info,img,status,crown);
+   btn.append(img,info,flag,status,crown);
   }else{
-   btn.append(info,img,status);
+   btn.append(img,info,flag,status);
   }
   btn.setAttribute("aria-label",(u.displayName||u.name||"کاربر")+"، "+(online?"آنلاین":"آفلاین"));
   btn.onclick=()=>window.showProfile(u);
