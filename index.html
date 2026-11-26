@@ -1599,7 +1599,7 @@ function renderUsers(){
   status.setAttribute("aria-label",online?"آنلاین":"آفلاین");
   const flag=document.createElement("span");
   flag.className="user-country-flag";
-  flag.textContent=countryFlag(String(u.countryCode||u.country_code||(u.self?profile?.countryCode:"")||"").toUpperCase());
+  flag.textContent=countryFlag(String(u.countryCode||u.country_code||"").toUpperCase());
   flag.title=u.countryName||u.country_name||"کشور ثبت‌شده کاربر";
   if(isOwner){
    const crown=document.createElement("span");
