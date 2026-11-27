@@ -2105,6 +2105,11 @@ window.openPublic=function(){
  // یک تازه‌سازی دیگر پس از اعمال کامل چیدمان موبایل.
  requestAnimationFrame(()=>{if(me && $("chat").style.display==="block")refreshUserSidebar();});
  listenMessages("public");
+ // پس‌زمینه را بعد از بازشدن کامل اتاق و آماده‌شدن بخش پیام‌ها از فضای ابری دوباره اعمال کن.
+ if(typeof applySavedChatBackground==="function"){
+  requestAnimationFrame(()=>{if(me && $("chat").style.display==="block")applySavedChatBackground();});
+  setTimeout(()=>{if(me && $("chat").style.display==="block")applySavedChatBackground();},700);
+ }
  // مقصد عمومی را پس از بارگذاری اولیه نیز تثبیت کن.
  setTimeout(()=>{
   if(me && $("chat").style.display!=="none"){
