@@ -2327,7 +2327,41 @@ async function saveChatBackground(data){try{const localDb=await openChatBackgrou
 }
 async function readChatBackground(){try{const snap=await getDoc(doc(db,"settings","chatBackground"));if(snap.exists()&&snap.data().imageData)return snap.data().imageData;}catch(e){console.warn("Shared background read failed",e);}try{const localDb=await openChatBackgroundDB();const data=await new Promise((resolve,reject)=>{const req=localDb.transaction("settings","readonly").objectStore("settings").get("customBackground");req.onsuccess=()=>resolve(req.result||"");req.onerror=()=>reject(req.error);});localDb.close();if(data)return data;}catch(e){}try{return localStorage.getItem("loveChatCustomBackground")||"";}catch(e){return "";}}
 window.uploadChatBackground=async function(ev){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");if(ev.target)ev.target.value="";return;}const f=ev.target.files?.[0];if(!f)return;if(!f.type.startsWith("image/")||f.size>12*1024*1024){alert("یک عکس کمتر از ۱۲ مگابایت انتخاب کن.");ev.target.value="";return;}try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(reader.error);reader.onload=()=>{const im=new Image();im.onerror=reject;im.onload=()=>{const scale=Math.min(1,1000/im.width,1000/im.height),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));c.getContext("2d").drawImage(im,0,0,c.width,c.height);resolve(c.toDataURL("image/jpeg",.48));};im.src=reader.result;};reader.readAsDataURL(f);});if(data.length>850000)throw new Error("image-too-large");await saveChatBackground(data);try{localStorage.removeItem("loveChatBackground");}catch(e){}setVisibleChatBackground(data);$("chatSettingsStatus").textContent="پس‌زمینه برای همه کاربران ذخیره شد.";}catch(e){$("chatSettingsStatus").textContent=e.message==="image-too-large"?"حجم عکس پس از فشرده‌سازی هنوز زیاد است؛ عکس کوچک‌تری انتخاب کن.":"ذخیره ابری انجام نشد؛ تنظیمات دسترسی Firebase را بررسی کن.";console.error("Shared chat background save failed",e);}finally{if(ev.target)ev.target.value="";}};
-async function applySavedChatBackground(){try{const snap=await getDoc(doc(db,"settings","chatBackground"));if(snap.exists()){const data=snap.data();if(data.imageData)setVisibleChatBackground(data.imageData);else if(chatBackgrounds[data.preset])$("messages").style.setProperty("background-image",chatBackgrounds[data.preset],"important");}else{const custom=await readChatBackground(),key=localStorage.getItem("loveChatBackground");if(custom)setVisibleChatBackground(custom);else if(chatBackgrounds[key])$("messages").style.setProperty("background-image",chatBackgrounds[key],"important");}if(sharedBackgroundUnsub)sharedBackgroundUnsub();sharedBackgroundUnsub=onSnapshot(doc(db,"settings","chatBackground"),snap=>{if(snap.exists()){const data=snap.data();if(data.imageData)setVisibleChatBackground(data.imageData);else if(chatBackgrounds[data.preset])$("messages").style.setProperty("background-image",chatBackgrounds[data.preset],"important");}else{$("messages").style.setProperty("background-image","linear-gradient(160deg,#211052,#351078 55%,#180b3b)","important");$("messages").style.removeProperty("background-size");}},err=>console.warn("Shared background listener failed",err));}catch(e){console.error("Chat background restore failed",e);}}
+async function applySavedChatBackground(){
+ // ابتدا نسخه محلی را نشان بده تا هنگام قطع اینترنت پس‌زمینه ناپدید نشود.
+ try{
+  const localCustom=await readChatBackground();
+  const localPreset=localStorage.getItem("loveChatBackground");
+  if(localCustom)setVisibleChatBackground(localCustom);
+  else if(chatBackgrounds[localPreset])$("messages").style.setProperty("background-image",chatBackgrounds[localPreset],"important");
+ }catch(localError){console.warn("Local background restore failed",localError);}
+ // سپس نسخه مشترک فایربیس را بخوان و جایگزین کن.
+ try{
+  const snap=await getDoc(doc(db,"settings","chatBackground"));
+  if(snap.exists()){
+   const data=snap.data();
+   if(data.imageData)setVisibleChatBackground(data.imageData);
+   else if(chatBackgrounds[data.preset])$("messages").style.setProperty("background-image",chatBackgrounds[data.preset],"important");
+  }else{
+   $("messages").style.setProperty("background-image","linear-gradient(160deg,#211052,#351078 55%,#180b3b)","important");
+   $("messages").style.removeProperty("background-size");
+  }
+ }catch(e){console.warn("Cloud background restore deferred until connection returns",e);}
+ if(sharedBackgroundUnsub)sharedBackgroundUnsub();
+ sharedBackgroundUnsub=onSnapshot(doc(db,"settings","chatBackground"),snap=>{
+  if(snap.exists()){
+   const data=snap.data();
+   if(data.imageData)setVisibleChatBackground(data.imageData);
+   else if(chatBackgrounds[data.preset])$("messages").style.setProperty("background-image",chatBackgrounds[data.preset],"important");
+  }else{
+   $("messages").style.setProperty("background-image","linear-gradient(160deg,#211052,#351078 55%,#180b3b)","important");
+   $("messages").style.removeProperty("background-size");
+  }
+ },err=>console.warn("Shared background listener failed; will retry on reconnect",err));
+}
+// بعد از وصل‌شدن دوباره اینترنت، پس‌زمینه مشترک را مجدداً از فایربیس بخوان.
+window.addEventListener("online",()=>{if(me)setTimeout(()=>applySavedChatBackground(),500);});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&navigator.onLine&&me)applySavedChatBackground();});
 
 window.resetChatBackground=async function(){if(me?.uid!==OWNER_UID){alert("فقط مدیر اصلی اجازه تغییر پس‌زمینه را دارد.");return;}try{await deleteDoc(doc(db,"settings","chatBackground"));}catch(e){console.error("Shared background reset failed",e);$("chatSettingsStatus").textContent="حذف پس‌زمینه مشترک انجام نشد؛ دسترسی Firebase را بررسی کن.";return;}try{localStorage.removeItem("loveChatBackground");localStorage.removeItem("loveChatCustomBackground");}catch(e){}try{const localDb=await openChatBackgroundDB();const tx=localDb.transaction("settings","readwrite");tx.objectStore("settings").delete("customBackground");tx.oncomplete=()=>localDb.close();}catch(e){}$("messages").style.setProperty("background-image","linear-gradient(160deg,#211052,#351078 55%,#180b3b)","important");$("messages").style.removeProperty("background-size");$("chatSettingsStatus").textContent="پس‌زمینه مشترک برای همه کاربران پاک شد.";};
 window.toggleChatEmoji=function(){const p=$("chatEmojiPanel");p.style.display=p.style.display==="flex"?"none":"flex";};
